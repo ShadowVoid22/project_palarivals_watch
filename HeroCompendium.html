@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hero Compendium | PalaRivals Watch</title>
+  <link rel="stylesheet" href="css/main/HeroCompendium.css">
+</head>
+<body>
+  <header class="compendium-header">
+    <div>
+      <p>PALARIVALS WATCH</p>
+      <h1>Hero Compendium</h1>
+      <span id="heroCount">Loading heroes...</span>
+    </div>
+    <a href="Main.html">Back to Main Menu</a>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Hero filters">
+      <label>Search <input id="heroSearch" type="search" placeholder="Search heroes..."></label>
+      <label>Universe
+        <select id="universeFilter">
+          <option value="all">All Universes</option>
+        </select>
+      </label>
+      <label>Trait
+        <select id="traitFilter">
+          <option value="all">All Traits</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="heroGrid" class="hero-grid" aria-live="polite"></section>
+    <p id="emptyState" hidden>No heroes match your filters.</p>
+  </main>
+
+  <dialog id="heroDialog">
+    <article id="heroDetails"></article>
+    <button id="closeDialog" type="button">Close</button>
+  </dialog>
+
+  <script src="data/hero-chess.js"></script>
+  <script src="data/hero-abilities.js"></script>
+  <script src="data/hero-traits.js"></script>
+  <script src="js/main/HeroCompendium.js"></script>
+</body>
+</html>
