@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-app.get("/api/getuser", async (req, res) => {
+app.get("/api/getusers", async (req, res) => {
     try {
         const users = await database.getUsers();
 
