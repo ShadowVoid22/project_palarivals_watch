@@ -29,8 +29,10 @@ async function getHeroes() {
 async function getHeroID(Hero) {
         const pool = await poolPromise;
     
-    const result = await pool.request().query(`
-        select HeroID from Heroes where HeroName = ${Hero}
+    const result = await pool.request()
+    .input("hero", sql.VarChar, Hero)
+    .query(`
+        select HeroID from Heroes where HeroName = @hero
     `);
 
     return result.recordset;
@@ -79,7 +81,7 @@ async function getUserID(Username) {
 async function getUsersHeroes() {
     const pool = await poolPromise;
 
-    const pool = await pool.request().query(`
+    const result = await pool.request().query(`
             select *
             from UsersHeroes
     `);
