@@ -20,7 +20,7 @@ async function submitClicked(){
 }
 
 async function tryLogin(){
-    const users = getUsers(UsernameInput.value);
+    const users = await getUsers(UsernameInput.value);
     console.log(users);
 }
 
