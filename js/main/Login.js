@@ -29,7 +29,7 @@ async function checkUsernameLength(){
 }
 
 async function tryLogin(){
-    if (checkUsernameLength) {
+    if (await checkUsernameLength === true) {
         const users = await getUsers(UsernameInput.value);
         console.log(users);
         console.log("PLEASE WORK");
