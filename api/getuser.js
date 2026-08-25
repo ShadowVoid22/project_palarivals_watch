@@ -1,4 +1,4 @@
-const database = require("../database");
+const database = require("../Database");
 
 module.exports = async (req, res) => {
     try {
