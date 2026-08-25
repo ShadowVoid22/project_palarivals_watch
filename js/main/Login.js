@@ -11,7 +11,7 @@ LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
 SubmitButton.addEventListener("click", () => submitClicked());
 
-aync function submitClicked(){
+async function submitClicked(){
     if (Login){
         tryLogin();
     } else {
