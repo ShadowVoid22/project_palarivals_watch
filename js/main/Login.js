@@ -30,7 +30,7 @@ async function trySignUp(){
 
 async function getUsers(Username) {
     let api = `/api/getuser`;
-    if (Username !== undefined){
+    if (Username !== undefined && Username !== ""){
         api += `?username=${encodeURIComponent(Username)}`
     }
     const response = await fetch(api);
