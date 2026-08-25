@@ -9,7 +9,7 @@ Login = true;
 
 LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
-SubmitButton.addEventListener("click", () => submitClicked());
+SubmitButton.addEventListener("click", () => submitClicked);
 
 async function submitClicked(){
     if (Login){
