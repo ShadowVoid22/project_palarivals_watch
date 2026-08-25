@@ -11,13 +11,40 @@ LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
 SubmitButton.addEventListener("click", () => getUsers());
 
-async function getUsers() {
-    const response = await fetch("/api/getuser");
+aync function submitClicked(){
+    if (Login){
+        tryLogin();
+    } else {
+        trySignUp();
+    }
+}
 
-    console.log("Status:", response.status);
-    console.log("Content-Type:", response.headers.get("content-type"));
+async function tryLogin(){
+    const users = getUsers(UsernameInput.value);
+    console.log(users);
+}
 
-    const text = await response.text();
+async function trySignUp(){
 
-    console.log("Response:", text);
+}
+
+async function getUsers(Username) {
+    let api = `/api/getuser`;
+    if (Username !== undefined){
+        api += `?username=${encodeURIComponent(Username)}`
+    }
+    const response = await fetch(api);
+    const users = await response.json();
+    return users;
+}
+
+async function getUserID(Username) {
+    let api = `/api/getuserid`;
+        if (Username !== undefined){
+        api += `?username=${encodeURIComponent(Username)}`
+    }
+    const response = await fetch(api);
+    const data = await response.json();
+    const userID = data.UserID;
+    return userID;
 }
