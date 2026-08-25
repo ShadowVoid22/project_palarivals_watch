@@ -819,24 +819,138 @@ function aiShopTier() {
   return Math.min(MAX_SHOP_TIER, 1 + Math.floor((gameState.round - 1) / 2));
 }
 
-function chooseAiHero(aiPlayer) {
+const AI_BUILD_STRATEGIES = [
+  { name: "Rivals Vanguard", traits: ["rivals", "brawl", "tank"] },
+  { name: "Overwatch Dive", traits: ["overwatch", "dive", "dps"] },
+  { name: "Realm Artillery", traits: ["paladins", "poke", "dps"] },
+  { name: "Bulwark Core", traits: ["tank", "brawl"] },
+  { name: "Dive Execution", traits: ["dive", "dps"] },
+  { name: "Target Lock", traits: ["poke", "dps"] },
+  { name: "Sustain Engine", traits: ["support", "brawl"] },
+];
+
+function getAiStrategy(aiPlayer) {
+  if (!aiPlayer.aiStrategy) {
+    const aiPlayers = players.filter((player) => !player.isHuman);
+    const aiIndex = Math.max(0, aiPlayers.indexOf(aiPlayer));
+    aiPlayer.aiStrategy = AI_BUILD_STRATEGIES[aiIndex % AI_BUILD_STRATEGIES.length];
+  }
+
+  return aiPlayer.aiStrategy;
+}
+
+function scoreCombatEffects(effects = {}) {
+  const weights = {
+    bonusPower: 2.7,
+    bonusHealth: 1.35,
+    damageReduction: 4.8,
+    dodgeChance: 34,
+    critChance: 30,
+    critDamage: 1.5,
+    firstStrikeBonus: 1.55,
+    lifesteal: 24,
+    onKillHeal: 1.25,
+    thorns: 1.8,
+    executeBonus: 1.2,
+    executeThreshold: 8,
+  };
+
+  return Object.entries(effects).reduce(
+    (score, [effectName, value]) => score + ((weights[effectName] || 0.7) * Number(value || 0)),
+    0,
+  );
+}
+
+function scoreAiTeam(team, aiPlayer) {
+  const deployedTeam = team.filter(Boolean);
+  const strategy = getAiStrategy(aiPlayer);
+  const traitCounts = countTeamTraits(deployedTeam);
+  let score = 0;
+
+  deployedTeam.forEach((hero) => {
+    const traitCombat = heroTraitCombatData(hero, deployedTeam);
+    score += (hero.power * 2.15) + (hero.health * 1.25);
+    score += scoreCombatEffects(hero.ability?.effects);
+    score += scoreCombatEffects(traitCombat.effects);
+    score += Math.max(0, (hero.level || 1) - 1) * 7;
+    score += heroTraitIds(hero).filter((traitId) => strategy.traits.includes(traitId)).length * 2.4;
+  });
+
+  traitCounts.forEach((count, traitId) => {
+    const state = traitState(traitId, deployedTeam);
+    if (state.activeTier) score += state.activeTier.threshold * 3.5;
+    if (strategy.traits.includes(traitId)) score += Math.min(6, count) * 2;
+  });
+
+  score += new Set(deployedTeam.map(heroCatalogId)).size * 1.2;
+  return score;
+}
+
+function cloneAiTeam(team) {
+  return team.filter(Boolean).map((hero) => createHeroInstance({ ...hero }));
+}
+
+function simulateAiRecruit(team, catalogHero) {
+  const simulatedTeam = cloneAiTeam(team);
+  simulatedTeam.push(createHeroInstance(catalogHero));
+  mergeAiDuplicates(simulatedTeam);
+  return simulatedTeam;
+}
+
+function candidateTraitProgressScore(hero, team, strategy) {
+  const beforeCounts = countTeamTraits(team);
+  const alreadyOwned = team.some((ownedHero) => heroCatalogId(ownedHero) === hero.id);
+  let score = 0;
+
+  heroTraitIds(hero).forEach((traitId) => {
+    const beforeCount = beforeCounts.get(traitId) || 0;
+    const afterCount = beforeCount + (alreadyOwned ? 0 : 1);
+    const definition = traitDefinitions[traitId];
+    const crossedTier = definition?.tiers?.find(
+      (tier) => tier.threshold === afterCount && beforeCount < tier.threshold,
+    );
+    if (crossedTier) score += 12 + (crossedTier.threshold * 2.5);
+    else if (!alreadyOwned) score += 2.5;
+    if (strategy.traits.includes(traitId)) score += alreadyOwned ? 1.5 : 6;
+  });
+
+  return score;
+}
+
+function chooseAiHero(aiPlayer, { preferGrowth = false } = {}) {
   const maxTier = aiShopTier();
-  const candidates = heroCatalog.filter((hero) => hero.tier <= maxTier);
+  const unlockedCandidates = heroCatalog.filter((hero) => hero.tier <= maxTier);
+  const unownedCandidates = unlockedCandidates.filter(
+    (hero) => !aiPlayer.team.some((ownedHero) => heroCatalogId(ownedHero) === hero.id),
+  );
+  const candidates = preferGrowth && unownedCandidates.length ? unownedCandidates : unlockedCandidates;
+  const currentScore = scoreAiTeam(aiPlayer.team, aiPlayer);
+  const strategy = getAiStrategy(aiPlayer);
 
   const weightedCandidates = candidates
     .map((hero) => {
-      const matchingCopy = aiPlayer.team.some(
+      const matchingHero = aiPlayer.team.find(
         (ownedHero) => heroCatalogId(ownedHero) === hero.id && ownedHero.level < MAX_HERO_LEVEL,
       );
+      const simulatedTeam = simulateAiRecruit(aiPlayer.team, hero);
+      const completedMerge = simulatedTeam.length === aiPlayer.team.length;
+      const mergeScore = matchingHero
+        ? (completedMerge ? 18 + ((matchingHero.level || 1) * 6) : 7)
+        : 0;
       return {
         hero,
-        score: hero.power + hero.health + (matchingCopy ? 8 : 0) + (Math.random() * 8),
+        score: (scoreAiTeam(simulatedTeam, aiPlayer) - currentScore)
+          + candidateTraitProgressScore(hero, aiPlayer.team, strategy)
+          + mergeScore
+          + (((hero.power * 2) + hero.health + scoreCombatEffects(hero.ability?.effects)) * 0.16)
+          + (Math.random() * 1.8),
       };
     })
     .sort((first, second) => second.score - first.score)
-    .slice(0, Math.max(3, Math.ceil(candidates.length / 2)));
+    .slice(0, Math.min(3, candidates.length));
 
-  return createHeroInstance(weightedCandidates[Math.floor(Math.random() * weightedCandidates.length)].hero);
+  const selectionWindow = weightedCandidates.slice(0, Math.min(2, weightedCandidates.length));
+  return createHeroInstance(selectionWindow[Math.floor(Math.random() * selectionWindow.length)].hero);
 }
 
 function mergeAiDuplicates(team) {
@@ -865,6 +979,61 @@ function mergeAiDuplicates(team) {
   }
 }
 
+function findBestAiUpgrade(aiPlayer) {
+  const maxTier = aiShopTier();
+  const currentScore = scoreAiTeam(aiPlayer.team, aiPlayer);
+  const plans = [];
+
+  heroCatalog.filter((hero) => hero.tier <= maxTier).forEach((catalogHero) => {
+    const matchingCopy = aiPlayer.team.some(
+      (hero) => heroCatalogId(hero) === catalogHero.id
+        && hero.level === 1
+        && hero.level < MAX_HERO_LEVEL,
+    );
+
+    if (matchingCopy) {
+      const mergedTeam = simulateAiRecruit(aiPlayer.team, catalogHero);
+      plans.push({
+        type: "merge",
+        hero: catalogHero,
+        score: scoreAiTeam(mergedTeam, aiPlayer) - currentScore + 14,
+      });
+    }
+
+    aiPlayer.team.forEach((ownedHero, index) => {
+      const replacementTeam = cloneAiTeam(aiPlayer.team);
+      replacementTeam[index] = createHeroInstance(catalogHero);
+      plans.push({
+        type: "replace",
+        hero: catalogHero,
+        index,
+        score: scoreAiTeam(replacementTeam, aiPlayer) - currentScore,
+      });
+    });
+  });
+
+  return plans.sort((first, second) => second.score - first.score)[0] || null;
+}
+
+function updateAiBuildStatus(aiPlayer, targetSize, locked = false) {
+  const strategy = getAiStrategy(aiPlayer);
+  const activeTrait = [...countTeamTraits(aiPlayer.team).keys()]
+    .map((traitId) => traitState(traitId, aiPlayer.team))
+    .filter((state) => state.activeTier)
+    .sort((first, second) => second.activeTier.threshold - first.activeTier.threshold)[0];
+
+  if (locked) {
+    aiPlayer.buildStatus = activeTrait
+      ? `${activeTrait.definition.name} ${activeTrait.count} · locked`
+      : `${strategy.name} · locked`;
+    return;
+  }
+
+  aiPlayer.buildStatus = aiPlayer.team.length >= targetSize
+    ? `Optimizing ${strategy.name}`
+    : `${strategy.name} ${aiPlayer.team.length}/${targetSize}`;
+}
+
 function runAiBuildAction(aiPlayer) {
   if (gameState.phase !== "build" || aiPlayer.eliminated) {
     return;
@@ -873,37 +1042,40 @@ function runAiBuildAction(aiPlayer) {
   const targetSize = aiTeamTargetSize();
 
   if (aiPlayer.team.length < targetSize) {
-    aiPlayer.team.push(chooseAiHero(aiPlayer));
+    aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: aiPlayer.team.length < targetSize - 1 }));
     mergeAiDuplicates(aiPlayer.team);
-  } else if (gameState.round > 1) {
-    const replacement = chooseAiHero(aiPlayer);
-    const mergeTarget = aiPlayer.team.find(
-      (hero) => heroCatalogId(hero) === heroCatalogId(replacement)
-        && hero.level === replacement.level
-        && hero.level < MAX_HERO_LEVEL,
-    );
+  } else {
+    const upgrade = findBestAiUpgrade(aiPlayer);
 
-    if (mergeTarget) {
-      aiPlayer.team.push(replacement);
+    if (upgrade?.type === "merge") {
+      aiPlayer.team.push(createHeroInstance(upgrade.hero));
       mergeAiDuplicates(aiPlayer.team);
-    } else {
-    const weakestIndex = aiPlayer.team.reduce((weakest, hero, index, team) => {
-      const heroScore = hero.power + hero.health;
-      const weakestScore = team[weakest].power + team[weakest].health;
-      return heroScore < weakestScore ? index : weakest;
-    }, 0);
-    const weakestHero = aiPlayer.team[weakestIndex];
-
-    if ((replacement.power + replacement.health) > (weakestHero.power + weakestHero.health)) {
-      aiPlayer.team[weakestIndex] = replacement;
-    }
+    } else if (upgrade?.type === "replace" && upgrade.score > 1.5) {
+      aiPlayer.team[upgrade.index] = createHeroInstance(upgrade.hero);
     }
   }
 
-  aiPlayer.buildStatus = aiPlayer.team.length >= targetSize
-    ? "Squad ready"
-    : `Recruiting ${aiPlayer.team.length}/${targetSize}`;
-  aiPlayer.ready = aiPlayer.team.length >= targetSize;
+  aiPlayer.ready = false;
+  updateAiBuildStatus(aiPlayer, targetSize);
+  renderLeaderboard();
+  renderThreatPreview();
+  renderSpectatorBuildBoard();
+  checkAllPlayersReady();
+}
+
+function finalizeAiBuild(aiPlayer) {
+  if (gameState.phase !== "build" || aiPlayer.eliminated) return;
+  const targetSize = aiTeamTargetSize();
+  let safety = 0;
+
+  while (aiPlayer.team.length < targetSize && safety < 20) {
+    aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: true }));
+    mergeAiDuplicates(aiPlayer.team);
+    safety += 1;
+  }
+
+  aiPlayer.ready = true;
+  updateAiBuildStatus(aiPlayer, targetSize, true);
   renderLeaderboard();
   renderThreatPreview();
   renderSpectatorBuildBoard();
@@ -919,17 +1091,27 @@ function scheduleAiBuilds() {
   clearAiBuildTimers();
   const targetSize = aiTeamTargetSize();
 
-  players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer) => {
+  players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer, aiIndex) => {
     aiPlayer.ready = false;
-    aiPlayer.buildStatus = `Recruiting ${Math.min(aiPlayer.team.length, targetSize)}/${targetSize}`;
-    const actions = Math.max(1, targetSize - aiPlayer.team.length + (gameState.round > 1 ? 1 : 0));
+    const strategy = getAiStrategy(aiPlayer);
+    aiPlayer.buildStatus = `Planning ${strategy.name}`;
+    const actions = Math.max(3, targetSize - aiPlayer.team.length + 2 + (gameState.round > 1 ? 1 : 0));
+    const thinkingPace = 0.86 + ((aiIndex % 7) * 0.08) + (Math.random() * 0.06);
+    const openingThinkTime = 3_200 + (Math.random() * 4_200);
+    const actionThinkTime = (2_600 + (Math.random() * 1_000)) * thinkingPace;
 
     for (let actionIndex = 0; actionIndex < actions; actionIndex += 1) {
-      const delay = 350
-        + (actionIndex * 620)
-        + (Math.random() * 520);
+      const delay = openingThinkTime
+        + (actionIndex * actionThinkTime)
+        + (Math.random() * 220);
       aiBuildTimers.push(window.setTimeout(() => runAiBuildAction(aiPlayer), delay));
     }
+
+    const lockDelay = openingThinkTime
+      + (actions * actionThinkTime)
+      + 1_600
+      + (Math.random() * 3_200);
+    aiBuildTimers.push(window.setTimeout(() => finalizeAiBuild(aiPlayer), lockDelay));
   });
 
   renderLeaderboard();
@@ -942,12 +1124,14 @@ function completeAiBuilds() {
   const targetSize = aiTeamTargetSize();
 
   players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer) => {
-    while (aiPlayer.team.length < targetSize) {
-      aiPlayer.team.push(chooseAiHero(aiPlayer));
+    let safety = 0;
+    while (aiPlayer.team.length < targetSize && safety < 20) {
+      aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: true }));
       mergeAiDuplicates(aiPlayer.team);
+      safety += 1;
     }
     aiPlayer.ready = true;
-    aiPlayer.buildStatus = "Squad locked";
+    updateAiBuildStatus(aiPlayer, targetSize, true);
   });
 
   gameState.pairings.flat().filter((player) => player.isGhost).forEach((ghostPlayer) => {
