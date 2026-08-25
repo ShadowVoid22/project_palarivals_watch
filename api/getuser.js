@@ -1,16 +1,25 @@
-const database = require("../database");
-
 module.exports = async (req, res) => {
     try {
+        const database = require("../database");
+
+        console.log("Database module loaded");
+
         const users = await database.getUsers();
 
-        res.status(200).json(users);
-    } catch (error) {
-        console.error("DATABASE ERROR:");
-        console.error(error);
+        console.log("Users retrieved");
 
-        res.status(500).json({
-            error: error.message
+        return res.status(200).json(users);
+
+    } catch (error) {
+        console.error("================================");
+        console.error("GETUSER ERROR");
+        console.error(error);
+        console.error("================================");
+
+        return res.status(500).json({
+            error: error.message,
+            name: error.name,
+            stack: error.stack
         });
     }
 };
