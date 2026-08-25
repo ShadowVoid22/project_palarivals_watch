@@ -11,10 +11,13 @@ LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
 SubmitButton.addEventListener("click", () => getUsers());
 
-async function getUsers(Username) {
-
+async function getUsers() {
     const response = await fetch("/api/getuser");
-    const users = await response.json();
-    console.log(users);
-    
+
+    console.log("Status:", response.status);
+    console.log("Content-Type:", response.headers.get("content-type"));
+
+    const text = await response.text();
+
+    console.log("Response:", text);
 }
