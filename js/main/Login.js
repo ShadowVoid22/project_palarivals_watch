@@ -19,10 +19,21 @@ async function submitClicked(){
     }
 }
 
+async function checkUsernameLength(){
+    let length = UsernameInput.value.length;
+    if(length >= 3 && length <= 50){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 async function tryLogin(){
-    const users = await getUsers(UsernameInput.value);
-    console.log(users);
-    console.log("PLEASE WORK");
+    if (checkUsernameLength) {
+        const users = await getUsers(UsernameInput.value);
+        console.log(users);
+        console.log("PLEASE WORK");
+    }
 }
 
 async function trySignUp(){
