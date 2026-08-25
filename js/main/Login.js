@@ -21,7 +21,7 @@ async function submitClicked(){
 
 async function tryLogin(){
     const users = await getUsers(UsernameInput.value);
-    console.log(users);
+    console.log(users.Username);
     console.log("PLEASE WORK");
 }
 
