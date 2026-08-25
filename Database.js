@@ -29,7 +29,7 @@ async function getHeroes() {
 async function getHeroID(Hero) {
     const pool = await poolPromise;
     
-    const result = await pool.request();
+    const result = await pool.request()
     .input("hero", sql.VarChar, Hero)
     .query(`
         select HeroID from Heroes where HeroName = @hero
