@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "rules": {
+    "startingCredits": 12,
+    "startingHealth": 100,
+    "buildSeconds": 50,
+    "teamSlots": 6,
+    "shopSize": 3,
+    "rerollCost": 1,
+    "roundIncome": 8,
+    "lossDamageBase": 8,
+    "leaderAscendsEvery": 3
+  },
+  "commandLink": {
+    "tiers": [
+      { "threshold": 2, "name": "Linked", "effects": { "bonusPower": 1, "bonusHealth": 1 }, "text": "Inspired allies gain +1 power and +1 health." },
+      { "threshold": 4, "name": "Synchronized", "effects": { "bonusPower": 3, "bonusHealth": 3 }, "text": "Inspired allies gain +3 power and +3 health." },
+      { "threshold": 6, "name": "Perfect Command", "effects": { "bonusPower": 5, "bonusHealth": 6, "critChance": 0.08 }, "text": "Inspired allies gain +5 power, +6 health, and 8% critical chance." }
+    ]
+  },
+  "aiNames": [
+    "NovaVex", "RocketLynx", "ArcRunner", "PalKeeper", "StarTank", "HeroDraft", "Nexus",
+    "QuantumWarden", "ChronoKnight", "PrismPulse", "VoidRanger", "TitanCircuit", "SolarStriker",
+    "RiftRebel", "NeonVanguard", "ThunderTitan", "VectorVortex", "BlizzardBlade", "HyperHerald"
+  ],
+  "leaders": [
+    {
+      "heroId": "iron-man",
+      "title": "The Futurist",
+      "favored": ["rivals", "poke"],
+      "opposed": ["brawl"],
+      "auraName": "Stark Network",
+      "auraText": "Rivals and Poke heroes gain power and critical targeting. Brawl heroes lose health under rigid flight formations.",
+      "favoredEffects": { "bonusPower": 2, "bonusHealth": 1, "critChance": 0.04 },
+      "opposedEffects": { "bonusPower": -2, "bonusHealth": -3 },
+      "leaderEffects": { "powerMultiplier": 1.8, "healthMultiplier": 1.55, "critChance": 0.2, "firstStrikeBonus": 8 },
+      "ultimate": { "name": "House Party Protocol", "description": "The leader opens with a devastating missile barrage and gains extreme critical targeting.", "effects": { "firstStrikeBonus": 10, "critChance": 0.25 } }
+    },
+    {
+      "heroId": "hulk",
+      "title": "The Worldbreaker",
+      "favored": ["rivals", "brawl"],
+      "opposed": ["poke"],
+      "auraName": "Gamma Stampede",
+      "auraText": "Rivals and Brawl heroes gain durability and lifesteal. Poke heroes lose power when forced into close quarters.",
+      "favoredEffects": { "bonusPower": 1, "bonusHealth": 3, "lifesteal": 0.08 },
+      "opposedEffects": { "bonusPower": -3, "bonusHealth": -1 },
+      "leaderEffects": { "powerMultiplier": 1.7, "healthMultiplier": 1.9, "damageReduction": 2, "onKillPower": 3 },
+      "ultimate": { "name": "Cataclysmic Smash", "description": "The leader gains massive health, ignores damage, and becomes stronger after every knockout.", "effects": { "bonusHealth": 12, "damageReduction": 2, "onKillPower": 4 } }
+    },
+    {
+      "heroId": "tracer",
+      "title": "The Chronal Ace",
+      "favored": ["overwatch", "dive"],
+      "opposed": ["tank"],
+      "auraName": "Recall Squadron",
+      "auraText": "Overwatch and Dive heroes gain dodge and opening damage. Tanks lose health trying to match the tempo.",
+      "favoredEffects": { "bonusPower": 2, "dodgeChance": 0.08, "firstStrikeBonus": 2 },
+      "opposedEffects": { "bonusHealth": -4, "dodgeChance": -0.04 },
+      "leaderEffects": { "powerMultiplier": 1.9, "healthMultiplier": 1.6, "dodgeChance": 0.34, "firstStrikeBonus": 7 },
+      "ultimate": { "name": "Infinite Recall", "description": "The leader becomes exceptionally hard to hit and deals enormous opening damage.", "effects": { "dodgeChance": 0.22, "firstStrikeBonus": 9 } }
+    },
+    {
+      "heroId": "bastion",
+      "title": "The Siege Core",
+      "favored": ["overwatch", "poke"],
+      "opposed": ["dive"],
+      "auraName": "Fortress Grid",
+      "auraText": "Overwatch and Poke heroes gain armor and power. Dive heroes are slowed and lose their opening advantage.",
+      "favoredEffects": { "bonusPower": 2, "bonusHealth": 2, "damageReduction": 1 },
+      "opposedEffects": { "bonusPower": -2, "firstStrikeBonus": -3 },
+      "leaderEffects": { "powerMultiplier": 1.75, "healthMultiplier": 1.8, "damageReduction": 3, "thorns": 3 },
+      "ultimate": { "name": "Configuration: Annihilation", "description": "The leader becomes a fortified gun platform that reflects damage and hits with overwhelming power.", "effects": { "bonusPower": 7, "damageReduction": 2, "thorns": 5 } }
+    },
+    {
+      "heroId": "seris",
+      "title": "The Abyssal Oracle",
+      "favored": ["paladins", "support"],
+      "opposed": ["dps"],
+      "auraName": "Soul Covenant",
+      "auraText": "Paladins and Support heroes gain health drain and recovery. DPS heroes sacrifice raw power to the Abyss.",
+      "favoredEffects": { "bonusHealth": 3, "lifesteal": 0.14, "onKillHeal": 2 },
+      "opposedEffects": { "bonusPower": -3, "critChance": -0.05 },
+      "leaderEffects": { "powerMultiplier": 1.65, "healthMultiplier": 1.85, "lifesteal": 0.55, "onKillHeal": 6 },
+      "ultimate": { "name": "Convergence Beyond", "description": "The leader drains enormous health from every attack and fully feeds on defeated enemies.", "effects": { "lifesteal": 0.35, "onKillHeal": 8 } }
+    },
+    {
+      "heroId": "raum",
+      "title": "The Juggernaut",
+      "favored": ["paladins", "tank"],
+      "opposed": ["poke"],
+      "auraName": "Warpath Pact",
+      "auraText": "Paladins and Tanks gain immense health and retaliation. Poke heroes lose power inside the warpath.",
+      "favoredEffects": { "bonusPower": 1, "bonusHealth": 4, "thorns": 1 },
+      "opposedEffects": { "bonusPower": -3, "bonusHealth": -1 },
+      "leaderEffects": { "powerMultiplier": 1.7, "healthMultiplier": 2, "lifesteal": 0.35, "thorns": 4 },
+      "ultimate": { "name": "Abyssal Cataclysm", "description": "The leader doubles down on health, lifesteal, and punishing retaliation damage.", "effects": { "bonusHealth": 14, "lifesteal": 0.25, "thorns": 5 } }
+    },
+    {
+      "heroId": "spider-man",
+      "title": "The Web Commander",
+      "favored": ["rivals", "dive"],
+      "opposed": ["tank"],
+      "auraName": "Web-Warrior Network",
+      "auraText": "Rivals and Dive heroes gain dodge and execution damage. Tanks become vulnerable inside the web.",
+      "favoredEffects": { "bonusPower": 2, "dodgeChance": 0.07, "executeBonus": 2 },
+      "opposedEffects": { "bonusHealth": -4, "damageReduction": -1 },
+      "leaderEffects": { "powerMultiplier": 1.8, "healthMultiplier": 1.65, "dodgeChance": 0.36, "executeThreshold": 0.5, "executeBonus": 8 },
+      "ultimate": { "name": "Great Web Collapse", "description": "The leader evades attacks and executes weakened enemies with brutal precision.", "effects": { "dodgeChance": 0.2, "executeThreshold": 0.55, "executeBonus": 10 } }
+    },
+    {
+      "heroId": "bomb-king",
+      "title": "His Explosiveness",
+      "favored": ["paladins", "dps"],
+      "opposed": ["support"],
+      "auraName": "Royal Detonation Corps",
+      "auraText": "Paladins and DPS heroes gain critical power. Supports lose health in the blast formation.",
+      "favoredEffects": { "bonusPower": 2, "critChance": 0.08, "critDamage": 2 },
+      "opposedEffects": { "bonusHealth": -3, "lifesteal": -0.08 },
+      "leaderEffects": { "powerMultiplier": 1.9, "healthMultiplier": 1.6, "critChance": 0.35, "critDamage": 7 },
+      "ultimate": { "name": "King Bomb Supreme", "description": "The leader gains exceptional critical chance and catastrophic critical damage.", "effects": { "critChance": 0.25, "critDamage": 9, "firstStrikeBonus": 5 } }
+    }
+  ],
+  "heroes": [
+    { "id": "groot", "name": "Groot", "universe": "rivals", "image": "Img/Characters/MarvelRivals/GrootPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "traits": ["rivals", "brawl", "tank"], "power": 7, "health": 10, "cost": 3, "ability": { "name": "Ironwood Guard", "description": "Gain 4 health and reduce incoming damage.", "effects": { "bonusHealth": 4, "damageReduction": 1 } } },
+    { "id": "hulk", "name": "Hulk", "universe": "rivals", "image": "Img/Characters/MarvelRivals/HulkPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "traits": ["rivals", "brawl", "tank"], "power": 10, "health": 12, "cost": 5, "ability": { "name": "Worldbreaker", "description": "Gain power and heal after a knockout.", "effects": { "bonusPower": 4, "onKillHeal": 3 } } },
+    { "id": "iron-man", "name": "Iron Man", "universe": "rivals", "image": "Img/Characters/MarvelRivals/IronManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "traits": ["rivals", "poke", "dps"], "power": 8, "health": 6, "cost": 4, "ability": { "name": "Maximum Pulse", "description": "Gain critical chance and critical damage.", "effects": { "critChance": 0.18, "critDamage": 3 } } },
+    { "id": "spider-man", "name": "Spider-Man", "universe": "rivals", "image": "Img/Characters/MarvelRivals/SpiderManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "traits": ["rivals", "dive", "dps"], "power": 7, "health": 5, "cost": 3, "ability": { "name": "Spider-Sense", "description": "Dodge attacks and execute weakened enemies.", "effects": { "dodgeChance": 0.22, "executeThreshold": 0.35, "executeBonus": 3 } } },
+    { "id": "thor", "name": "Thor", "universe": "rivals", "image": "Img/Characters/MarvelRivals/ThorPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "traits": ["rivals", "brawl", "tank"], "power": 9, "health": 9, "cost": 4, "ability": { "name": "God of Thunder", "description": "The first strike deals bonus damage.", "effects": { "firstStrikeBonus": 5, "critChance": 0.18 } } },
+    { "id": "bastion", "name": "Bastion", "universe": "overwatch", "image": "Img/Characters/Overwatch/BastionPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "traits": ["overwatch", "poke", "dps"], "power": 9, "health": 7, "cost": 3, "ability": { "name": "Configuration: Assault", "description": "Gain power and reduce incoming damage.", "effects": { "bonusPower": 2, "damageReduction": 1 } } },
+    { "id": "genji", "name": "Genji", "universe": "overwatch", "image": "Img/Characters/Overwatch/GenjiPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "traits": ["overwatch", "dive", "dps"], "power": 6, "health": 5, "cost": 3, "ability": { "name": "Deflect", "description": "Dodge and reflect damage.", "effects": { "dodgeChance": 0.18, "thorns": 2 } } },
+    { "id": "junkrat", "name": "Junkrat", "universe": "overwatch", "image": "Img/Characters/Overwatch/JunkratPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "traits": ["overwatch", "poke", "dps"], "power": 7, "health": 4, "cost": 2, "ability": { "name": "Total Mayhem", "description": "Return explosive damage whenever struck.", "effects": { "thorns": 3 } } },
+    { "id": "roadhog", "name": "Roadhog", "universe": "overwatch", "image": "Img/Characters/Overwatch/Roadhog.png", "logo": "Img/Icons/OverwatchLogo.png", "traits": ["overwatch", "brawl", "tank"], "power": 6, "health": 14, "cost": 3, "ability": { "name": "Take a Breather", "description": "Gain health and lifesteal.", "effects": { "bonusHealth": 3, "lifesteal": 0.35 } } },
+    { "id": "tracer", "name": "Tracer", "universe": "overwatch", "image": "Img/Characters/Overwatch/TracerPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "traits": ["overwatch", "dive", "dps"], "power": 5, "health": 4, "cost": 2, "ability": { "name": "Blink Recall", "description": "Dodge and deal opening damage.", "effects": { "dodgeChance": 0.18, "firstStrikeBonus": 2 } } },
+    { "id": "bomb-king", "name": "Bomb King", "universe": "paladins", "image": "Img/Characters/Paladins/BombKingPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "traits": ["paladins", "poke", "dps"], "power": 10, "health": 8, "cost": 4, "ability": { "name": "Royal Detonation", "description": "Gain critical chance and damage.", "effects": { "critChance": 0.2, "critDamage": 4 } } },
+    { "id": "drogoz", "name": "Drogoz", "universe": "paladins", "image": "Img/Characters/Paladins/DrogozPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "traits": ["paladins", "poke", "dps"], "power": 8, "health": 6, "cost": 3, "ability": { "name": "Dragon Punch", "description": "The opening attack deals bonus damage.", "effects": { "firstStrikeBonus": 6 } } },
+    { "id": "moji", "name": "Moji", "universe": "paladins", "image": "Img/Characters/Paladins/MojiPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "traits": ["paladins", "brawl", "support"], "power": 5, "health": 7, "cost": 2, "ability": { "name": "Familiar Feast", "description": "Execute enemies below half health.", "effects": { "executeThreshold": 0.5, "executeBonus": 8 } } },
+    { "id": "raum", "name": "Raum", "universe": "paladins", "image": "Img/Characters/Paladins/RaumPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "traits": ["paladins", "brawl", "tank"], "power": 7, "health": 12, "cost": 4, "ability": { "name": "Soul Armor", "description": "Gain health and lifesteal.", "effects": { "bonusHealth": 5, "lifesteal": 0.25 } } },
+    { "id": "seris", "name": "Seris", "universe": "paladins", "image": "Img/Characters/Paladins/SerisPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "traits": ["paladins", "poke", "support"], "power": 4, "health": 8, "cost": 3, "ability": { "name": "Soul Collector", "description": "Drain health and heal after knockouts.", "effects": { "lifesteal": 0.45, "onKillHeal": 3 } } }
+  ]
+}

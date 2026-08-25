@@ -6,6 +6,9 @@ const sidelineCountElement = document.querySelector("#sidelineCount");
 const traitListElement = document.querySelector("#traitList");
 const gameStatusElement = document.querySelector("#gameStatus");
 const deploymentWorkspace = document.querySelector("#deploymentWorkspace");
+const spectatorBuildBoard = document.querySelector("#spectatorBuildBoard");
+const spectatorBuildGrid = document.querySelector("#spectatorBuildGrid");
+const spectatorBuilderCount = document.querySelector("#spectatorBuilderCount");
 const teamBoard = document.querySelector("#teamBoard");
 const sidelineBoard = document.querySelector("#sidelineBoard");
 const teamSlots = [...teamBoard.querySelectorAll(".team-slot")];
@@ -30,8 +33,14 @@ const roundValueElement = document.querySelector("#roundValue");
 const teamTitleElement = document.querySelector("#team-title");
 const teamKickerElement = document.querySelector(".stage-header .kicker");
 const combatArena = document.querySelector("#combatArena");
+const combatMatchup = document.querySelector(".combat-matchup");
+const spectatorCombatBroadcast = document.querySelector("#spectatorCombatBroadcast");
+const spectatorCombatGrid = document.querySelector("#spectatorCombatGrid");
+const spectatorBattleCount = document.querySelector("#spectatorBattleCount");
 const playerCombatTeam = document.querySelector("#playerCombatTeam");
 const enemyCombatTeam = document.querySelector("#enemyCombatTeam");
+const playerCombatLabel = document.querySelector("#playerCombatLabel");
+const playerCombatName = document.querySelector("#playerCombatName");
 const enemyCombatName = document.querySelector("#enemyCombatName");
 const combatFeed = document.querySelector("#combatFeed");
 const combatFxLayer = document.querySelector("#combatFxLayer");
@@ -45,6 +54,16 @@ const combatRoundResult = document.querySelector("#combatRoundResult");
 const combatRoundResultKicker = document.querySelector("#combatRoundResultKicker");
 const combatRoundResultTitle = document.querySelector("#combatRoundResultTitle");
 const combatRoundResultDetail = document.querySelector("#combatRoundResultDetail");
+const combatRecapButton = document.querySelector("#combatRecapButton");
+const combatRecap = document.querySelector("#combatRecap");
+const combatRecapSubtitle = document.querySelector("#combatRecapSubtitle");
+const combatRecapTeams = document.querySelector("#combatRecapTeams");
+const combatRecapContinue = document.querySelector("#combatRecapContinue");
+const closeCombatRecapButtons = [...document.querySelectorAll("[data-close-recap]")];
+const spectatorControls = document.querySelector("#spectatorControls");
+const spectatorPrevious = document.querySelector("#spectatorPrevious");
+const spectatorNext = document.querySelector("#spectatorNext");
+const spectatorMatchLabel = document.querySelector("#spectatorMatchLabel");
 const playerListElement = document.querySelector("#playerList");
 const onlineCountElement = document.querySelector("#onlineCount");
 const nextThreatNameElement = document.querySelector("#nextThreatName");
@@ -54,6 +73,7 @@ const matchResult = document.querySelector("#matchResult");
 const matchResultKicker = document.querySelector("#matchResultKicker");
 const matchResultTitle = document.querySelector("#matchResultTitle");
 const matchResultDescription = document.querySelector("#matchResultDescription");
+const spectateMatchButton = document.querySelector("#spectateMatchButton");
 const readyButton = document.querySelector("#readyButton");
 const brandExit = document.querySelector("#brandExit");
 const leaveGameButton = document.querySelector("#leaveGameButton");
@@ -62,6 +82,14 @@ const stayInGameButton = document.querySelector("#stayInGameButton");
 const closeLeaveModalButtons = [...document.querySelectorAll("[data-close-leave-modal]")];
 const heroInfoPopover = document.querySelector("#heroInfoPopover");
 const heroInfoPopoverContent = document.querySelector("#heroInfoPopoverContent");
+const scoutOverlay = document.querySelector("#scoutOverlay");
+const scoutPlayerAvatar = document.querySelector("#scoutPlayerAvatar");
+const scoutPlayerName = document.querySelector("#scoutPlayerName");
+const scoutPlayerStatus = document.querySelector("#scoutPlayerStatus");
+const scoutPlayerSummary = document.querySelector("#scoutPlayerSummary");
+const scoutTraitList = document.querySelector("#scoutTraitList");
+const scoutFormation = document.querySelector("#scoutFormation");
+const closeScoutButtons = [...document.querySelectorAll("[data-close-scout]")];
 
 const gameState = {
   credits: Number(creditsElement.textContent),
@@ -72,6 +100,13 @@ const gameState = {
   buildEndsAt: null,
   pairings: [],
   combatResults: [],
+  viewedCombatResult: null,
+  viewedPairingIndex: 0,
+  spectating: false,
+  spectatedPlayerId: null,
+  eliminationPromptOpen: false,
+  scoutedPlayerId: null,
+  recapPausedRound: false,
   selectedShopId: null,
   shopFrozen: false,
   team: Array(6).fill(null),
@@ -85,7 +120,7 @@ const LEVEL_STAT_MULTIPLIERS = [1, 1.5, 2.25, 3.25];
 const SHOP_UPGRADE_COSTS = { 1: 4, 2: 6, 3: 8 };
 const BUILD_PHASE_DURATION = 60_000;
 const COMBAT_EVENT_DURATION = 780;
-const COMBAT_RESULT_DURATION = 6_000;
+const COMBAT_RESULT_DURATION = 12_000;
 const AI_NAME_SOURCE = "data/ai-names.json";
 const HERO_ABILITY_SOURCE = "data/hero-abilities.json";
 const HERO_TRAIT_SOURCE = "data/hero-traits.json";
@@ -574,8 +609,10 @@ function renderLeaderboard() {
         : player.buildStatus;
     const commanderTag = player.isHuman ? "<small>Commander</small>" : "";
 
+    const scoutLabel = player.isHuman ? "Inspect your squad" : `Scout ${player.name}`;
+
     return `
-      <li class="player-row${player.isHuman ? " player-row--you" : ""}${player.ready && !player.eliminated ? " player-row--ready" : ""}${player.eliminated ? " player-row--eliminated" : ""}" data-player-id="${player.id}">
+      <li class="player-row${player.isHuman ? " player-row--you" : ""}${player.ready && !player.eliminated ? " player-row--ready" : ""}${player.eliminated ? " player-row--eliminated" : ""}${gameState.scoutedPlayerId === player.id ? " player-row--scouted" : ""}" data-player-id="${player.id}" role="button" tabindex="0" aria-label="${scoutLabel}. ${player.eliminated ? "Eliminated" : `${player.hp} health`}">
         <span class="rank">${String(index + 1).padStart(2, "0")}</span>
         <span class="player-avatar avatar--${player.avatar}">${player.initials}</span>
         <div class="player-data">
@@ -584,11 +621,101 @@ function renderLeaderboard() {
           <span class="hp-track"><i style="--hp: ${player.hp}%"></i></span>
         </div>
         <span class="hp-value">${player.eliminated ? "OUT" : player.hp}</span>
+        <span class="player-scout-cue" aria-hidden="true">SCOUT</span>
       </li>
     `;
   }).join("");
 
   onlineCountElement.textContent = getAlivePlayers().length;
+
+  if (!scoutOverlay.hidden && gameState.scoutedPlayerId) {
+    renderScoutPanel(players.find((player) => player.id === gameState.scoutedPlayerId));
+  }
+}
+
+function scoutingStatus(player) {
+  if (player.eliminated) return "Eliminated // Final formation archived";
+  if (gameState.phase === "combat") return "In combat // Formation locked";
+  if (player.isHuman) return `${player.team.filter(Boolean).length}/6 heroes deployed`;
+  return `${player.buildStatus} // ${player.team.filter(Boolean).length}/6 heroes detected`;
+}
+
+function scoutingHeroMarkup(hero, index) {
+  if (!hero) {
+    return `<article class="scout-hero scout-hero--empty"><span>${String(index + 1).padStart(2, "0")}</span><b>Empty</b></article>`;
+  }
+
+  const traits = heroTraitIds(hero)
+    .map((traitId) => traitDefinitions[traitId]?.name)
+    .filter(Boolean)
+    .join(" · ");
+
+  return `
+    <article class="scout-hero" tabindex="0" aria-label="${hero.name}, level ${hero.level || 1}, ${hero.power} power, ${hero.health} health">
+      <span class="scout-hero__index">${String(index + 1).padStart(2, "0")}</span>
+      <img src="${hero.image}" alt="${hero.name}">
+      <div><strong>${hero.name}</strong><small>${hero.ability?.name || "Standard Attack"}</small></div>
+      <b>LV ${hero.level || 1}</b>
+      <p><span>✦ ${hero.power}</span><span>♥ ${hero.health}</span></p>
+      ${traits ? `<em>${traits}</em>` : ""}
+    </article>
+  `;
+}
+
+function renderScoutPanel(player) {
+  if (!player) return;
+
+  const deployedTeam = player.team.filter(Boolean);
+  const traitCounts = countTeamTraits(deployedTeam);
+  const totalPower = deployedTeam.reduce((total, hero) => total + hero.power, 0);
+  const totalHealth = deployedTeam.reduce((total, hero) => total + hero.health, 0);
+  const activeTraits = [...traitCounts]
+    .map(([traitId, count]) => ({ traitId, count, definition: traitDefinitions[traitId] }))
+    .filter(({ definition }) => definition)
+    .sort((first, second) => second.count - first.count);
+
+  scoutPlayerAvatar.className = `scout-panel__avatar avatar--${player.avatar}`;
+  scoutPlayerAvatar.textContent = player.initials;
+  scoutPlayerName.textContent = player.name;
+  scoutPlayerStatus.textContent = scoutingStatus(player);
+  scoutPlayerSummary.innerHTML = `
+    <span><small>Integrity</small><strong>${player.eliminated ? "OUT" : player.hp}</strong></span>
+    <span><small>Units Seen</small><strong>${deployedTeam.length}/6</strong></span>
+    <span><small>Squad Power</small><strong>${totalPower}</strong></span>
+    <span><small>Squad Health</small><strong>${totalHealth}</strong></span>
+  `;
+  scoutTraitList.innerHTML = activeTraits.length
+    ? activeTraits.map(({ traitId, count, definition }) => {
+      const state = traitState(traitId, deployedTeam);
+      return `<span class="scout-trait${state.activeTier ? " scout-trait--active" : ""}"><b>${definition.name}</b><i>${count}</i><small>${state.activeTier ? `${state.activeTier.threshold}-unit active` : "Inactive"}</small></span>`;
+    }).join("")
+    : "<p>No trait data detected yet.</p>";
+  scoutFormation.innerHTML = Array.from({ length: 6 }, (_, index) => scoutingHeroMarkup(deployedTeam[index], index)).join("");
+}
+
+function openScoutPanel(playerId) {
+  const player = players.find((entry) => entry.id === playerId);
+  if (!player) return;
+
+  gameState.scoutedPlayerId = player.id;
+  renderScoutPanel(player);
+  renderLeaderboard();
+  scoutOverlay.hidden = false;
+  scoutOverlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("intel-overlay-open");
+  scoutOverlay.querySelector(".intel-close")?.focus();
+  window.PRWAudio?.play("modalOpen");
+  announce(`Scouting report opened for ${player.name}.`);
+}
+
+function closeScoutPanel() {
+  if (scoutOverlay.hidden) return;
+  scoutOverlay.hidden = true;
+  scoutOverlay.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("intel-overlay-open");
+  gameState.scoutedPlayerId = null;
+  renderLeaderboard();
+  window.PRWAudio?.play("modalClose");
 }
 
 function getHumanPairing() {
@@ -596,6 +723,16 @@ function getHumanPairing() {
 }
 
 function renderThreatPreview() {
+  if (gameState.spectating) {
+    const observedPlayer = players.find((player) => player.id === gameState.spectatedPlayerId && !player.eliminated)
+      || getAlivePlayers()[0];
+    nextThreatNameElement.textContent = observedPlayer?.name || "Spectator Network";
+    nextThreatStatusElement.textContent = observedPlayer
+      ? `Following commander · ${observedPlayer.team.length}/6 heroes`
+      : "Waiting for final result";
+    return;
+  }
+
   const pairing = getHumanPairing();
   const opponent = pairing?.find((player) => !player.isHuman);
 
@@ -611,6 +748,69 @@ function renderThreatPreview() {
     : `${opponent.ready ? "Ready" : opponent.buildStatus} · ${opponent.team.length}/6 heroes`;
 }
 
+function spectatorBuildHeroMarkup(hero, index) {
+  if (!hero) {
+    return `<span class="spectator-builder__empty"><i>${String(index + 1).padStart(2, "0")}</i><b>Open</b></span>`;
+  }
+
+  return `
+    <span class="spectator-builder__hero" title="${hero.name} // Level ${hero.level || 1} // ${hero.power} power // ${hero.health} health">
+      <img src="${hero.image}" alt="${hero.name}">
+      <i>LV ${hero.level || 1}</i>
+      <b>${hero.name}</b>
+      <small><em>✦ ${hero.power}</em><em>♥ ${hero.health}</em></small>
+    </span>
+  `;
+}
+
+function spectatorBuilderMarkup(player, rank) {
+  const deployedTeam = player.team.filter(Boolean);
+  const totalPower = deployedTeam.reduce((total, hero) => total + hero.power, 0);
+  const totalHealth = deployedTeam.reduce((total, hero) => total + hero.health, 0);
+  const traitCounts = [...countTeamTraits(deployedTeam)]
+    .map(([traitId]) => traitState(traitId, deployedTeam))
+    .filter((state) => state.definition)
+    .sort((first, second) => Number(Boolean(second.activeTier)) - Number(Boolean(first.activeTier)) || second.count - first.count)
+    .slice(0, 5);
+
+  return `
+    <article class="spectator-builder${player.ready ? " spectator-builder--ready" : ""}" data-player-id="${player.id}" role="button" tabindex="0" aria-label="Scout ${player.name}'s live build">
+      <header>
+        <span class="spectator-builder__rank">${String(rank + 1).padStart(2, "0")}</span>
+        <span class="spectator-builder__avatar avatar--${player.avatar}">${player.initials}</span>
+        <div><strong>${player.name}</strong><small>${player.buildStatus}</small></div>
+        <span class="spectator-builder__hp"><b>${player.hp}</b><small>HP</small></span>
+      </header>
+      <div class="spectator-builder__formation">
+        ${Array.from({ length: 6 }, (_, index) => spectatorBuildHeroMarkup(deployedTeam[index], index)).join("")}
+      </div>
+      <footer>
+        <span><small>Squad Output</small><b>✦ ${totalPower}</b><b>♥ ${totalHealth}</b></span>
+        <div>${traitCounts.length
+          ? traitCounts.map((state) => `<i class="${state.activeTier ? "is-active" : ""}">${state.definition.name} ${state.count}</i>`).join("")
+          : "<i>Traits scanning</i>"}</div>
+        <em>${player.ready ? "LOCKED" : "LIVE"}</em>
+      </footer>
+    </article>
+  `;
+}
+
+function renderSpectatorBuildBoard() {
+  if (!gameState.spectating || gameState.phase !== "build") {
+    spectatorBuildBoard.hidden = true;
+    return;
+  }
+
+  const remainingBuilders = getAlivePlayers()
+    .filter((player) => !player.isHuman)
+    .sort((first, second) => second.hp - first.hp);
+  spectatorBuildBoard.hidden = false;
+  spectatorBuilderCount.textContent = remainingBuilders.length;
+  spectatorBuildGrid.innerHTML = remainingBuilders.length
+    ? remainingBuilders.map(spectatorBuilderMarkup).join("")
+    : '<p class="spectator-build__empty">No remaining build feeds detected.</p>';
+}
+
 function aiTeamTargetSize() {
   return Math.min(6, gameState.round + 2);
 }
@@ -619,24 +819,138 @@ function aiShopTier() {
   return Math.min(MAX_SHOP_TIER, 1 + Math.floor((gameState.round - 1) / 2));
 }
 
-function chooseAiHero(aiPlayer) {
+const AI_BUILD_STRATEGIES = [
+  { name: "Rivals Vanguard", traits: ["rivals", "brawl", "tank"] },
+  { name: "Overwatch Dive", traits: ["overwatch", "dive", "dps"] },
+  { name: "Realm Artillery", traits: ["paladins", "poke", "dps"] },
+  { name: "Bulwark Core", traits: ["tank", "brawl"] },
+  { name: "Dive Execution", traits: ["dive", "dps"] },
+  { name: "Target Lock", traits: ["poke", "dps"] },
+  { name: "Sustain Engine", traits: ["support", "brawl"] },
+];
+
+function getAiStrategy(aiPlayer) {
+  if (!aiPlayer.aiStrategy) {
+    const aiPlayers = players.filter((player) => !player.isHuman);
+    const aiIndex = Math.max(0, aiPlayers.indexOf(aiPlayer));
+    aiPlayer.aiStrategy = AI_BUILD_STRATEGIES[aiIndex % AI_BUILD_STRATEGIES.length];
+  }
+
+  return aiPlayer.aiStrategy;
+}
+
+function scoreCombatEffects(effects = {}) {
+  const weights = {
+    bonusPower: 2.7,
+    bonusHealth: 1.35,
+    damageReduction: 4.8,
+    dodgeChance: 34,
+    critChance: 30,
+    critDamage: 1.5,
+    firstStrikeBonus: 1.55,
+    lifesteal: 24,
+    onKillHeal: 1.25,
+    thorns: 1.8,
+    executeBonus: 1.2,
+    executeThreshold: 8,
+  };
+
+  return Object.entries(effects).reduce(
+    (score, [effectName, value]) => score + ((weights[effectName] || 0.7) * Number(value || 0)),
+    0,
+  );
+}
+
+function scoreAiTeam(team, aiPlayer) {
+  const deployedTeam = team.filter(Boolean);
+  const strategy = getAiStrategy(aiPlayer);
+  const traitCounts = countTeamTraits(deployedTeam);
+  let score = 0;
+
+  deployedTeam.forEach((hero) => {
+    const traitCombat = heroTraitCombatData(hero, deployedTeam);
+    score += (hero.power * 2.15) + (hero.health * 1.25);
+    score += scoreCombatEffects(hero.ability?.effects);
+    score += scoreCombatEffects(traitCombat.effects);
+    score += Math.max(0, (hero.level || 1) - 1) * 7;
+    score += heroTraitIds(hero).filter((traitId) => strategy.traits.includes(traitId)).length * 2.4;
+  });
+
+  traitCounts.forEach((count, traitId) => {
+    const state = traitState(traitId, deployedTeam);
+    if (state.activeTier) score += state.activeTier.threshold * 3.5;
+    if (strategy.traits.includes(traitId)) score += Math.min(6, count) * 2;
+  });
+
+  score += new Set(deployedTeam.map(heroCatalogId)).size * 1.2;
+  return score;
+}
+
+function cloneAiTeam(team) {
+  return team.filter(Boolean).map((hero) => createHeroInstance({ ...hero }));
+}
+
+function simulateAiRecruit(team, catalogHero) {
+  const simulatedTeam = cloneAiTeam(team);
+  simulatedTeam.push(createHeroInstance(catalogHero));
+  mergeAiDuplicates(simulatedTeam);
+  return simulatedTeam;
+}
+
+function candidateTraitProgressScore(hero, team, strategy) {
+  const beforeCounts = countTeamTraits(team);
+  const alreadyOwned = team.some((ownedHero) => heroCatalogId(ownedHero) === hero.id);
+  let score = 0;
+
+  heroTraitIds(hero).forEach((traitId) => {
+    const beforeCount = beforeCounts.get(traitId) || 0;
+    const afterCount = beforeCount + (alreadyOwned ? 0 : 1);
+    const definition = traitDefinitions[traitId];
+    const crossedTier = definition?.tiers?.find(
+      (tier) => tier.threshold === afterCount && beforeCount < tier.threshold,
+    );
+    if (crossedTier) score += 12 + (crossedTier.threshold * 2.5);
+    else if (!alreadyOwned) score += 2.5;
+    if (strategy.traits.includes(traitId)) score += alreadyOwned ? 1.5 : 6;
+  });
+
+  return score;
+}
+
+function chooseAiHero(aiPlayer, { preferGrowth = false } = {}) {
   const maxTier = aiShopTier();
-  const candidates = heroCatalog.filter((hero) => hero.tier <= maxTier);
+  const unlockedCandidates = heroCatalog.filter((hero) => hero.tier <= maxTier);
+  const unownedCandidates = unlockedCandidates.filter(
+    (hero) => !aiPlayer.team.some((ownedHero) => heroCatalogId(ownedHero) === hero.id),
+  );
+  const candidates = preferGrowth && unownedCandidates.length ? unownedCandidates : unlockedCandidates;
+  const currentScore = scoreAiTeam(aiPlayer.team, aiPlayer);
+  const strategy = getAiStrategy(aiPlayer);
 
   const weightedCandidates = candidates
     .map((hero) => {
-      const matchingCopy = aiPlayer.team.some(
+      const matchingHero = aiPlayer.team.find(
         (ownedHero) => heroCatalogId(ownedHero) === hero.id && ownedHero.level < MAX_HERO_LEVEL,
       );
+      const simulatedTeam = simulateAiRecruit(aiPlayer.team, hero);
+      const completedMerge = simulatedTeam.length === aiPlayer.team.length;
+      const mergeScore = matchingHero
+        ? (completedMerge ? 18 + ((matchingHero.level || 1) * 6) : 7)
+        : 0;
       return {
         hero,
-        score: hero.power + hero.health + (matchingCopy ? 8 : 0) + (Math.random() * 8),
+        score: (scoreAiTeam(simulatedTeam, aiPlayer) - currentScore)
+          + candidateTraitProgressScore(hero, aiPlayer.team, strategy)
+          + mergeScore
+          + (((hero.power * 2) + hero.health + scoreCombatEffects(hero.ability?.effects)) * 0.16)
+          + (Math.random() * 1.8),
       };
     })
     .sort((first, second) => second.score - first.score)
-    .slice(0, Math.max(3, Math.ceil(candidates.length / 2)));
+    .slice(0, Math.min(3, candidates.length));
 
-  return createHeroInstance(weightedCandidates[Math.floor(Math.random() * weightedCandidates.length)].hero);
+  const selectionWindow = weightedCandidates.slice(0, Math.min(2, weightedCandidates.length));
+  return createHeroInstance(selectionWindow[Math.floor(Math.random() * selectionWindow.length)].hero);
 }
 
 function mergeAiDuplicates(team) {
@@ -665,6 +979,61 @@ function mergeAiDuplicates(team) {
   }
 }
 
+function findBestAiUpgrade(aiPlayer) {
+  const maxTier = aiShopTier();
+  const currentScore = scoreAiTeam(aiPlayer.team, aiPlayer);
+  const plans = [];
+
+  heroCatalog.filter((hero) => hero.tier <= maxTier).forEach((catalogHero) => {
+    const matchingCopy = aiPlayer.team.some(
+      (hero) => heroCatalogId(hero) === catalogHero.id
+        && hero.level === 1
+        && hero.level < MAX_HERO_LEVEL,
+    );
+
+    if (matchingCopy) {
+      const mergedTeam = simulateAiRecruit(aiPlayer.team, catalogHero);
+      plans.push({
+        type: "merge",
+        hero: catalogHero,
+        score: scoreAiTeam(mergedTeam, aiPlayer) - currentScore + 14,
+      });
+    }
+
+    aiPlayer.team.forEach((ownedHero, index) => {
+      const replacementTeam = cloneAiTeam(aiPlayer.team);
+      replacementTeam[index] = createHeroInstance(catalogHero);
+      plans.push({
+        type: "replace",
+        hero: catalogHero,
+        index,
+        score: scoreAiTeam(replacementTeam, aiPlayer) - currentScore,
+      });
+    });
+  });
+
+  return plans.sort((first, second) => second.score - first.score)[0] || null;
+}
+
+function updateAiBuildStatus(aiPlayer, targetSize, locked = false) {
+  const strategy = getAiStrategy(aiPlayer);
+  const activeTrait = [...countTeamTraits(aiPlayer.team).keys()]
+    .map((traitId) => traitState(traitId, aiPlayer.team))
+    .filter((state) => state.activeTier)
+    .sort((first, second) => second.activeTier.threshold - first.activeTier.threshold)[0];
+
+  if (locked) {
+    aiPlayer.buildStatus = activeTrait
+      ? `${activeTrait.definition.name} ${activeTrait.count} · locked`
+      : `${strategy.name} · locked`;
+    return;
+  }
+
+  aiPlayer.buildStatus = aiPlayer.team.length >= targetSize
+    ? `Optimizing ${strategy.name}`
+    : `${strategy.name} ${aiPlayer.team.length}/${targetSize}`;
+}
+
 function runAiBuildAction(aiPlayer) {
   if (gameState.phase !== "build" || aiPlayer.eliminated) {
     return;
@@ -673,39 +1042,43 @@ function runAiBuildAction(aiPlayer) {
   const targetSize = aiTeamTargetSize();
 
   if (aiPlayer.team.length < targetSize) {
-    aiPlayer.team.push(chooseAiHero(aiPlayer));
+    aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: aiPlayer.team.length < targetSize - 1 }));
     mergeAiDuplicates(aiPlayer.team);
-  } else if (gameState.round > 1) {
-    const replacement = chooseAiHero(aiPlayer);
-    const mergeTarget = aiPlayer.team.find(
-      (hero) => heroCatalogId(hero) === heroCatalogId(replacement)
-        && hero.level === replacement.level
-        && hero.level < MAX_HERO_LEVEL,
-    );
+  } else {
+    const upgrade = findBestAiUpgrade(aiPlayer);
 
-    if (mergeTarget) {
-      aiPlayer.team.push(replacement);
+    if (upgrade?.type === "merge") {
+      aiPlayer.team.push(createHeroInstance(upgrade.hero));
       mergeAiDuplicates(aiPlayer.team);
-    } else {
-    const weakestIndex = aiPlayer.team.reduce((weakest, hero, index, team) => {
-      const heroScore = hero.power + hero.health;
-      const weakestScore = team[weakest].power + team[weakest].health;
-      return heroScore < weakestScore ? index : weakest;
-    }, 0);
-    const weakestHero = aiPlayer.team[weakestIndex];
-
-    if ((replacement.power + replacement.health) > (weakestHero.power + weakestHero.health)) {
-      aiPlayer.team[weakestIndex] = replacement;
-    }
+    } else if (upgrade?.type === "replace" && upgrade.score > 1.5) {
+      aiPlayer.team[upgrade.index] = createHeroInstance(upgrade.hero);
     }
   }
 
-  aiPlayer.buildStatus = aiPlayer.team.length >= targetSize
-    ? "Squad ready"
-    : `Recruiting ${aiPlayer.team.length}/${targetSize}`;
-  aiPlayer.ready = aiPlayer.team.length >= targetSize;
+  aiPlayer.ready = false;
+  updateAiBuildStatus(aiPlayer, targetSize);
   renderLeaderboard();
   renderThreatPreview();
+  renderSpectatorBuildBoard();
+  checkAllPlayersReady();
+}
+
+function finalizeAiBuild(aiPlayer) {
+  if (gameState.phase !== "build" || aiPlayer.eliminated) return;
+  const targetSize = aiTeamTargetSize();
+  let safety = 0;
+
+  while (aiPlayer.team.length < targetSize && safety < 20) {
+    aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: true }));
+    mergeAiDuplicates(aiPlayer.team);
+    safety += 1;
+  }
+
+  aiPlayer.ready = true;
+  updateAiBuildStatus(aiPlayer, targetSize, true);
+  renderLeaderboard();
+  renderThreatPreview();
+  renderSpectatorBuildBoard();
   checkAllPlayersReady();
 }
 
@@ -718,21 +1091,32 @@ function scheduleAiBuilds() {
   clearAiBuildTimers();
   const targetSize = aiTeamTargetSize();
 
-  players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer) => {
+  players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer, aiIndex) => {
     aiPlayer.ready = false;
-    aiPlayer.buildStatus = `Recruiting ${Math.min(aiPlayer.team.length, targetSize)}/${targetSize}`;
-    const actions = Math.max(1, targetSize - aiPlayer.team.length + (gameState.round > 1 ? 1 : 0));
+    const strategy = getAiStrategy(aiPlayer);
+    aiPlayer.buildStatus = `Planning ${strategy.name}`;
+    const actions = Math.max(3, targetSize - aiPlayer.team.length + 2 + (gameState.round > 1 ? 1 : 0));
+    const thinkingPace = 0.86 + ((aiIndex % 7) * 0.08) + (Math.random() * 0.06);
+    const openingThinkTime = 3_200 + (Math.random() * 4_200);
+    const actionThinkTime = (2_600 + (Math.random() * 1_000)) * thinkingPace;
 
     for (let actionIndex = 0; actionIndex < actions; actionIndex += 1) {
-      const delay = 1_200
-        + (((actionIndex + 1) / (actions + 1)) * (BUILD_PHASE_DURATION * 0.68))
-        + (Math.random() * 1_500);
+      const delay = openingThinkTime
+        + (actionIndex * actionThinkTime)
+        + (Math.random() * 220);
       aiBuildTimers.push(window.setTimeout(() => runAiBuildAction(aiPlayer), delay));
     }
+
+    const lockDelay = openingThinkTime
+      + (actions * actionThinkTime)
+      + 1_600
+      + (Math.random() * 3_200);
+    aiBuildTimers.push(window.setTimeout(() => finalizeAiBuild(aiPlayer), lockDelay));
   });
 
   renderLeaderboard();
   renderThreatPreview();
+  renderSpectatorBuildBoard();
 }
 
 function completeAiBuilds() {
@@ -740,12 +1124,14 @@ function completeAiBuilds() {
   const targetSize = aiTeamTargetSize();
 
   players.filter((player) => !player.isHuman && !player.eliminated).forEach((aiPlayer) => {
-    while (aiPlayer.team.length < targetSize) {
-      aiPlayer.team.push(chooseAiHero(aiPlayer));
+    let safety = 0;
+    while (aiPlayer.team.length < targetSize && safety < 20) {
+      aiPlayer.team.push(chooseAiHero(aiPlayer, { preferGrowth: true }));
       mergeAiDuplicates(aiPlayer.team);
+      safety += 1;
     }
     aiPlayer.ready = true;
-    aiPlayer.buildStatus = "Squad locked";
+    updateAiBuildStatus(aiPlayer, targetSize, true);
   });
 
   gameState.pairings.flat().filter((player) => player.isGhost).forEach((ghostPlayer) => {
@@ -759,6 +1145,7 @@ function completeAiBuilds() {
 
   renderLeaderboard();
   renderThreatPreview();
+  renderSpectatorBuildBoard();
 }
 
 function prepareRoundPairings() {
@@ -798,6 +1185,7 @@ function prepareRoundPairings() {
 
 function updateHud() {
   const humanPlayer = getHumanPlayer();
+  const playerCanBuild = gameState.buildPhaseActive && !humanPlayer.eliminated;
   creditsElement.textContent = gameState.credits;
   unitCountElement.textContent = gameState.team.filter(Boolean).length;
   sidelineCountElement.textContent = gameState.bench.filter(Boolean).length;
@@ -810,11 +1198,11 @@ function updateHud() {
     const cannotAfford = isAvailable && hero.cost > gameState.credits;
     hero.card.classList.toggle("shop-card--locked", cannotAfford);
     const buyButton = hero.card.querySelector(".shop-card__buy");
-    buyButton.disabled = !gameState.buildPhaseActive;
-    buyButton.setAttribute("aria-disabled", String(cannotAfford || !gameState.buildPhaseActive));
+    buyButton.disabled = !playerCanBuild;
+    buyButton.setAttribute("aria-disabled", String(cannotAfford || !playerCanBuild));
   });
 
-  freezeShopButton.disabled = !gameState.buildPhaseActive;
+  freezeShopButton.disabled = !playerCanBuild;
   freezeShopButton.classList.toggle("freeze-shop-button--active", gameState.shopFrozen);
   freezeShopButton.setAttribute("aria-pressed", String(gameState.shopFrozen));
   freezeShopButton.setAttribute("aria-disabled", String(freezeShopButton.disabled));
@@ -832,13 +1220,13 @@ function updateHud() {
     card.classList.toggle("shop-card--frozen", gameState.shopFrozen && card.dataset.status !== "deployed");
   });
 
-  rerollButton.disabled = gameState.shopFrozen || gameState.credits < 1 || !gameState.buildPhaseActive;
+  rerollButton.disabled = gameState.shopFrozen || gameState.credits < 1 || !playerCanBuild;
   rerollButton.setAttribute("aria-disabled", String(rerollButton.disabled));
 
   const isMaxTier = gameState.shopTier >= MAX_SHOP_TIER;
   const upgradeCost = SHOP_UPGRADE_COSTS[gameState.shopTier];
   const cannotAffordUpgrade = !isMaxTier && gameState.credits < upgradeCost;
-  upgradeShopButton.disabled = isMaxTier || !gameState.buildPhaseActive;
+  upgradeShopButton.disabled = isMaxTier || !playerCanBuild;
   upgradeShopButton.classList.toggle("upgrade-button--locked", cannotAffordUpgrade);
   upgradeShopButton.setAttribute(
     "aria-disabled",
@@ -1213,8 +1601,31 @@ function combatBuffIndicators(effects = {}) {
   return indicators;
 }
 
+function combatantRecap(fighter) {
+  return {
+    catalogId: heroCatalogId(fighter),
+    name: fighter.name,
+    image: fighter.image,
+    universe: fighter.universe,
+    level: fighter.level || 1,
+    power: fighter.power,
+    maxHealth: fighter.maxHealth,
+    remainingHealth: Math.max(0, fighter.currentHealth),
+    survived: fighter.currentHealth > 0,
+    abilityName: fighter.ability?.name || "Standard Attack",
+    stats: { ...fighter.combatStats },
+  };
+}
+
+function battleRecapTeams(firstSquad, secondSquad) {
+  return {
+    first: firstSquad.map(combatantRecap),
+    second: secondSquad.map(combatantRecap),
+  };
+}
+
 function simulateBattle(firstPlayer, secondPlayer) {
-  const createFighter = (hero, team) => {
+  const createFighter = (hero, team, combatIndex, combatSide) => {
     const traitData = heroTraitCombatData(hero, team);
     const effects = combineCombatEffects(hero.ability?.effects, traitData.effects);
     const maxHealth = hero.health + (effects.bonusHealth || 0);
@@ -1229,12 +1640,24 @@ function simulateBattle(firstPlayer, secondPlayer) {
       maxHealth,
       currentHealth: maxHealth,
       attacksMade: 0,
+      combatIndex,
+      combatSide,
+      combatStats: {
+        attacks: 0,
+        damageDealt: 0,
+        damageTaken: 0,
+        healing: 0,
+        eliminations: 0,
+        criticals: 0,
+        dodges: 0,
+        abilityProcs: 0,
+      },
       openingBuffs,
       openingBuffSources: [hero.ability?.name, ...traitData.abilities].filter(Boolean),
     };
   };
-  const firstSquad = firstPlayer.team.filter(Boolean).map((hero) => createFighter(hero, firstPlayer.team));
-  const secondSquad = secondPlayer.team.filter(Boolean).map((hero) => createFighter(hero, secondPlayer.team));
+  const firstSquad = firstPlayer.team.filter(Boolean).map((hero, index) => createFighter(hero, firstPlayer.team, index, "first"));
+  const secondSquad = secondPlayer.team.filter(Boolean).map((hero, index) => createFighter(hero, secondPlayer.team, index, "second"));
   const events = [];
   const openingBuffs = {
     first: firstSquad.map((hero) => ({
@@ -1261,6 +1684,7 @@ function simulateBattle(firstPlayer, secondPlayer) {
       survivors: 0,
       events,
       openingBuffs,
+      combatants: battleRecapTeams(firstSquad, secondSquad),
     };
   }
 
@@ -1271,6 +1695,7 @@ function simulateBattle(firstPlayer, secondPlayer) {
       survivors: Math.max(firstSquad.length, secondSquad.length),
       events,
       openingBuffs,
+      combatants: battleRecapTeams(firstSquad, secondSquad),
     };
   }
 
@@ -1294,7 +1719,11 @@ function simulateBattle(firstPlayer, secondPlayer) {
     const criticalBonus = critical ? 3 + (attackerEffects.critDamage || 0) : 0;
     let damage = 0;
 
+    attacker.combatStats.attacks += 1;
+
     if (dodged) {
+      defender.combatStats.dodges += 1;
+      defender.combatStats.abilityProcs += 1;
       abilityNames.push(defender.ability?.name);
       abilityNames.push(...defender.traitAbilities);
     } else {
@@ -1309,8 +1738,15 @@ function simulateBattle(firstPlayer, secondPlayer) {
           - (defenderEffects.damageReduction || 0),
       );
       defender.currentHealth -= damage;
+      attacker.combatStats.damageDealt += damage;
+      defender.combatStats.damageTaken += damage;
+
+      if (critical) {
+        attacker.combatStats.criticals += 1;
+      }
 
       if (firstStrikeBonus || executeBonus || (critical && attackerEffects.critChance)) {
+        attacker.combatStats.abilityProcs += 1;
         abilityNames.push(attacker.ability?.name);
         abilityNames.push(...attacker.traitAbilities);
       }
@@ -1326,8 +1762,10 @@ function simulateBattle(firstPlayer, secondPlayer) {
         Math.max(1, Math.ceil(damage * attackerEffects.lifesteal)),
       );
       attacker.currentHealth += healing;
+      attacker.combatStats.healing += healing;
 
       if (healing > 0) {
+        attacker.combatStats.abilityProcs += 1;
         abilityNames.push(attacker.ability?.name);
         abilityNames.push(...attacker.traitAbilities);
       }
@@ -1336,6 +1774,9 @@ function simulateBattle(firstPlayer, secondPlayer) {
     if (damage > 0 && defenderEffects.thorns) {
       retaliationDamage = defenderEffects.thorns;
       attacker.currentHealth -= retaliationDamage;
+      defender.combatStats.damageDealt += retaliationDamage;
+      attacker.combatStats.damageTaken += retaliationDamage;
+      defender.combatStats.abilityProcs += 1;
       abilityNames.push(defender.ability?.name);
       abilityNames.push(...defender.traitAbilities);
     }
@@ -1347,8 +1788,10 @@ function simulateBattle(firstPlayer, secondPlayer) {
       );
       attacker.currentHealth += knockoutHealing;
       healing += knockoutHealing;
+      attacker.combatStats.healing += knockoutHealing;
 
       if (knockoutHealing > 0) {
+        attacker.combatStats.abilityProcs += 1;
         abilityNames.push(attacker.ability?.name);
         abilityNames.push(...attacker.traitAbilities);
       }
@@ -1356,6 +1799,10 @@ function simulateBattle(firstPlayer, secondPlayer) {
 
     attacker.attacksMade += 1;
     const attackerDefeated = attacker.currentHealth <= 0;
+
+    if (defenderDefeated) {
+      attacker.combatStats.eliminations += 1;
+    }
 
     if (events.length < 48) {
       events.push({
@@ -1415,6 +1862,7 @@ function simulateBattle(firstPlayer, secondPlayer) {
     survivors: winningSquad.filter((hero) => hero.currentHealth > 0).length,
     events,
     openingBuffs,
+    combatants: battleRecapTeams(firstSquad, secondSquad),
   };
 }
 
@@ -1422,13 +1870,105 @@ function calculateCombatDamage(survivors) {
   return Math.min(35, 8 + (gameState.round * 2) + (survivors * 3));
 }
 
+function recapTeamTotals(combatants = []) {
+  return combatants.reduce((totals, hero) => ({
+    damage: totals.damage + hero.stats.damageDealt,
+    healing: totals.healing + hero.stats.healing,
+    eliminations: totals.eliminations + hero.stats.eliminations,
+  }), { damage: 0, healing: 0, eliminations: 0 });
+}
+
+function combatRecapHeroMarkup(hero, highestDamage) {
+  const stats = hero.stats;
+  const topDamageClass = stats.damageDealt === highestDamage && highestDamage > 0
+    ? " combat-recap-hero--mvp"
+    : "";
+
+  return `
+    <article class="combat-recap-hero${topDamageClass}${hero.survived ? "" : " combat-recap-hero--defeated"}">
+      <div class="combat-recap-hero__identity">
+        <span><img src="${hero.image}" alt="${hero.name}"><i>${hero.survived ? "UP" : "KO"}</i></span>
+        <div><strong>${hero.name}</strong><small>LV ${hero.level} // ${hero.abilityName}</small><em>${stats.attacks} attacks · ${stats.abilityProcs} ability procs</em></div>
+      </div>
+      <div class="combat-recap-hero__stats">
+        <span data-stat="damage"><b>${stats.damageDealt}</b><small>DMG</small></span>
+        <span><b>${stats.damageTaken}</b><small>TAKEN</small></span>
+        <span data-stat="healing"><b>${stats.healing}</b><small>HEAL</small></span>
+        <span data-stat="ko"><b>${stats.eliminations}</b><small>KO</small></span>
+        <span><b>${stats.criticals}</b><small>CRIT</small></span>
+        <span><b>${stats.dodges}</b><small>EVADE</small></span>
+      </div>
+      <div class="combat-recap-hero__survival"><i style="--survival: ${(hero.remainingHealth / Math.max(1, hero.maxHealth)) * 100}%"></i><span>${Math.ceil(hero.remainingHealth)} / ${hero.maxHealth} HP</span></div>
+    </article>
+  `;
+}
+
+function combatRecapTeamMarkup(result, side) {
+  const combatants = result.combatants?.[side] || [];
+  const playerName = side === "first" ? result.firstPlayerName : result.secondPlayerName;
+  const playerId = side === "first" ? result.firstPlayerId : result.secondPlayerId;
+  const won = result.winner.id === playerId;
+  const totals = recapTeamTotals(combatants);
+  const highestDamage = Math.max(0, ...combatants.map((hero) => hero.stats.damageDealt));
+
+  return `
+    <section class="combat-recap-team${won ? " combat-recap-team--winner" : " combat-recap-team--loser"}">
+      <header>
+        <div><small>${won ? "Round Winner" : "Round Defeat"}</small><h3>${playerName}</h3></div>
+        <span><b>${totals.damage}</b> team damage</span>
+        <span><b>${totals.healing}</b> healing</span>
+        <span><b>${totals.eliminations}</b> eliminations</span>
+      </header>
+      <div class="combat-recap-team__heroes">
+        ${combatants.length
+          ? combatants.map((hero) => combatRecapHeroMarkup(hero, highestDamage)).join("")
+          : '<p class="combat-recap-team__empty">No heroes were deployed.</p>'}
+      </div>
+    </section>
+  `;
+}
+
+function renderCombatRecap(result) {
+  if (!result) return;
+  combatRecapSubtitle.textContent = `Round ${String(gameState.round).padStart(2, "0")} // ${result.firstPlayerName} vs ${result.secondPlayerName} // ${result.winner.name} won`;
+  combatRecapTeams.innerHTML = ["first", "second"]
+    .map((side) => combatRecapTeamMarkup(result, side))
+    .join("");
+}
+
+function openCombatRecap() {
+  const result = gameState.viewedCombatResult;
+  if (!result) return;
+
+  renderCombatRecap(result);
+  window.clearTimeout(nextRoundTimeout);
+  nextRoundTimeout = null;
+  gameState.recapPausedRound = gameState.phase === "combat";
+  combatRecap.hidden = false;
+  combatRecap.setAttribute("aria-hidden", "false");
+  document.body.classList.add("intel-overlay-open");
+  combatRecap.querySelector(".intel-close")?.focus();
+  window.PRWAudio?.play("modalOpen");
+  announce("Combat recap opened. Per-hero round statistics are available.");
+}
+
+function closeCombatRecap({ continueMatch = false } = {}) {
+  if (combatRecap.hidden) return;
+  combatRecap.hidden = true;
+  combatRecap.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("intel-overlay-open");
+  window.PRWAudio?.play("modalClose");
+
+  if (gameState.recapPausedRound && gameState.phase === "combat") {
+    nextRoundTimeout = window.setTimeout(completeCombatRound, continueMatch ? 150 : 2_500);
+  }
+
+  gameState.recapPausedRound = false;
+  combatRecapButton.focus();
+}
+
 function getCombatUnit(side, unitIndex, result) {
-  const humanPlayerId = getHumanPlayer().id;
-  const firstSideIsHuman = result?.firstPlayerId
-    ? result.firstPlayerId === humanPlayerId
-    : true;
-  const eventSideIsHuman = side === "first" ? firstSideIsHuman : !firstSideIsHuman;
-  const teamContainer = eventSideIsHuman ? playerCombatTeam : enemyCombatTeam;
+  const teamContainer = side === "first" ? playerCombatTeam : enemyCombatTeam;
   return teamContainer.querySelector(`[data-combat-index="${unitIndex}"]`);
 }
 
@@ -1728,6 +2268,206 @@ function playCombatEvents(result, eventIndex = 0) {
   );
 }
 
+function findInitialViewedResult() {
+  const humanPlayer = getHumanPlayer();
+
+  if (!gameState.spectating && !humanPlayer.eliminated) {
+    return gameState.combatResults.find(
+      (result) => result.firstPlayerId === humanPlayer.id || result.secondPlayerId === humanPlayer.id,
+    );
+  }
+
+  return gameState.combatResults.find(
+    (result) => result.firstPlayerId === gameState.spectatedPlayerId
+      || result.secondPlayerId === gameState.spectatedPlayerId,
+  ) || gameState.combatResults[0];
+}
+
+function showViewedCombatResult(result, { playEvents = true } = {}) {
+  if (!result) return;
+
+  window.clearTimeout(combatPhaseTimeout);
+  gameState.viewedCombatResult = result;
+  gameState.viewedPairingIndex = Math.max(0, gameState.combatResults.indexOf(result));
+  const isSpectatorView = gameState.spectating || getHumanPlayer().eliminated;
+
+  playerCombatLabel.textContent = isSpectatorView ? "Observed Squad" : "Your Squad";
+  playerCombatName.textContent = result.firstPlayerName;
+  enemyCombatName.textContent = result.secondPlayerName;
+  renderCombatTeam(playerCombatTeam, result.firstTeam);
+  renderCombatTeam(enemyCombatTeam, result.secondTeam);
+  updateCombatRemainingCounts();
+  combatFxLayer.innerHTML = "";
+  combatTimeline.innerHTML = "";
+  combatEventCounter.textContent = "00";
+  combatEventProgress.style.width = "0%";
+  combatArena.classList.remove("combat-arena--finalizing", "combat-arena--impact", "combat-arena--heavy-impact");
+  combatFeed.textContent = `Round ${gameState.round}: ${result.firstPlayerName} is engaging ${result.secondPlayerName}.`;
+  spectatorControls.hidden = !isSpectatorView;
+  spectatorMatchLabel.textContent = `Battle ${gameState.viewedPairingIndex + 1} of ${gameState.combatResults.length}`;
+  spectatorPrevious.disabled = gameState.combatResults.length < 2;
+  spectatorNext.disabled = gameState.combatResults.length < 2;
+
+  if (isSpectatorView) {
+    const observedId = result.firstPlayerId.startsWith("ghost-") ? result.secondPlayerId : result.firstPlayerId;
+    gameState.spectatedPlayerId = observedId;
+  }
+
+  if (playEvents) {
+    const hasOpeningBuffs = showCombatOpeningBuffs(result);
+    combatPhaseTimeout = window.setTimeout(
+      () => playCombatEvents(result),
+      hasOpeningBuffs ? 1550 : 700,
+    );
+  }
+}
+
+function cycleSpectatedBattle(direction) {
+  if (!gameState.spectating || gameState.phase !== "combat" || document.body.classList.contains("combat-resolved") || gameState.combatResults.length < 2) return;
+  const nextIndex = (gameState.viewedPairingIndex + direction + gameState.combatResults.length) % gameState.combatResults.length;
+  showViewedCombatResult(gameState.combatResults[nextIndex]);
+  announce(`Now spectating battle ${nextIndex + 1} of ${gameState.combatResults.length}.`);
+}
+
+function spectatorCombatHeroMarkup(hero, side, index, result) {
+  const openingData = result.openingBuffs?.[side]?.[index];
+  const maxHealth = openingData?.maxHealth || hero.health;
+  const power = openingData?.power || hero.power;
+
+  return `
+    <figure class="spectator-fighter" data-combat-side="${side}" data-combat-index="${index}" title="${hero.name} // ${hero.ability?.name || "Standard Attack"}">
+      <span><img src="${hero.image}" alt="${hero.name}"><i>LV ${hero.level || 1}</i></span>
+      <figcaption><strong>${hero.name}</strong><small>✦ ${power} · ♥ ${maxHealth}</small></figcaption>
+      <em class="spectator-fighter__health" aria-label="${maxHealth} of ${maxHealth} health"><i style="width:100%"></i><b>${maxHealth}</b></em>
+    </figure>
+  `;
+}
+
+function spectatorBattleMarkup(result, battleIndex) {
+  return `
+    <article class="spectator-battle" data-battle-index="${battleIndex}">
+      <header>
+        <div><span>${result.firstPlayerName}</span><b data-remaining-side="first">${result.firstTeam.length}</b></div>
+        <i><small>Feed ${String(battleIndex + 1).padStart(2, "0")}</small>VS</i>
+        <div><span>${result.secondPlayerName}</span><b data-remaining-side="second">${result.secondTeam.length}</b></div>
+      </header>
+      <div class="spectator-battle__arena">
+        <section data-broadcast-side="first">${result.firstTeam.map((hero, index) => spectatorCombatHeroMarkup(hero, "first", index, result)).join("") || "<p>No squad</p>"}</section>
+        <section data-broadcast-side="second">${result.secondTeam.map((hero, index) => spectatorCombatHeroMarkup(hero, "second", index, result)).join("") || "<p>No squad</p>"}</section>
+      </div>
+      <div class="spectator-battle__feed"><i></i><span>Engagement initialized</span><b>00</b></div>
+      <footer>
+        <span class="spectator-battle__result">LIVE // Resolving</span>
+        <button type="button" data-spectator-recap-index="${battleIndex}" hidden>View Recap</button>
+      </footer>
+    </article>
+  `;
+}
+
+function renderSpectatorCombatBroadcast() {
+  spectatorCombatBroadcast.hidden = false;
+  spectatorBattleCount.textContent = gameState.combatResults.length;
+  spectatorCombatGrid.innerHTML = gameState.combatResults
+    .map(spectatorBattleMarkup)
+    .join("");
+}
+
+function getSpectatorCombatUnit(battleIndex, side, unitIndex) {
+  return spectatorCombatGrid.querySelector(
+    `[data-battle-index="${battleIndex}"] [data-broadcast-side="${side}"] [data-combat-index="${unitIndex}"]`,
+  );
+}
+
+function setSpectatorCombatUnitHealth(unit, currentHealth, maxHealth) {
+  if (!unit) return;
+  const safeHealth = Math.max(0, currentHealth);
+  const percent = maxHealth > 0 ? (safeHealth / maxHealth) * 100 : 0;
+  const bar = unit.querySelector(".spectator-fighter__health i");
+  const value = unit.querySelector(".spectator-fighter__health b");
+  if (bar) bar.style.width = `${percent}%`;
+  if (value) value.textContent = Math.ceil(safeHealth);
+  unit.classList.toggle("spectator-fighter--danger", percent > 0 && percent <= 30);
+}
+
+function updateSpectatorBattleCounts(battleCard) {
+  ["first", "second"].forEach((side) => {
+    const count = battleCard.querySelectorAll(`[data-broadcast-side="${side}"] .spectator-fighter:not(.spectator-fighter--defeated)`).length;
+    const counter = battleCard.querySelector(`[data-remaining-side="${side}"]`);
+    if (counter) counter.textContent = count;
+  });
+}
+
+function playSpectatorBattleMoment(result, battleIndex, combatEvent, eventIndex) {
+  const battleCard = spectatorCombatGrid.querySelector(`[data-battle-index="${battleIndex}"]`);
+  if (!battleCard) return;
+  const attacker = getSpectatorCombatUnit(battleIndex, combatEvent.attackerSide, combatEvent.attackerIndex);
+  const defender = getSpectatorCombatUnit(battleIndex, combatEvent.defenderSide, combatEvent.defenderIndex);
+  const feed = battleCard.querySelector(".spectator-battle__feed");
+
+  battleCard.querySelectorAll(".spectator-fighter--attacking, .spectator-fighter--hit, .spectator-fighter--dodge, .spectator-fighter--ability").forEach((unit) => {
+    unit.classList.remove("spectator-fighter--attacking", "spectator-fighter--hit", "spectator-fighter--dodge", "spectator-fighter--ability");
+  });
+  attacker?.classList.add("spectator-fighter--attacking");
+  defender?.classList.add(combatEvent.dodged ? "spectator-fighter--dodge" : "spectator-fighter--hit");
+  attacker?.classList.toggle("spectator-fighter--ability", combatEvent.abilityNames.length > 0);
+  setSpectatorCombatUnitHealth(defender, combatEvent.remainingHealth, combatEvent.maxHealth);
+  setSpectatorCombatUnitHealth(attacker, combatEvent.attackerRemainingHealth, combatEvent.attackerMaxHealth);
+
+  if (combatEvent.defeated) defender?.classList.add("spectator-fighter--defeated");
+  if (combatEvent.attackerDefeated) attacker?.classList.add("spectator-fighter--defeated");
+  updateSpectatorBattleCounts(battleCard);
+
+  const eventText = combatEvent.dodged
+    ? `${combatEvent.defenderName} evaded ${combatEvent.attackerName}`
+    : combatEvent.defeated
+      ? `${combatEvent.attackerName} knocked out ${combatEvent.defenderName}`
+      : `${combatEvent.attackerName} dealt ${combatEvent.damage} to ${combatEvent.defenderName}`;
+  feed.querySelector("span").textContent = eventText;
+  feed.querySelector("b").textContent = String(eventIndex + 1).padStart(2, "0");
+  feed.classList.toggle("spectator-battle__feed--ko", combatEvent.defeated);
+  feed.classList.toggle("spectator-battle__feed--ability", combatEvent.abilityNames.length > 0);
+}
+
+function finishSpectatorBattleCard(result, battleIndex) {
+  const battleCard = spectatorCombatGrid.querySelector(`[data-battle-index="${battleIndex}"]`);
+  if (!battleCard || battleCard.classList.contains("spectator-battle--complete")) return;
+  const firstWon = result.winner.id === result.firstPlayerId;
+  battleCard.classList.add("spectator-battle--complete", firstWon ? "spectator-battle--first-won" : "spectator-battle--second-won");
+  const status = battleCard.querySelector(".spectator-battle__result");
+  const recapButton = battleCard.querySelector("[data-spectator-recap-index]");
+  status.textContent = `${result.winner.name} WINS // ${result.loser.name} -${result.damage} HP`;
+  recapButton.hidden = false;
+}
+
+function playAllSpectatorCombatEvents(eventIndex = 0) {
+  if (!gameState.spectating || gameState.phase !== "combat") return;
+  const longestBattle = Math.max(0, ...gameState.combatResults.map((result) => result.events.length));
+  const progress = longestBattle ? Math.min(100, ((eventIndex + 1) / longestBattle) * 100) : 100;
+  combatEventCounter.textContent = String(Math.min(eventIndex + 1, longestBattle)).padStart(2, "0");
+  combatEventProgress.style.width = `${progress}%`;
+
+  gameState.combatResults.forEach((result, battleIndex) => {
+    const combatEvent = result.events[eventIndex];
+    if (combatEvent) {
+      playSpectatorBattleMoment(result, battleIndex, combatEvent, eventIndex);
+    } else if (eventIndex >= result.events.length) {
+      finishSpectatorBattleCard(result, battleIndex);
+    }
+  });
+
+  if (eventIndex >= longestBattle) {
+    teamTitleElement.textContent = "All Battles Complete";
+    matchPhaseLabel.textContent = "Broadcast results";
+    combatPhaseTimeout = window.setTimeout(resolveCombatPhase, 900);
+    return;
+  }
+
+  combatPhaseTimeout = window.setTimeout(
+    () => playAllSpectatorCombatEvents(eventIndex + 1),
+    Math.max(300, COMBAT_EVENT_DURATION * 0.72),
+  );
+}
+
 function startCombatPhase() {
   if (gameState.phase !== "build-complete") {
     return;
@@ -1744,7 +2484,12 @@ function startCombatPhase() {
     "combat-arena--finalizing",
   );
   deploymentWorkspace.hidden = true;
+  spectatorBuildBoard.hidden = true;
   combatArena.hidden = false;
+  spectatorControls.hidden = true;
+  spectatorCombatBroadcast.hidden = true;
+  combatMatchup.hidden = false;
+  document.body.classList.toggle("spectator-multi-view", gameState.spectating);
   combatFxLayer.innerHTML = "";
   combatTimeline.innerHTML = "";
   combatRoundResult.hidden = true;
@@ -1759,17 +2504,10 @@ function startCombatPhase() {
   buildTimerElement.textContent = "FIGHT";
   matchPhaseLabel.textContent = "Combat phase";
 
-  const pairing = getHumanPairing();
-  const opponent = pairing?.find((player) => !player.isHuman);
-  enemyCombatName.textContent = opponent?.name || "No Opponent";
-  renderCombatTeam(playerCombatTeam, getHumanPlayer().team);
-  renderCombatTeam(enemyCombatTeam, opponent?.team || []);
-  updateCombatRemainingCounts();
-  combatFeed.textContent = opponent
-    ? `Round ${gameState.round}: your squad is engaging ${opponent.name}.`
-    : "No valid opponent detected.";
   renderLeaderboard();
-  announce("Combat phase started. All battles are resolving automatically.");
+  announce(gameState.spectating
+    ? "Spectator uplink connected. AI battles are resolving automatically."
+    : "Combat phase started. All battles are resolving automatically.");
 
   gameState.combatResults = gameState.pairings.map(([firstPlayer, secondPlayer]) => {
     const result = simulateBattle(firstPlayer, secondPlayer);
@@ -1777,17 +2515,25 @@ function startCombatPhase() {
       ...result,
       firstPlayerId: firstPlayer.id,
       secondPlayerId: secondPlayer.id,
+      firstPlayerName: firstPlayer.name,
+      secondPlayerName: secondPlayer.name,
+      firstTeam: firstPlayer.team.filter(Boolean),
+      secondTeam: secondPlayer.team.filter(Boolean),
       damage: calculateCombatDamage(result.survivors),
     };
   });
-  const humanResult = gameState.combatResults.find(
-    (result) => result.winner.isHuman || result.loser.isHuman,
-  );
-  const hasOpeningBuffs = showCombatOpeningBuffs(humanResult);
-  combatPhaseTimeout = window.setTimeout(
-    () => playCombatEvents(humanResult),
-    hasOpeningBuffs ? 1550 : 700,
-  );
+
+  if (gameState.spectating) {
+    gameState.viewedCombatResult = gameState.combatResults[0] || null;
+    combatMatchup.hidden = true;
+    renderSpectatorCombatBroadcast();
+    teamKickerElement.innerHTML = "<span>Multicast Arena</span> // Every Remaining Fight";
+    teamTitleElement.textContent = "All Battles Live";
+    matchPhaseLabel.textContent = `${gameState.combatResults.length} battles live`;
+    combatPhaseTimeout = window.setTimeout(() => playAllSpectatorCombatEvents(), 550);
+  } else {
+    showViewedCombatResult(findInitialViewedResult());
+  }
 }
 
 function resolveCombatPhase() {
@@ -1807,37 +2553,66 @@ function resolveCombatPhase() {
     }
   });
 
+  if (gameState.spectating) {
+    gameState.combatResults.forEach(finishSpectatorBattleCard);
+    document.body.classList.remove("combat-resolving");
+    document.body.classList.add("combat-resolved");
+    combatEventProgress.style.width = "100%";
+    updateHud();
+    renderLeaderboard();
+    renderThreatPreview();
+    announce(`All ${gameState.combatResults.length} spectator battles are complete. Recaps are available on every feed.`);
+    nextRoundTimeout = window.setTimeout(completeCombatRound, COMBAT_RESULT_DURATION);
+    return;
+  }
+
   const humanPlayer = getHumanPlayer();
+  const viewedResult = gameState.viewedCombatResult;
   const humanResult = gameState.combatResults.find(
     (result) => result.winner.isHuman || result.loser.isHuman,
   );
-  const playerWon = humanResult?.winner.isHuman;
-  const opponent = playerWon ? humanResult?.loser : humanResult?.winner;
-  window.PRWAudio?.play(playerWon ? "victory" : "defeat");
+  const isHumanBattle = Boolean(humanResult && viewedResult === humanResult && !gameState.spectating);
+  const humanWon = Boolean(humanResult?.winner.isHuman);
+  const viewedLeftWon = viewedResult?.winner.id === viewedResult?.firstPlayerId;
+  const viewedWinner = viewedResult?.winner;
+  const viewedLoser = viewedResult?.loser;
+  const resultVictoryStyle = isHumanBattle ? humanWon : viewedLeftWon;
+  window.PRWAudio?.play(isHumanBattle && !humanWon ? "defeat" : "victory");
 
   document.body.classList.remove("combat-resolving");
-  document.body.classList.add("combat-resolved", playerWon ? "combat-victory" : "combat-defeat");
+  document.body.classList.add("combat-resolved", resultVictoryStyle ? "combat-victory" : "combat-defeat");
+  spectatorPrevious.disabled = true;
+  spectatorNext.disabled = true;
   combatArena.classList.remove("combat-arena--finalizing", "combat-arena--impact", "combat-arena--heavy-impact");
   combatRoundResult.hidden = false;
   combatRoundResult.setAttribute("aria-hidden", "false");
-  combatRoundResult.className = `combat-round-result combat-round-result--${playerWon ? "victory" : "defeat"}`;
+  combatRoundResult.className = `combat-round-result combat-round-result--${resultVictoryStyle ? "victory" : "defeat"}`;
   combatRoundResultKicker.textContent = `Round ${String(gameState.round).padStart(2, "0")} Complete`;
-  combatRoundResultTitle.textContent = playerWon ? "Victory" : "Defeat";
-  combatRoundResultDetail.textContent = playerWon
-    ? `${opponent?.name || "Enemy squad"} neutralized // Integrity secure`
-    : `${humanResult?.damage || 0} integrity damage // ${humanPlayer.hp} HP remains`;
-  combatFeed.innerHTML = playerWon
-    ? `<strong>Victory!</strong> ${opponent?.name || "The enemy"} was defeated. You lose no HP.`
-    : `<strong>Defeat.</strong> ${opponent?.name || "The enemy"} dealt ${humanResult?.damage || 0} damage. ${humanPlayer.hp} HP remains.`;
+  combatRoundResultTitle.textContent = isHumanBattle
+    ? (humanWon ? "Victory" : "Defeat")
+    : `${viewedWinner?.name || "Combatant"} Wins`;
+  combatRoundResultDetail.textContent = isHumanBattle
+    ? (humanWon
+      ? `${humanResult?.loser.name || "Enemy squad"} neutralized // Integrity secure`
+      : `${humanResult?.damage || 0} integrity damage // ${humanPlayer.hp} HP remains`)
+    : `${viewedLoser?.name || "Opponent"} loses ${viewedResult?.damage || 0} integrity // Spectator feed`;
+  combatFeed.innerHTML = isHumanBattle
+    ? (humanWon
+      ? `<strong>Victory!</strong> ${humanResult?.loser.name || "The enemy"} was defeated. You lose no HP.`
+      : `<strong>Defeat.</strong> ${humanResult?.winner.name || "The enemy"} dealt ${humanResult?.damage || 0} damage. ${humanPlayer.hp} HP remains.`)
+    : `<strong>${viewedWinner?.name || "The winner"} takes the round!</strong> ${viewedLoser?.name || "The opponent"} loses ${viewedResult?.damage || 0} integrity.`;
   updateHud();
   renderLeaderboard();
   renderThreatPreview();
-  announce(playerWon ? "Battle won. You lose no health." : `Battle lost. ${humanResult?.damage || 0} health lost.`);
+  announce(isHumanBattle
+    ? (humanWon ? "Battle won. You lose no health." : `Battle lost. ${humanResult?.damage || 0} health lost.`)
+    : `${viewedWinner?.name || "The observed commander"} won the spectated battle.`);
 
   nextRoundTimeout = window.setTimeout(completeCombatRound, COMBAT_RESULT_DURATION);
 }
 
 function showMatchResultScreen(isVictory, winnerName = "") {
+  const spectatorFinish = gameState.spectating && !isVictory;
   gameState.phase = "game-over";
   gameState.buildPhaseActive = false;
   clearAiBuildTimers();
@@ -1846,14 +2621,52 @@ function showMatchResultScreen(isVictory, winnerName = "") {
   window.clearTimeout(nextRoundTimeout);
   window.clearTimeout(readyLaunchTimeout);
   document.body.classList.add("modal-open", "match-over");
-  document.body.classList.toggle("match-defeat", !isVictory);
+  document.body.classList.toggle("match-defeat", !isVictory && !spectatorFinish);
   matchResult.hidden = false;
-  matchResultKicker.textContent = isVictory ? "Match Complete" : "Squad Eliminated";
-  matchResultTitle.textContent = isVictory ? "Victory" : "Defeat";
-  matchResultDescription.textContent = isVictory
-    ? "You are the last commander standing."
-    : `${winnerName || "Another commander"} remains in the fight. Your integrity reached zero.`;
-  announce(isVictory ? "Match victory." : "You have been eliminated from the match.");
+  spectateMatchButton.hidden = true;
+  matchResultKicker.textContent = spectatorFinish ? "Broadcast Complete" : (isVictory ? "Match Complete" : "Squad Eliminated");
+  matchResultTitle.textContent = spectatorFinish ? `${winnerName || "A Commander"} Wins` : (isVictory ? "Victory" : "Defeat");
+  matchResultDescription.textContent = spectatorFinish
+    ? "The final battle is complete. Thanks for staying on the spectator network."
+    : (isVictory
+      ? "You are the last commander standing."
+      : `${winnerName || "Another commander"} remains in the fight. Your integrity reached zero.`);
+  announce(spectatorFinish ? `${winnerName || "A commander"} won the match.` : (isVictory ? "Match victory." : "You have been eliminated from the match."));
+}
+
+function showEliminationPrompt(winnerName = "") {
+  gameState.eliminationPromptOpen = true;
+  gameState.buildPhaseActive = false;
+  clearAiBuildTimers();
+  window.clearInterval(buildTimerInterval);
+  window.clearTimeout(combatPhaseTimeout);
+  window.clearTimeout(nextRoundTimeout);
+  window.clearTimeout(readyLaunchTimeout);
+  document.body.classList.add("modal-open", "match-over", "match-defeat");
+  matchResult.hidden = false;
+  spectateMatchButton.hidden = false;
+  matchResultKicker.textContent = "Squad Eliminated";
+  matchResultTitle.textContent = "Defeat";
+  matchResultDescription.textContent = `${winnerName || "Another commander"} remains in the fight. Continue watching every surviving AI battle or return to the menu.`;
+  spectateMatchButton.focus();
+  announce("Your squad was eliminated. Spectator mode is available.");
+}
+
+function beginSpectatorMode() {
+  const alivePlayers = getAlivePlayers();
+  if (!getHumanPlayer().eliminated || alivePlayers.length < 2) return;
+
+  gameState.spectating = true;
+  gameState.eliminationPromptOpen = false;
+  gameState.spectatedPlayerId = [...alivePlayers].sort((first, second) => second.hp - first.hp)[0]?.id || null;
+  matchResult.hidden = true;
+  spectateMatchButton.hidden = true;
+  document.body.classList.remove("modal-open", "match-over", "match-defeat");
+  document.body.classList.add("spectator-mode");
+  getHumanPlayer().buildStatus = "Spectating";
+  renderLeaderboard();
+  announce("Spectator mode activated. Select combatants to scout them or wait for the next battle.");
+  completeCombatRound();
 }
 
 function completeCombatRound() {
@@ -1864,14 +2677,14 @@ function completeCombatRound() {
   const humanPlayer = getHumanPlayer();
   const alivePlayers = getAlivePlayers();
 
-  if (humanPlayer.eliminated) {
-    const leadingOpponent = alivePlayers.sort((first, second) => second.hp - first.hp)[0];
-    showMatchResultScreen(false, leadingOpponent?.name);
+  if (alivePlayers.length === 1) {
+    showMatchResultScreen(alivePlayers[0].isHuman, alivePlayers[0].name);
     return;
   }
 
-  if (alivePlayers.length === 1) {
-    showMatchResultScreen(alivePlayers[0].isHuman, alivePlayers[0].name);
+  if (humanPlayer.eliminated && !gameState.spectating) {
+    const leadingOpponent = alivePlayers.sort((first, second) => second.hp - first.hp)[0];
+    showEliminationPrompt(leadingOpponent?.name);
     return;
   }
 
@@ -1888,16 +2701,22 @@ function completeCombatRound() {
     "combat-resolved",
     "combat-victory",
     "combat-defeat",
+    "spectator-multi-view",
   );
   combatArena.hidden = true;
+  spectatorCombatBroadcast.hidden = true;
+  spectatorControls.hidden = true;
   combatRoundResult.hidden = true;
   combatRoundResult.setAttribute("aria-hidden", "true");
   combatFxLayer.innerHTML = "";
-  deploymentWorkspace.hidden = false;
-  teamKickerElement.innerHTML = "<span>Squad Deployment</span> // Your Side";
-  teamTitleElement.textContent = "Assemble Your Strike Team";
+  deploymentWorkspace.hidden = gameState.spectating;
+  spectatorBuildBoard.hidden = !gameState.spectating;
+  teamKickerElement.innerHTML = gameState.spectating
+    ? "<span>Spectator Network</span> // Build Observation"
+    : "<span>Squad Deployment</span> // Your Side";
+  teamTitleElement.textContent = gameState.spectating ? "Awaiting Next Engagement" : "Assemble Your Strike Team";
   buildTimerChip.querySelector("small").textContent = "Build Time";
-  matchPhaseLabel.textContent = "Planning phase";
+  matchPhaseLabel.textContent = gameState.spectating ? "Spectating build phase" : "Planning phase";
   players.filter((player) => !player.eliminated).forEach((player) => {
     player.ready = false;
 
@@ -1908,6 +2727,7 @@ function completeCombatRound() {
   const preservedFrozenShop = prepareShopForNextRound();
   renderRoster();
   startBuildTimer();
+  renderSpectatorBuildBoard();
   announce(
     `Round ${gameState.round} build phase started. New credits received.${preservedFrozenShop ? " Frozen shop offers were preserved." : ""}`,
   );
@@ -1933,6 +2753,7 @@ function finishBuildPhase() {
   buildTimerChip.classList.remove("timer-warning");
   buildTimerChip.classList.add("timer-ended");
   document.body.classList.add("build-phase-ended");
+  spectatorBuildBoard.hidden = true;
   shopCards.forEach((card) => card.classList.remove("shop-card--selected"));
   completeAiBuilds();
   updateHud();
@@ -2745,9 +3566,62 @@ window.addEventListener("scroll", queueHeroInfoPosition, { passive: true, captur
 window.addEventListener("resize", queueHeroInfoPosition, { passive: true });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
+    if (!combatRecap.hidden) {
+      closeCombatRecap();
+      return;
+    }
+
+    if (!scoutOverlay.hidden) {
+      closeScoutPanel();
+      return;
+    }
+
     hideHeroInfoPopover();
   }
 });
+
+playerListElement.addEventListener("click", (event) => {
+  const playerRow = event.target.closest(".player-row[data-player-id]");
+  if (playerRow) openScoutPanel(playerRow.dataset.playerId);
+});
+
+playerListElement.addEventListener("keydown", (event) => {
+  const playerRow = event.target.closest(".player-row[data-player-id]");
+  if (playerRow && (event.key === "Enter" || event.key === " ")) {
+    event.preventDefault();
+    openScoutPanel(playerRow.dataset.playerId);
+  }
+});
+
+spectatorBuildGrid.addEventListener("click", (event) => {
+  const builderCard = event.target.closest(".spectator-builder[data-player-id]");
+  if (builderCard) openScoutPanel(builderCard.dataset.playerId);
+});
+
+spectatorBuildGrid.addEventListener("keydown", (event) => {
+  const builderCard = event.target.closest(".spectator-builder[data-player-id]");
+  if (builderCard && (event.key === "Enter" || event.key === " ")) {
+    event.preventDefault();
+    openScoutPanel(builderCard.dataset.playerId);
+  }
+});
+
+spectatorCombatGrid.addEventListener("click", (event) => {
+  const recapTrigger = event.target.closest("[data-spectator-recap-index]");
+  if (!recapTrigger) return;
+  const result = gameState.combatResults[Number(recapTrigger.dataset.spectatorRecapIndex)];
+  if (!result) return;
+  gameState.viewedCombatResult = result;
+  openCombatRecap();
+});
+
+closeScoutButtons.forEach((button) => button.addEventListener("click", closeScoutPanel));
+combatRecapButton.addEventListener("click", openCombatRecap);
+closeCombatRecapButtons.forEach((button) => button.addEventListener("click", () => closeCombatRecap()));
+combatRecapContinue.addEventListener("click", () => closeCombatRecap({ continueMatch: true }));
+spectateMatchButton.addEventListener("click", beginSpectatorMode);
+spectatorPrevious.addEventListener("click", () => cycleSpectatedBattle(-1));
+spectatorNext.addEventListener("click", () => cycleSpectatedBattle(1));
 
 rerollButton.addEventListener("click", rerollShop);
 freezeShopButton.addEventListener("click", toggleShopFreeze);

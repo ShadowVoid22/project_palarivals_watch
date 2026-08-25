@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Private suggestion review console for PalaRivals Watch.">
+  <title>Suggestion Command | PalaRivals Watch</title>
+  <link rel="stylesheet" href="/css/admin/SuggestionsAdmin.css">
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body>
+  <div class="admin-world" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+
+  <header class="admin-header">
+    <a class="admin-brand" href="/" aria-label="Return to PalaRivals Watch main menu">
+      <span>PRW</span>
+      <div><small>Autobattler Command</small><strong>PalaRivals <em>Watch</em></strong></div>
+    </a>
+    <div class="admin-header__status"><i></i><span>Private Development Channel</span><b>ADMIN // 07</b></div>
+    <a class="admin-exit" href="/">Main Menu <span aria-hidden="true">&#8599;</span></a>
+  </header>
+
+  <main class="admin-shell">
+    <section class="admin-lock" id="AdminLock" aria-labelledby="AdminLockTitle">
+      <div class="admin-lock__visual" aria-hidden="true">
+        <span class="admin-lock__ring"></span><span class="admin-lock__ring"></span>
+        <strong>SC</strong><i></i>
+      </div>
+      <div class="admin-lock__content">
+        <span class="eyebrow">Restricted Uplink // Development Eyes Only</span>
+        <h1 id="AdminLockTitle">Suggestion <em>Command</em></h1>
+        <p>Review community transmissions, export the current archive, and remove suggestions once your team has handled them.</p>
+        <form id="AdminKeyForm">
+          <label for="AdminKey">Suggestion Admin Key</label>
+          <div class="admin-key-field">
+            <span aria-hidden="true">KEY</span>
+            <input id="AdminKey" type="password" autocomplete="current-password" required placeholder="Enter SUGGESTIONS_ADMIN_KEY">
+            <button id="AdminKeyToggle" type="button" aria-label="Show admin key" aria-pressed="false">Show</button>
+          </div>
+          <button class="admin-unlock" id="AdminUnlock" type="submit"><span>Open Suggestion Inbox</span><i aria-hidden="true">&#10140;</i></button>
+        </form>
+        <p class="admin-lock__privacy"><i></i>Your key is used only for this page session. It is never saved to local storage.</p>
+        <div class="admin-message" id="AdminLoginMessage" role="alert" hidden></div>
+      </div>
+    </section>
+
+    <section class="admin-dashboard" id="AdminDashboard" aria-labelledby="AdminDashboardTitle" hidden>
+      <header class="dashboard-hero">
+        <div>
+          <span class="eyebrow">Community Intelligence // Live Archive</span>
+          <h1 id="AdminDashboardTitle">Suggestion <em>Inbox</em></h1>
+          <p>Read every transmission before clearing it from the shared development channel.</p>
+        </div>
+        <div class="dashboard-hero__actions">
+          <button id="RefreshSuggestions" type="button"><span aria-hidden="true">&#8635;</span> Refresh</button>
+          <button id="ExportSuggestions" type="button"><span aria-hidden="true">&#8681;</span> Export JSON</button>
+          <button id="LockAdmin" type="button"><span aria-hidden="true">&#10005;</span> Lock Console</button>
+        </div>
+      </header>
+
+      <section class="admin-stats" aria-label="Suggestion statistics">
+        <article><span>Total Transmissions</span><strong id="TotalSuggestions">0</strong><small>currently archived</small></article>
+        <article><span>Feature Requests</span><strong id="FeatureSuggestions">0</strong><small>feature and game mode</small></article>
+        <article><span>Balance Reports</span><strong id="BalanceSuggestions">0</strong><small>balance, hero, and bugs</small></article>
+        <article><span>Latest Signal</span><strong id="LatestSuggestion">--</strong><small>most recent arrival</small></article>
+      </section>
+
+      <section class="admin-toolbar" aria-label="Suggestion filters">
+        <label class="admin-search">
+          <span aria-hidden="true">&#8981;</span>
+          <input id="SuggestionSearch" type="search" placeholder="Search title, player, or details" aria-label="Search suggestions">
+        </label>
+        <label>
+          <span class="sr-only">Filter by category</span>
+          <select id="SuggestionFilter" aria-label="Filter suggestions by category">
+            <option value="all">All Channels</option>
+            <option value="feature">New Feature</option>
+            <option value="balance">Balance Change</option>
+            <option value="hero">Hero or Ability</option>
+            <option value="interface">Interface / Accessibility</option>
+            <option value="game-mode">Game Mode</option>
+            <option value="bug">Bug or Problem</option>
+            <option value="other">Other Idea</option>
+          </select>
+        </label>
+        <div class="admin-toolbar__count"><i></i><span>Displaying <b id="VisibleSuggestions">0</b> transmissions</span></div>
+      </section>
+
+      <div class="admin-notice" id="AdminNotice" role="status" aria-live="polite" hidden></div>
+      <section class="suggestion-list" id="SuggestionList" aria-label="Community suggestions"></section>
+      <section class="admin-empty" id="AdminEmpty" hidden>
+        <span aria-hidden="true">&#10003;</span>
+        <h2>Channel Clear</h2>
+        <p id="AdminEmptyMessage">There are no suggestions waiting for review.</p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="admin-footer"><span><i></i>Encrypted connection</span><b>PalaRivals Watch // Community Command</b><span>Private archive access</span></footer>
+
+  <section class="delete-dialog" id="DeleteDialog" aria-hidden="true" hidden>
+    <button class="delete-dialog__backdrop" id="DeleteBackdrop" type="button" aria-label="Cancel deletion"></button>
+    <article role="alertdialog" aria-modal="true" aria-labelledby="DeleteDialogTitle" aria-describedby="DeleteDialogMessage">
+      <span class="delete-dialog__icon" aria-hidden="true">!</span>
+      <small>Permanent Archive Action</small>
+      <h2 id="DeleteDialogTitle">Delete Suggestion?</h2>
+      <p id="DeleteDialogMessage">This removes <strong id="DeleteSuggestionName">this suggestion</strong> from the shared JSON archive. This cannot be undone.</p>
+      <div><button id="CancelDelete" type="button">Keep Suggestion</button><button id="ConfirmDelete" type="button">Delete Permanently</button></div>
+    </article>
+  </section>
+
+  <template id="SuggestionCardTemplate">
+    <article class="suggestion-card">
+      <header>
+        <div><span class="suggestion-card__category"></span><span class="suggestion-card__status"><i></i>New Transmission</span></div>
+        <time></time>
+      </header>
+      <div class="suggestion-card__body">
+        <div class="suggestion-card__index" aria-hidden="true"></div>
+        <div class="suggestion-card__content">
+          <h2></h2>
+          <p></p>
+          <footer><span class="suggestion-card__player"></span><span class="suggestion-card__context"></span><span class="suggestion-card__id"></span></footer>
+        </div>
+        <button class="suggestion-card__delete" type="button"><span aria-hidden="true">&#10005;</span><b>Delete</b><small>Archive Clear</small></button>
+      </div>
+    </article>
+  </template>
+
+  <script src="/js/admin/SuggestionsAdmin.js"></script>
+</body>
+
+</html>

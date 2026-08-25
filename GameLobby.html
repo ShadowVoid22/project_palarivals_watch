@@ -160,6 +160,17 @@
         </section>
         </div>
 
+        <section class="spectator-build" id="spectatorBuildBoard" aria-labelledby="spectatorBuildTitle" hidden>
+          <header class="spectator-build__header">
+            <div>
+              <p class="kicker"><span>All-Commander Feed</span> // Live Build Surveillance</p>
+              <h2 id="spectatorBuildTitle">Remaining Team Workshops</h2>
+            </div>
+            <span><i></i><strong id="spectatorBuilderCount">0</strong> commanders building</span>
+          </header>
+          <div class="spectator-build__grid" id="spectatorBuildGrid" aria-live="polite"></div>
+        </section>
+
         <section class="combat-arena" id="combatArena" aria-labelledby="combatTitle" hidden>
           <div class="combat-arena__header">
             <div class="combat-broadcast">
@@ -174,13 +185,23 @@
               <i><b id="combatEventProgress"></b></i>
             </div>
           </div>
+          <section class="spectator-broadcast" id="spectatorCombatBroadcast" aria-labelledby="spectatorBroadcastTitle" hidden>
+            <header>
+              <div>
+                <small>Multicast Arena Network</small>
+                <h3 id="spectatorBroadcastTitle">All Battles Live</h3>
+              </div>
+              <span><i></i><strong id="spectatorBattleCount">0</strong> simultaneous feeds</span>
+            </header>
+            <div class="spectator-broadcast__grid" id="spectatorCombatGrid"></div>
+          </section>
           <div class="combat-matchup">
             <div class="combat-fx-layer" id="combatFxLayer" aria-hidden="true"></div>
             <article class="combat-side combat-side--player">
               <header class="combat-side__header">
                 <div>
-                  <span class="combat-side__label">Your Squad</span>
-                  <h3>You</h3>
+                  <span class="combat-side__label" id="playerCombatLabel">Your Squad</span>
+                  <h3 id="playerCombatName">You</h3>
                 </div>
                 <span class="combat-side__status"><b id="playerCombatRemaining">0</b> Active</span>
               </header>
@@ -206,7 +227,16 @@
             <small id="combatRoundResultKicker">Round Complete</small>
             <strong id="combatRoundResultTitle">Victory</strong>
             <span id="combatRoundResultDetail">Enemy squad neutralized</span>
+            <button class="combat-recap-button" id="combatRecapButton" type="button">
+              <i aria-hidden="true">▥</i>
+              View Combat Recap
+            </button>
           </div>
+          <nav class="spectator-controls" id="spectatorControls" aria-label="Spectator match controls" hidden>
+            <button id="spectatorPrevious" type="button" aria-label="Watch previous battle">‹</button>
+            <span><small>Spectator Uplink</small><strong id="spectatorMatchLabel">Match 1 of 1</strong></span>
+            <button id="spectatorNext" type="button" aria-label="Watch next battle">›</button>
+          </nav>
         </section>
       </div>
     </section>
@@ -383,12 +413,64 @@
     </div>
   </aside>
 
+  <div class="scout-overlay" id="scoutOverlay" hidden aria-hidden="true">
+    <button class="scout-overlay__backdrop" type="button" data-close-scout aria-label="Close opponent scouting"></button>
+    <section class="scout-panel" role="dialog" aria-modal="true" aria-labelledby="scoutPlayerName">
+      <header class="scout-panel__header">
+        <div class="scout-panel__identity">
+          <span class="scout-panel__avatar" id="scoutPlayerAvatar">AI</span>
+          <div>
+            <small>Opponent Scouting // Live Intel</small>
+            <h2 id="scoutPlayerName">Combatant</h2>
+            <p id="scoutPlayerStatus">Scanning formation</p>
+          </div>
+        </div>
+        <button class="intel-close" type="button" data-close-scout aria-label="Close opponent scouting">×</button>
+      </header>
+      <div class="scout-panel__summary" id="scoutPlayerSummary"></div>
+      <section class="scout-panel__traits" aria-labelledby="scoutTraitsTitle">
+        <div class="intel-section-title"><span>01</span><h3 id="scoutTraitsTitle">Detected Traits</h3></div>
+        <div class="scout-trait-list" id="scoutTraitList"></div>
+      </section>
+      <section class="scout-panel__formation" aria-labelledby="scoutFormationTitle">
+        <div class="intel-section-title"><span>02</span><h3 id="scoutFormationTitle">Last Seen Formation</h3></div>
+        <div class="scout-formation" id="scoutFormation"></div>
+      </section>
+      <footer><span><i></i> Intel updates during the build phase</span><b>Click any combatant to scout</b></footer>
+    </section>
+  </div>
+
+  <div class="combat-recap" id="combatRecap" hidden aria-hidden="true">
+    <button class="combat-recap__backdrop" type="button" data-close-recap aria-label="Close combat recap"></button>
+    <section class="combat-recap__panel" role="dialog" aria-modal="true" aria-labelledby="combatRecapTitle">
+      <header class="combat-recap__header">
+        <div>
+          <small>After Action Report // Per-Hero Telemetry</small>
+          <h2 id="combatRecapTitle">Combat Recap</h2>
+          <p id="combatRecapSubtitle">Round statistics synchronized</p>
+        </div>
+        <button class="intel-close" type="button" data-close-recap aria-label="Close combat recap">×</button>
+      </header>
+      <div class="combat-recap__legend" aria-hidden="true">
+        <span>DMG<small>Dealt</small></span><span>TAKEN<small>Received</small></span><span>HEAL<small>Restored</small></span><span>KO<small>Eliminations</small></span><span>CRIT<small>Criticals</small></span><span>EVADE<small>Dodges</small></span>
+      </div>
+      <div class="combat-recap__teams" id="combatRecapTeams"></div>
+      <footer class="combat-recap__footer">
+        <span><i></i> Complete round telemetry</span>
+        <button id="combatRecapContinue" type="button">Continue Match</button>
+      </footer>
+    </section>
+  </div>
+
   <div class="match-result" id="matchResult" hidden>
     <section class="match-result__panel" role="dialog" aria-modal="true" aria-labelledby="matchResultTitle">
       <p class="kicker"><span id="matchResultKicker">Match Complete</span> // Final Result</p>
       <h2 id="matchResultTitle">Victory</h2>
       <p id="matchResultDescription">You are the last commander standing.</p>
-      <a href="Main.html">Return to Main Menu</a>
+      <div class="match-result__actions">
+        <button id="spectateMatchButton" type="button" hidden>Watch Remaining Match</button>
+        <a href="Main.html">Return to Main Menu</a>
+      </div>
     </section>
   </div>
 

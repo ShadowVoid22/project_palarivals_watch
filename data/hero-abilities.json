@@ -2,19 +2,19 @@
   "version": 1,
   "abilities": {
     "groot": { "name": "Ironwood Guard", "type": "Passive", "description": "Gains 4 maximum health and reduces every incoming hit by 1.", "effects": { "bonusHealth": 4, "damageReduction": 1 } },
-    "hulk": { "name": "Worldbreaker", "type": "Passive", "description": "Gains 2 power and restores 3 health after knocking out an enemy.", "effects": { "bonusPower": 2, "onKillHeal": 3 } },
+    "hulk": { "name": "Worldbreaker", "type": "Passive", "description": "Gains 4 power and restores 3 health after knocking out an enemy.", "effects": { "bonusPower": 4, "onKillHeal": 3 } },
     "iron-man": { "name": "Maximum Pulse", "type": "Attack", "description": "Gains 18% critical chance and critical hits deal 3 additional damage.", "effects": { "critChance": 0.18, "critDamage": 3 } },
-    "spider-man": { "name": "Spider-Sense", "type": "Reaction", "description": "Has a 22% chance to dodge attacks and deals 2 bonus damage on his first strike.", "effects": { "dodgeChance": 0.22, "firstStrikeBonus": 2 } },
-    "thor": { "name": "God of Thunder", "type": "Attack", "description": "His first strike deals 5 bonus damage and he gains 8% critical chance.", "effects": { "firstStrikeBonus": 5, "critChance": 0.08 } },
+    "spider-man": { "name": "Spider-Sense", "type": "Reaction", "description": "Has a 22% chance to dodge attacks and deals 3 bonus damage to enemies at or below 35% health.", "effects": { "dodgeChance": 0.22, "executeThreshold": 0.35, "executeBonus": 3 } },
+    "thor": { "name": "God of Thunder", "type": "Attack", "description": "His first strike deals 5 bonus damage and he gains 18% critical chance.", "effects": { "firstStrikeBonus": 5, "critChance": 0.18 } },
     "bastion": { "name": "Configuration: Assault", "type": "Passive", "description": "Gains 2 power and reduces every incoming hit by 1.", "effects": { "bonusPower": 2, "damageReduction": 1 } },
     "genji": { "name": "Deflect", "type": "Reaction", "description": "Has an 18% chance to dodge and reflects 2 damage whenever struck.", "effects": { "dodgeChance": 0.18, "thorns": 2 } },
     "junkrat": { "name": "Total Mayhem", "type": "Reaction", "description": "Returns 3 explosive damage whenever an enemy lands a hit.", "effects": { "thorns": 3 } },
     "roadhog": { "name": "Take a Breather", "type": "Passive", "description": "Gains 3 maximum health and heals for 35% of damage dealt.", "effects": { "bonusHealth": 3, "lifesteal": 0.35 } },
-    "tracer": { "name": "Blink Recall", "type": "Reaction", "description": "Has a 25% chance to dodge and deals 2 bonus damage on her first strike.", "effects": { "dodgeChance": 0.25, "firstStrikeBonus": 2 } },
+    "tracer": { "name": "Blink Recall", "type": "Reaction", "description": "Has a 18% chance to dodge and deals 2 bonus damage on her first strike.", "effects": { "dodgeChance": 0.18, "firstStrikeBonus": 2 } },
     "bomb-king": { "name": "Royal Detonation", "type": "Attack", "description": "Gains 20% critical chance and critical hits deal 4 additional damage.", "effects": { "critChance": 0.2, "critDamage": 4 } },
     "drogoz": { "name": "Dragon Punch", "type": "Attack", "description": "His opening attack deals 6 bonus damage.", "effects": { "firstStrikeBonus": 6 } },
-    "moji": { "name": "Familiar Feast", "type": "Attack", "description": "Deals 4 bonus damage to enemies at or below 40% health.", "effects": { "executeThreshold": 0.4, "executeBonus": 4 } },
-    "raum": { "name": "Soul Armor", "type": "Passive", "description": "Gains 5 maximum health and heals for 20% of damage dealt.", "effects": { "bonusHealth": 5, "lifesteal": 0.2 } },
-    "seris": { "name": "Soul Collector", "type": "Passive", "description": "Heals for 45% of damage dealt and restores 2 more health after a knockout.", "effects": { "lifesteal": 0.45, "onKillHeal": 2 } }
+    "moji": { "name": "Familiar Feast", "type": "Attack", "description": "Deals 8 bonus damage to enemies at or below 50% health.", "effects": { "executeThreshold": 0.5, "executeBonus": 8 } },
+    "raum": { "name": "Soul Armor", "type": "Passive", "description": "Gains 5 maximum health and heals for 25% of damage dealt.", "effects": { "bonusHealth": 5, "lifesteal": 0.25 } },
+    "seris": { "name": "Soul Collector", "type": "Passive", "description": "Heals for 45% of damage dealt and restores 3 more health after a knockout.", "effects": { "lifesteal": 0.45, "onKillHeal": 3 } }
   }
 }

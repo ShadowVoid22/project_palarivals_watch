@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leader Protocol | PalaRivals Watch Arcade</title>
+  <meta name="description" content="Choose a hyper-powered leader and build a team around their command aura in this PalaRivals Watch Arcade mode.">
+  <link rel="stylesheet" href="css/arcade/LeaderProtocol.css">
+  <link rel="stylesheet" href="css/shared/Audio.css">
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body data-audio-scene="build">
+  <div class="lp-world" aria-hidden="true"><i></i><i></i><i></i><b>LP</b></div>
+
+  <header class="lp-command-bar">
+    <a class="lp-brand" href="Main.html" aria-label="Return to the PalaRivals Watch main menu">
+      <span>PRW</span>
+      <span><small>Arcade Directive</small><strong>Leader Protocol</strong></span>
+    </a>
+
+    <div class="lp-operation"><small>Operation</small><strong id="operationLabel">Awaiting Commander</strong></div>
+
+    <section class="lp-hud" aria-label="Leader Protocol match statistics">
+      <div><span>♥</span><small>Integrity</small><strong id="healthValue">100</strong></div>
+      <div><span>R</span><small>Round</small><strong id="roundValue">01</strong></div>
+      <div class="lp-hud__timer"><span>◷</span><small>Build Time</small><strong id="timerValue">00:50</strong></div>
+      <div class="lp-hud__credits"><span>◆</span><small>Credits</small><strong id="creditValue">12</strong></div>
+    </section>
+
+    <button class="lp-rules-button" id="rulesButton" type="button" aria-controls="rulesPanel" aria-expanded="false">Protocol</button>
+  </header>
+
+  <div class="lp-status-strip" aria-hidden="true">
+    <span><i></i> Eight commanders connected</span>
+    <span>Leader signal <b id="signalLabel">unassigned</b></span>
+    <em>Build around the crown // punish disloyalty</em>
+  </div>
+
+  <main class="lp-shell">
+    <section class="lp-stage" id="buildView" aria-labelledby="buildTitle">
+      <div class="lp-workspace">
+        <header class="lp-build-header">
+          <div>
+            <p>Command Deck // Formation Phase</p>
+            <h1 id="buildTitle">Build Around<br><span>The Crown.</span></h1>
+            <p class="lp-build-copy">Your leader empowers heroes who fit their doctrine and weakens heroes who oppose it. Every slot is a strategic decision.</p>
+          </div>
+          <div class="lp-build-actions">
+            <span><small>Formation</small><b><i id="unitCount">1</i> / 6</b></span>
+            <button id="readyButton" type="button"><i>✓</i><strong>Lock Formation</strong><small>Enter combat</small></button>
+          </div>
+        </header>
+
+        <section class="lp-leader-console" id="leaderConsole" aria-live="polite">
+          <div class="lp-console-empty"><span>!</span><p><small>Command Channel Offline</small><strong>Select a leader to begin</strong></p></div>
+        </section>
+
+        <section class="lp-board-section" aria-labelledby="boardTitle">
+          <header>
+            <div><small>Command Formation // Six Units</small><h2 id="boardTitle">Strike Team</h2></div>
+            <p><b>Inspired</b> heroes receive the aura. <i>Conflict</i> heroes are weakened. The leader is permanently locked in slot 01.</p>
+          </header>
+          <div class="lp-board" id="teamBoard" aria-label="Six Leader Protocol team slots"></div>
+        </section>
+
+        <section class="lp-shop" aria-labelledby="shopTitle">
+          <header>
+            <div><small>Reinforcement Network</small><h2 id="shopTitle">Recruitment Drop</h2><p>Relationship labels show how each hero responds to your leader.</p></div>
+            <button id="rerollButton" type="button"><span>↻</span> Reroll <b>◆ 1</b></button>
+          </header>
+          <div class="lp-shop-grid" id="shopGrid" aria-label="Three available heroes"></div>
+        </section>
+      </div>
+
+      <aside class="lp-leaderboard" aria-labelledby="leaderboardTitle">
+        <header><p>Live Match // <b id="onlineCount">8</b> Online</p><h2 id="leaderboardTitle">Commanders</h2><span><i></i><i></i><i></i></span></header>
+        <ol id="playerList"></ol>
+        <footer><span><i></i> Command network online</span><b id="readyCount">0/8 ready</b></footer>
+      </aside>
+    </section>
+
+    <section class="lp-combat" id="combatView" aria-labelledby="combatTitle" hidden>
+      <header class="lp-combat-header">
+        <span><i></i> Commanders Engaged</span>
+        <div><small id="combatKicker">Leader Clash // Round 01</small><h1 id="combatTitle">Orders Executed</h1></div>
+        <b id="combatEvent">00</b>
+      </header>
+
+      <div class="lp-combat-arena">
+        <div class="lp-combat-fx" id="combatFx" aria-hidden="true"></div>
+        <article class="lp-combat-side lp-combat-side--player">
+          <header><span>Allied Command</span><strong>You</strong><b><i id="playerUnitsLeft">0</i> active</b></header>
+          <div class="lp-combat-team" id="playerCombatTeam"></div>
+        </article>
+        <div class="lp-versus" aria-hidden="true"><span>VS</span><i></i></div>
+        <article class="lp-combat-side lp-combat-side--enemy">
+          <header><span>Opposing Command</span><strong id="enemyName">Rival</strong><b><i id="enemyUnitsLeft">0</i> active</b></header>
+          <div class="lp-combat-team" id="enemyCombatTeam"></div>
+        </article>
+      </div>
+      <div class="lp-combat-feed" id="combatFeed" role="status" aria-live="polite">Synchronizing command auras…</div>
+      <div class="lp-combat-log" id="combatLog"></div>
+    </section>
+  </main>
+
+  <section class="lp-leader-draft" id="leaderDraft" aria-labelledby="leaderDraftTitle">
+    <div class="lp-leader-draft__backdrop"></div>
+    <article class="lp-leader-draft__panel">
+      <header>
+        <div><small>Arcade Protocol // Command Selection</small><h1 id="leaderDraftTitle">Choose Your Leader</h1><p>Three commanders answered the signal. Pick one—the entire run will bend around their doctrine.</p></div>
+        <span><b>03</b><small>Candidates</small></span>
+      </header>
+      <div class="lp-leader-options" id="leaderOptions" aria-live="polite"></div>
+      <footer><span><i></i> Selection is permanent for this run</span><b>Leader stats and abilities are hyper-augmented</b></footer>
+    </article>
+  </section>
+
+  <aside class="lp-rules" id="rulesPanel" aria-labelledby="rulesTitle" hidden>
+    <button class="lp-rules__backdrop" type="button" data-close-rules aria-label="Close protocol rules"></button>
+    <article>
+      <button class="lp-rules__close" type="button" data-close-rules aria-label="Close protocol rules">×</button>
+      <small>Leader Protocol // Field Manual</small>
+      <h2 id="rulesTitle">Build for the Crown</h2>
+      <ol>
+        <li><b>Choose.</b><span>Pick one of three randomly offered leaders. The leader occupies slot 01 and cannot be sold.</span></li>
+        <li><b>Inspire.</b><span>Heroes matching a favored leader tag receive the leader aura and build Command Link.</span></li>
+        <li><b>Avoid Conflict.</b><span>Heroes with an opposed tag are weakened even if they match a favored tag.</span></li>
+        <li><b>Link.</b><span>Reach 2, 4, and 6 inspired units to upgrade the entire favored formation.</span></li>
+        <li><b>Ascend.</b><span>Every third round the leader gains another level of power, health, and signature ability output.</span></li>
+        <li><b>Survive.</b><span>Fight seven AI commanders. Losing costs integrity; reaching zero eliminates that commander.</span></li>
+      </ol>
+    </article>
+  </aside>
+
+  <section class="lp-result" id="roundResult" hidden aria-live="assertive">
+    <article>
+      <small id="resultKicker">Round Complete</small>
+      <h2 id="resultTitle">Victory</h2>
+      <p id="resultDetail">The opposing command signal collapsed.</p>
+      <div><span>Your Integrity <b id="resultHealth">100</b></span><span>Commanders Left <b id="resultRemaining">8</b></span></div>
+      <button id="continueButton" type="button">Continue Campaign <i>➜</i></button>
+      <a id="returnButton" href="Main.html" hidden>Return to Arcade</a>
+    </article>
+  </section>
+
+  <aside class="lp-inspector" id="unitInspector" role="tooltip" hidden></aside>
+  <p class="lp-announcer" id="announcer" role="status" aria-live="polite"></p>
+
+  <script src="js/shared/AudioManager.js"></script>
+  <script src="js/arcade/LeaderProtocol.js"></script>
+</body>
+</html>

@@ -7,6 +7,9 @@
   <title>PalaRivals Watch</title>
   <link rel="stylesheet" href="css/main/Main.css">
   <link rel="stylesheet" href="css/main/Auth.css">
+  <link rel="stylesheet" href="css/main/Arcade.css">
+  <link rel="stylesheet" href="css/main/Changelog.css">
+  <link rel="stylesheet" href="css/main/Suggestions.css">
   <link rel="stylesheet" href="css/shared/Audio.css">
   <meta name="description" content="Main menu for PalaRivals Watch.">
   <script>
@@ -34,6 +37,18 @@
     <button class="AccountButtons" id="LoginButton" type="button" aria-controls="prwLoginPanel" aria-expanded="false">Log In</button>
     <button class="AccountButtons hidden" id="AccountButton" type="button">Account</button>
   </section>
+
+  <button class="ChangeLogShortcut" id="ChangeLogButton" type="button" aria-controls="ChangeLogMenu" aria-expanded="false">
+    <span class="ChangeLogShortcut__icon" aria-hidden="true">CL</span>
+    <b>Change Log</b>
+    <i aria-hidden="true">NEW</i>
+  </button>
+
+  <button class="SuggestionShortcut" id="SuggestionButton" type="button" aria-controls="SuggestionMenu" aria-expanded="false">
+    <span class="SuggestionShortcut__icon" aria-hidden="true">+</span>
+    <span><small>Community Uplink</small><b>Send an Idea</b></span>
+    <i aria-hidden="true"></i>
+  </button>
 
   <main class="menu-shell">
     <section class="menu-panel" aria-labelledby="MainMenuTitle">
@@ -77,6 +92,7 @@
           <span>Enter Lobby</span>
           <span class="button-arrow" aria-hidden="true">&#10140;</span>
         </a>
+        <button class="MainButtons MainButtons--arcade" id="ArcadeButton" type="button" aria-controls="ArcadeMenu" aria-expanded="false">Arcade</button>
         <button class="MainButtons" id="HeroCompendiumButton" type="button">Hero Compendium</button>
       </section>
 
@@ -176,6 +192,193 @@
       <footer class="prw-auth-card__footer">
         <span>Encrypted profile channel</span>
         <span>Three worlds // One identity</span>
+      </footer>
+    </article>
+  </section>
+
+  <section class="arcade-menu" id="ArcadeMenu" aria-labelledby="ArcadeMenuTitle" aria-hidden="true" hidden>
+    <button class="arcade-menu__backdrop" type="button" data-arcade-close aria-label="Close Arcade menu"></button>
+    <article class="arcade-menu__panel" role="dialog" aria-modal="true" aria-describedby="ArcadeMenuDescription">
+      <div class="arcade-menu__atmosphere" aria-hidden="true"><i></i><i></i><b>ARCADE</b></div>
+
+      <header class="arcade-menu__header">
+        <div class="arcade-menu__brand" aria-hidden="true"><span>PRW</span><i></i></div>
+        <div class="arcade-menu__heading">
+          <span>PRW Network // Alternate Reality Channel</span>
+          <h2 id="ArcadeMenuTitle">Arcade <em>Protocols</em></h2>
+          <p id="ArcadeMenuDescription">Standard combat rules suspended. Select an experiment and rewrite the arena.</p>
+        </div>
+        <div class="arcade-menu__network" aria-label="Arcade network status">
+          <span><i></i> Network Live</span>
+          <b>03</b>
+          <small>Playable Protocols</small>
+        </div>
+        <button type="button" class="arcade-menu__close" data-arcade-close aria-label="Close Arcade menu">×</button>
+      </header>
+
+      <div class="arcade-menu__selector" aria-hidden="true">
+        <span><b>Mode Select</b> // Choose Your Anomaly</span>
+        <i></i>
+        <em>Channel 8.21.26</em>
+      </div>
+
+      <div class="arcade-menu__grid">
+        <a class="arcade-mode-card arcade-mode-card--ability" href="AbilityDraft.html">
+          <span class="arcade-mode-card__topline"><b>01</b><i></i><em>Experiment Stable</em></span>
+          <span class="arcade-mode-card__art" aria-hidden="true">
+            <img src="Img/Characters/MarvelRivals/HulkPNG.jpeg" alt="">
+            <img src="Img/Characters/Overwatch/TracerPNG.png" alt="">
+            <img src="Img/Characters/Paladins/SerisPNG.png" alt="">
+            <b>FUSE</b>
+          </span>
+          <span class="arcade-mode-card__content">
+            <small>Draft // Merge // Improvise</small>
+            <strong>Ability <em>Draft</em></strong>
+            <span>Steal powers from across all three worlds, fuse impossible loadouts, and outbuild 1 adaptive rival.</span>
+            <span class="arcade-mode-card__features"><i>Ability Fusion</i><i>Hero Merging</i><i>1 AI Rival</i></span>
+            <span class="arcade-mode-card__meta"><b><small>Format</small>Solo Gauntlet</b><b><small>Formation</small>6 Units</b><b><small>Difficulty</small>Dynamic</b></span>
+            <b>Enter Mode <i aria-hidden="true">➜</i></b>
+          </span>
+        </a>
+
+        <a class="arcade-mode-card arcade-mode-card--leader" href="LeaderProtocol.html">
+          <span class="arcade-mode-card__topline"><b>02</b><i></i><em>New Signal</em></span>
+          <span class="arcade-mode-card__art" aria-hidden="true">
+            <img src="Img/Characters/MarvelRivals/IronManPNG.jpeg" alt="">
+            <img src="Img/Characters/Overwatch/TracerPNG.png" alt="">
+            <img src="Img/Characters/Paladins/RaumPNG.png" alt="">
+            <b>LEAD</b>
+          </span>
+          <span class="arcade-mode-card__content">
+            <small>Command // Synergize // Ascend</small>
+            <strong>Leader <em>Protocol</em></strong>
+            <span>Install a hyper-powered commander, obey their doctrine, and turn a synchronized formation into a weapon.</span>
+            <span class="arcade-mode-card__features"><i>Command Auras</i><i>Leader Ascension</i><i>7 AI Rivals</i></span>
+            <span class="arcade-mode-card__meta"><b><small>Format</small>Leader Run</b><b><small>Formation</small>6 Units</b><b><small>Difficulty</small>Strategic</b></span>
+            <b>Choose Your Leader <i aria-hidden="true">&#10140;</i></b>
+          </span>
+        </a>
+
+        <a class="arcade-mode-card arcade-mode-card--chess" href="HeroChess.html">
+          <span class="arcade-mode-card__topline"><b>03</b><i></i><em>Reality Grid Stable</em></span>
+          <span class="arcade-mode-card__art" aria-hidden="true">
+            <img src="Img/Characters/MarvelRivals/SpiderManPNG.jpeg" alt="">
+            <img src="Img/Characters/Overwatch/GenjiPNG.png" alt="">
+            <img src="Img/Characters/Paladins/BombKingPNG.png" alt="">
+            <b>CHECK</b>
+          </span>
+          <span class="arcade-mode-card__content">
+            <small>Draft // Maneuver // Checkmate</small>
+            <strong>Crownfall <em>Draft</em></strong>
+            <span>Contest six hero identities, manifest them as a chess army, and bend every piece with a unique anomaly.</span>
+            <span class="arcade-mode-card__features"><i>Contested Draft</i><i>Hero Piece Powers</i><i>1 AI Rival</i></span>
+            <span class="arcade-mode-card__meta"><b><small>Format</small>Tactical Duel</b><b><small>Formation</small>32 Pieces</b><b><small>Difficulty</small>Grandmaster</b></span>
+            <b class="arcade-mode-card__action">Enter the Grid <i aria-hidden="true">&#10140;</i></b>
+          </span>
+        </a>
+      </div>
+
+      <footer class="arcade-menu__footer">
+        <span><i></i> Arcade network synchronized <b>3/3 channels online</b></span>
+        <span class="arcade-menu__legend"><i></i>Live <i></i>New <i></i>Encrypted</span>
+        <b>Esc // Close Terminal</b>
+      </footer>
+    </article>
+  </section>
+
+  <section class="suggestion-menu" id="SuggestionMenu" aria-labelledby="SuggestionTitle" aria-hidden="true" hidden>
+    <button class="suggestion-menu__backdrop" type="button" data-suggestion-close aria-label="Close suggestion terminal"></button>
+    <article class="suggestion-menu__panel" role="dialog" aria-modal="true" aria-describedby="SuggestionDescription">
+      <div class="suggestion-menu__signal" aria-hidden="true"><i></i><i></i><b>IDEA</b></div>
+      <header class="suggestion-menu__header">
+        <div class="suggestion-menu__brand" aria-hidden="true"><span>PRW</span><i></i></div>
+        <div>
+          <span>Community Channel // Direct to Development</span>
+          <h2 id="SuggestionTitle">Shape the <em>Watch</em></h2>
+          <p id="SuggestionDescription">Pitch a feature, balance change, interface improvement, or anything else that would make the game better.</p>
+        </div>
+        <button class="suggestion-menu__close" type="button" data-suggestion-close aria-label="Close suggestion terminal">&times;</button>
+      </header>
+
+      <div class="suggestion-menu__status" aria-hidden="true">
+        <span><i></i> Suggestion uplink ready</span>
+        <b><span id="SuggestionQueueCount">0</span> waiting on this device</b>
+      </div>
+
+      <form class="suggestion-form" id="SuggestionForm">
+        <label class="suggestion-form__field suggestion-form__field--category">
+          <span>Suggestion Type <b>Required</b></span>
+          <select id="SuggestionCategory" name="category" required>
+            <option value="feature">New Feature</option>
+            <option value="balance">Balance Change</option>
+            <option value="hero">Hero or Ability</option>
+            <option value="interface">Interface / Accessibility</option>
+            <option value="game-mode">Game Mode</option>
+            <option value="bug">Bug or Problem</option>
+            <option value="other">Other Idea</option>
+          </select>
+        </label>
+
+        <label class="suggestion-form__field suggestion-form__field--name">
+          <span>Your Name <small>Optional</small></span>
+          <input id="SuggestionPlayerName" name="playerName" type="text" maxlength="30" autocomplete="nickname" placeholder="Anonymous Commander">
+        </label>
+
+        <label class="suggestion-form__field suggestion-form__field--title">
+          <span>Idea Title <b>Required</b></span>
+          <input id="SuggestionIdeaTitle" name="title" type="text" minlength="3" maxlength="80" required placeholder="Give your idea a short name">
+          <small><b id="SuggestionTitleCount">0</b> / 80</small>
+        </label>
+
+        <label class="suggestion-form__field suggestion-form__field--details">
+          <span>Explain the Idea <b>Required</b></span>
+          <textarea id="SuggestionDetails" name="details" minlength="20" maxlength="1200" required placeholder="What should change, how would it work, and why would it make the game more fun?"></textarea>
+          <small><b id="SuggestionDetailsCount">0</b> / 1200</small>
+        </label>
+
+        <label class="suggestion-form__honeypot" aria-hidden="true">
+          <span>Website</span><input id="SuggestionWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+        </label>
+
+        <footer class="suggestion-form__footer">
+          <p><i></i><span><b>JSON Feedback Channel</b>Your idea and current menu theme are saved. Do not include passwords or private information.</span></p>
+          <button id="SuggestionSubmit" type="submit"><span>Transmit Suggestion</span><i aria-hidden="true">&#10140;</i></button>
+        </footer>
+      </form>
+
+      <div class="suggestion-menu__response" id="SuggestionResponse" role="status" aria-live="polite" hidden>
+        <span aria-hidden="true">&#10003;</span>
+        <div><small id="SuggestionResponseKicker">Transmission Complete</small><strong id="SuggestionResponseTitle">Idea Received</strong><p id="SuggestionResponseMessage">Your suggestion was added to the development channel.</p></div>
+        <button id="SuggestionAnother" type="button">Send Another Idea</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="changelog-menu" id="ChangeLogMenu" aria-labelledby="ChangeLogTitle" aria-hidden="true" hidden>
+    <button class="changelog-menu__backdrop" type="button" data-changelog-close aria-label="Close change log"></button>
+    <article class="changelog-menu__panel" role="dialog" aria-modal="true" aria-describedby="ChangeLogDescription">
+      <header class="changelog-menu__header">
+        <div class="changelog-menu__brand" aria-hidden="true"><span>PRW</span><i></i></div>
+        <div>
+          <span>Development Archive // Live Build</span>
+          <h2 id="ChangeLogTitle">Change Log</h2>
+          <p id="ChangeLogDescription">Updates, balance changes, and new multiverse systems.</p>
+        </div>
+        <button type="button" class="changelog-menu__close" data-changelog-close aria-label="Close change log">&times;</button>
+      </header>
+
+      <div class="changelog-menu__status" aria-hidden="true">
+        <span><i></i> Archive synchronized</span>
+        <b>PATCH FEED // ONLINE</b>
+      </div>
+
+      <div class="changelog-menu__content" id="ChangeLogContent" aria-live="polite" aria-busy="true">
+        <div class="changelog-menu__loading"><i></i><span>Loading development archiveâ€¦</span></div>
+      </div>
+
+      <footer class="changelog-menu__footer">
+        <span>Patch notes</span>
+        <b id="ChangeLogEntryCount">Synchronizing</b>
       </footer>
     </article>
   </section>

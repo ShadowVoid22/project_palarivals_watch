@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "rules": {
+    "startingCredits": 12,
+    "startingHealth": 100,
+    "buildSeconds": 60,
+    "heroShopSize": 3,
+    "abilityShopSize": 3,
+    "heroSlots": 6,
+    "heroRerollCost": 1,
+    "abilityRerollCost": 1,
+    "abilityDraftCost": 2
+  },
+  "heroes": [
+    { "id": "groot", "name": "Groot", "universe": "marvel", "image": "Img/Characters/MarvelRivals/GrootPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 10, "cost": 3 },
+    { "id": "hulk", "name": "Hulk", "universe": "marvel", "image": "Img/Characters/MarvelRivals/HulkPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 10, "health": 12, "cost": 5 },
+    { "id": "iron-man", "name": "Iron Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/IronManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 8, "health": 6, "cost": 4 },
+    { "id": "spider-man", "name": "Spider-Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/SpiderManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 5, "cost": 3 },
+    { "id": "thor", "name": "Thor", "universe": "marvel", "image": "Img/Characters/MarvelRivals/ThorPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 9, "health": 9, "cost": 4 },
+    { "id": "bastion", "name": "Bastion", "universe": "overwatch", "image": "Img/Characters/Overwatch/BastionPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 9, "health": 7, "cost": 3 },
+    { "id": "genji", "name": "Genji", "universe": "overwatch", "image": "Img/Characters/Overwatch/GenjiPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 6, "health": 5, "cost": 3 },
+    { "id": "junkrat", "name": "Junkrat", "universe": "overwatch", "image": "Img/Characters/Overwatch/JunkratPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 7, "health": 4, "cost": 2 },
+    { "id": "roadhog", "name": "Roadhog", "universe": "overwatch", "image": "Img/Characters/Overwatch/Roadhog.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 6, "health": 14, "cost": 3 },
+    { "id": "tracer", "name": "Tracer", "universe": "overwatch", "image": "Img/Characters/Overwatch/TracerPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 5, "health": 4, "cost": 2 },
+    { "id": "bomb-king", "name": "Bomb King", "universe": "paladins", "image": "Img/Characters/Paladins/BombKingPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "power": 10, "health": 8, "cost": 4 },
+    { "id": "drogoz", "name": "Drogoz", "universe": "paladins", "image": "Img/Characters/Paladins/DrogozPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "power": 8, "health": 6, "cost": 3 },
+    { "id": "moji", "name": "Moji", "universe": "paladins", "image": "Img/Characters/Paladins/MojiPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "power": 5, "health": 7, "cost": 2 },
+    { "id": "raum", "name": "Raum", "universe": "paladins", "image": "Img/Characters/Paladins/RaumPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "power": 7, "health": 12, "cost": 4 },
+    { "id": "seris", "name": "Seris", "universe": "paladins", "image": "Img/Characters/Paladins/SerisPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "power": 4, "health": 8, "cost": 3 }
+  ],
+  "abilities": [
+    { "id": "ironwood-guard", "name": "Ironwood Guard", "origin": "Groot", "universe": "marvel", "type": "Fortify", "rarity": "rare", "description": "Gain 4 maximum health and reduce every incoming hit by 1.", "effects": { "bonusHealth": 4, "damageReduction": 1 } },
+    { "id": "worldbreaker", "name": "Worldbreaker", "origin": "Hulk", "universe": "marvel", "type": "Momentum", "rarity": "legendary", "description": "Gain 2 power. After a knockout, gain 2 more power and restore 3 health.", "effects": { "bonusPower": 2, "onKillPower": 2, "onKillHeal": 3 } },
+    { "id": "maximum-pulse", "name": "Maximum Pulse", "origin": "Iron Man", "universe": "marvel", "type": "Precision", "rarity": "epic", "description": "Gain 25% critical chance. Critical hits deal 4 additional damage.", "effects": { "critChance": 0.25, "critBonus": 4 } },
+    { "id": "spider-sense", "name": "Spider-Sense", "origin": "Spider-Man", "universe": "marvel", "type": "Reaction", "rarity": "epic", "description": "Gain 25% dodge chance and deal 2 bonus damage on the first strike.", "effects": { "dodgeChance": 0.25, "firstStrikeBonus": 2 } },
+    { "id": "god-of-thunder", "name": "God of Thunder", "origin": "Thor", "universe": "marvel", "type": "Opener", "rarity": "legendary", "description": "The first strike deals 6 bonus damage and gains 10% critical chance.", "effects": { "firstStrikeBonus": 6, "critChance": 0.1 } },
+    { "id": "configuration-assault", "name": "Configuration: Assault", "origin": "Bastion", "universe": "overwatch", "type": "Fortify", "rarity": "rare", "description": "Gain 3 power and reduce every incoming hit by 1.", "effects": { "bonusPower": 3, "damageReduction": 1 } },
+    { "id": "deflect", "name": "Deflect", "origin": "Genji", "universe": "overwatch", "type": "Reaction", "rarity": "epic", "description": "Gain 20% dodge chance and return 2 damage whenever struck.", "effects": { "dodgeChance": 0.2, "thorns": 2 } },
+    { "id": "total-mayhem", "name": "Total Mayhem", "origin": "Junkrat", "universe": "overwatch", "type": "Retaliation", "rarity": "rare", "description": "Return 4 explosive damage whenever an enemy lands a hit.", "effects": { "thorns": 4 } },
+    { "id": "take-a-breather", "name": "Take a Breather", "origin": "Roadhog", "universe": "overwatch", "type": "Sustain", "rarity": "epic", "description": "Gain 4 maximum health and heal for 35% of damage dealt.", "effects": { "bonusHealth": 4, "lifesteal": 0.35 } },
+    { "id": "blink-recall", "name": "Blink Recall", "origin": "Tracer", "universe": "overwatch", "type": "Reaction", "rarity": "rare", "description": "Gain 28% dodge chance and deal 2 bonus damage on the first strike.", "effects": { "dodgeChance": 0.28, "firstStrikeBonus": 2 } },
+    { "id": "royal-detonation", "name": "Royal Detonation", "origin": "Bomb King", "universe": "paladins", "type": "Precision", "rarity": "legendary", "description": "Gain 22% critical chance. Critical hits deal 5 additional damage.", "effects": { "critChance": 0.22, "critBonus": 5 } },
+    { "id": "dragon-punch", "name": "Dragon Punch", "origin": "Drogoz", "universe": "paladins", "type": "Opener", "rarity": "epic", "description": "The opening attack deals 7 bonus damage.", "effects": { "firstStrikeBonus": 7 } },
+    { "id": "familiar-feast", "name": "Familiar Feast", "origin": "Moji", "universe": "paladins", "type": "Execute", "rarity": "rare", "description": "Deal 5 bonus damage to enemies at or below 40% health.", "effects": { "executeThreshold": 0.4, "executeBonus": 5 } },
+    { "id": "soul-armor", "name": "Soul Armor", "origin": "Raum", "universe": "paladins", "type": "Sustain", "rarity": "epic", "description": "Gain 6 maximum health and heal for 20% of damage dealt.", "effects": { "bonusHealth": 6, "lifesteal": 0.2 } },
+    { "id": "soul-collector", "name": "Soul Collector", "origin": "Seris", "universe": "paladins", "type": "Sustain", "rarity": "legendary", "description": "Heal for 45% of damage dealt and restore 3 more health after a knockout.", "effects": { "lifesteal": 0.45, "onKillHeal": 3 } }
+  ]
+}

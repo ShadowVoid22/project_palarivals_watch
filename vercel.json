@@ -12,6 +12,22 @@
     {
       "source": "/profile",
       "destination": "/Profile.html"
+    },
+    {
+      "source": "/admin/suggestions",
+      "destination": "/SuggestionsAdmin.html"
+    },
+    {
+      "source": "/arcade/ability-draft",
+      "destination": "/AbilityDraft.html"
+    },
+    {
+      "source": "/arcade/leader-protocol",
+      "destination": "/LeaderProtocol.html"
+    },
+    {
+      "source": "/arcade/crownfall",
+      "destination": "/HeroChess.html"
     }
   ],
   "headers": [

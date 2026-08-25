@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ability Draft | PalaRivals Watch Arcade</title>
+  <meta name="description" content="Draft any hero ability onto any character in this PalaRivals Watch Arcade mode.">
+  <link rel="stylesheet" href="css/arcade/AbilityDraft.css">
+  <link rel="stylesheet" href="css/shared/Audio.css">
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body data-audio-scene="build">
+  <div class="draft-world" aria-hidden="true">
+    <i></i><i></i><i></i>
+    <span class="draft-world__mark">AD</span>
+    <span class="draft-world__coordinates">SECTOR 07 // POWER ROUTING MATRIX</span>
+  </div>
+
+  <header class="draft-command-bar">
+    <a class="draft-brand" href="Main.html" aria-label="Return to the PalaRivals Watch main menu">
+      <span>PRW</span>
+      <span><small>Arcade Protocol</small><strong>Ability Draft</strong></span>
+    </a>
+
+    <div class="draft-phase-readout">
+      <small>Active Experiment</small>
+      <strong id="phaseLabel">Build Phase</strong>
+    </div>
+
+    <section class="draft-hud" aria-label="Ability Draft match statistics">
+      <div class="draft-hud__item draft-hud__item--health"><span>♥</span><small>Integrity</small><strong id="playerHealth">100</strong></div>
+      <div class="draft-hud__item"><span>R</span><small>Round</small><strong id="roundValue">01</strong></div>
+      <div class="draft-hud__item draft-hud__item--timer"><span>◷</span><small>Build Time</small><strong id="timerValue">01:00</strong></div>
+      <div class="draft-hud__item draft-hud__item--credits"><span>◆</span><small>Credits</small><strong id="creditValue">12</strong></div>
+    </section>
+
+    <button class="draft-rules-button" id="rulesButton" type="button" aria-expanded="false" aria-controls="rulesPanel">How to Play</button>
+  </header>
+
+  <div class="draft-protocol-strip" aria-hidden="true">
+    <span><b>01</b> Recruit Chassis</span>
+    <i></i>
+    <span><b>02</b> Steal Ability</span>
+    <i></i>
+    <span><b>03</b> Fuse Loadout</span>
+    <em><u></u> Mutation channel stable</em>
+  </div>
+
+  <main class="draft-shell">
+    <section class="draft-build" id="buildView" aria-labelledby="draftTitle">
+      <header class="draft-build__header">
+        <div>
+          <p><span>Arcade // Experimental Loadouts</span></p>
+          <h1 id="draftTitle"><span>Steal the Power.</span><span>Rewrite the Hero.</span></h1>
+          <p class="draft-build__copy">Recruit heroes, select one on your board, then draft any ability onto them. Native abilities are disabled here.</p>
+        </div>
+        <div class="draft-build__actions">
+          <span><b id="unitCount">0</b> / 6 Heroes</span>
+          <button id="readyButton" type="button"><i>✓</i><strong>Ready</strong><small>Start combat</small></button>
+        </div>
+      </header>
+
+      <section class="draft-loadout" id="selectedLoadout" aria-live="polite">
+        <div class="draft-loadout__empty">
+          <span>01</span>
+          <p><small>Loadout Channel</small><strong>Select a hero to edit their ability</strong></p>
+        </div>
+      </section>
+
+      <section class="draft-board-section" aria-labelledby="boardTitle">
+        <header>
+          <div><small>Formation // Alpha</small><h2 id="boardTitle">Your Strike Team</h2></div>
+          <p>Drag heroes to reposition or combine matching copies. Every hero can equip one drafted ability.</p>
+        </header>
+        <div class="draft-board-legend" aria-label="Board controls">
+          <span><i>↔</i><b>Reposition</b> Drag or use Move / Swap</span>
+          <span><i>⇧</i><b>Merge</b> Combine 2 matching levels</span>
+          <span><i>04</i><b>Power Cap</b> Maximum hero level</span>
+        </div>
+        <div class="draft-board" id="teamBoard" aria-label="Six Ability Draft team slots"></div>
+      </section>
+
+      <section class="draft-markets" aria-label="Recruitment and ability draft markets">
+        <article class="draft-market draft-market--heroes">
+          <header>
+            <div><small>Recruitment Feed</small><h2>Hero Shop</h2><p>Heroes enter without their native ability.</p></div>
+            <button id="rerollHeroesButton" type="button"><span>↻</span> Reroll <b>◆ 1</b></button>
+          </header>
+          <div class="hero-draft-shop" id="heroShop" aria-label="Three available heroes"></div>
+        </article>
+
+        <article class="draft-market draft-market--abilities">
+          <header>
+            <div><small>Power Black Market</small><h2>Ability Draft</h2><p>Select a board hero, then install a power.</p></div>
+            <button id="rerollAbilitiesButton" type="button"><span>↻</span> Reroll <b>◆ 1</b></button>
+          </header>
+          <div class="ability-draft-shop" id="abilityShop" aria-label="Three available abilities"></div>
+        </article>
+      </section>
+    </section>
+
+    <section class="draft-combat" id="combatView" aria-labelledby="combatTitle" hidden>
+      <header class="draft-combat__header">
+        <span><i></i> Live Experiment</span>
+        <div><small>Fracture Arena // Power Collision</small><h1 id="combatTitle">Powers Unleashed</h1></div>
+        <b id="combatRound">Round 01</b>
+      </header>
+
+      <div class="draft-combat__arena">
+        <div class="draft-combat__collision" aria-hidden="true"><i></i><b>Ability Clash</b><i></i></div>
+        <div class="draft-combat__fx" id="combatFx" aria-hidden="true"></div>
+        <article class="draft-combat__side draft-combat__side--player">
+          <header><span>Allied Experiment</span><strong>You</strong><b><i id="playerUnitsLeft">0</i> active</b></header>
+          <div class="draft-combat__team" id="playerCombatTeam"></div>
+        </article>
+        <div class="draft-combat__versus" aria-hidden="true"><span>VS</span></div>
+        <article class="draft-combat__side draft-combat__side--enemy">
+          <header><span>Hostile Experiment</span><strong id="enemyName">Arcade AI</strong><b><i id="enemyUnitsLeft">0</i> active</b></header>
+          <div class="draft-combat__team" id="enemyCombatTeam"></div>
+        </article>
+      </div>
+
+      <div class="draft-combat__feed" id="combatFeed" role="status" aria-live="polite">Synchronizing stolen abilities…</div>
+      <div class="draft-combat__timeline" id="combatTimeline"></div>
+    </section>
+  </main>
+
+  <aside class="draft-rules" id="rulesPanel" aria-labelledby="rulesTitle" hidden>
+    <button type="button" class="draft-rules__backdrop" data-close-rules aria-label="Close rules"></button>
+    <article>
+      <button class="draft-rules__close" type="button" data-close-rules aria-label="Close rules">×</button>
+      <small>Arcade Protocol // 01</small>
+      <h2 id="rulesTitle">Ability Draft</h2>
+      <ol>
+        <li><b>Recruit.</b><span>Buy heroes from the Hero Shop. They arrive with no ability.</span></li>
+        <li><b>Select.</b><span>Click a hero on your six-slot board to open their loadout channel.</span></li>
+        <li><b>Draft.</b><span>Install any offered ability, even if it belongs to another universe.</span></li>
+        <li><b>Inspect.</b><span>Hover, focus, or tap a unit to see its full stats, equipped powers, and every combat effect.</span></li>
+        <li><b>Reposition.</b><span>Drag heroes between board slots or use the Move / Swap control on mobile.</span></li>
+        <li><b>Merge.</b><span>Combine two matching heroes of the same level to increase power and health. Different equipped abilities fuse and remain active, up to level 4.</span></li>
+        <li><b>Fight.</b><span>Ready up or wait for the timer. Your custom builds battle an AI draft rival.</span></li>
+      </ol>
+    </article>
+  </aside>
+
+  <section class="draft-result" id="resultPanel" aria-live="assertive" hidden>
+    <article>
+      <small id="resultKicker">Round Complete</small>
+      <h2 id="resultTitle">Victory</h2>
+      <p id="resultDetail">Enemy experiment neutralized.</p>
+      <div><span>You <b id="resultPlayerHealth">100 HP</b></span><span>Rival <b id="resultEnemyHealth">100 HP</b></span></div>
+      <button id="continueButton" type="button">Continue Drafting <i>➜</i></button>
+    </article>
+  </section>
+
+  <aside class="draft-unit-inspector" id="unitInspector" role="tooltip" aria-live="polite" hidden></aside>
+
+  <p class="draft-announcer" id="gameAnnouncer" role="status" aria-live="polite"></p>
+
+  <script src="js/shared/AudioManager.js"></script>
+  <script src="js/arcade/AbilityDraft.js"></script>
+</body>
+</html>

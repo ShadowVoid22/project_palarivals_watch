@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "rules": {
+    "draftOfferSize": 5,
+    "aiDraftDelayMs": 650,
+    "aiMoveDelayMs": 720,
+    "maxHalfMoves": 180
+  },
+  "pieceOrder": ["pawn", "rook", "knight", "bishop", "queen", "king"],
+  "pieceValues": { "pawn": 1, "knight": 3, "bishop": 3, "rook": 5, "queen": 9, "king": 100 },
+  "heroes": [
+    { "id": "groot", "name": "Groot", "universe": "rivals", "signature": "Ironwood", "image": "Img/Characters/MarvelRivals/GrootPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "pieceEffects": { "pawn": "groot-pawn", "rook": "groot-rook", "knight": "groot-knight", "bishop": "groot-bishop", "queen": "groot-queen", "king": "groot-king" } },
+    { "id": "hulk", "name": "Hulk", "universe": "rivals", "signature": "Gamma", "image": "Img/Characters/MarvelRivals/HulkPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "pieceEffects": { "pawn": "hulk-pawn", "rook": "hulk-rook", "knight": "hulk-knight", "bishop": "hulk-bishop", "queen": "hulk-queen", "king": "hulk-king" } },
+    { "id": "iron-man", "name": "Iron Man", "universe": "rivals", "signature": "Stark", "image": "Img/Characters/MarvelRivals/IronManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "pieceEffects": { "pawn": "iron-man-pawn", "rook": "iron-man-rook", "knight": "iron-man-knight", "bishop": "iron-man-bishop", "queen": "iron-man-queen", "king": "iron-man-king" } },
+    { "id": "spider-man", "name": "Spider-Man", "universe": "rivals", "signature": "Web", "image": "Img/Characters/MarvelRivals/SpiderManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "pieceEffects": { "pawn": "spider-man-pawn", "rook": "spider-man-rook", "knight": "spider-man-knight", "bishop": "spider-man-bishop", "queen": "spider-man-queen", "king": "spider-man-king" } },
+    { "id": "thor", "name": "Thor", "universe": "rivals", "signature": "Thunder", "image": "Img/Characters/MarvelRivals/ThorPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "pieceEffects": { "pawn": "thor-pawn", "rook": "thor-rook", "knight": "thor-knight", "bishop": "thor-bishop", "queen": "thor-queen", "king": "thor-king" } },
+    { "id": "bastion", "name": "Bastion", "universe": "overwatch", "signature": "Siege", "image": "Img/Characters/Overwatch/BastionPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "pieceEffects": { "pawn": "bastion-pawn", "rook": "bastion-rook", "knight": "bastion-knight", "bishop": "bastion-bishop", "queen": "bastion-queen", "king": "bastion-king" } },
+    { "id": "genji", "name": "Genji", "universe": "overwatch", "signature": "Dragon", "image": "Img/Characters/Overwatch/GenjiPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "pieceEffects": { "pawn": "genji-pawn", "rook": "genji-rook", "knight": "genji-knight", "bishop": "genji-bishop", "queen": "genji-queen", "king": "genji-king" } },
+    { "id": "junkrat", "name": "Junkrat", "universe": "overwatch", "signature": "Mayhem", "image": "Img/Characters/Overwatch/JunkratPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "pieceEffects": { "pawn": "junkrat-pawn", "rook": "junkrat-rook", "knight": "junkrat-knight", "bishop": "junkrat-bishop", "queen": "junkrat-queen", "king": "junkrat-king" } },
+    { "id": "roadhog", "name": "Roadhog", "universe": "overwatch", "signature": "Scrap", "image": "Img/Characters/Overwatch/Roadhog.png", "logo": "Img/Icons/OverwatchLogo.png", "pieceEffects": { "pawn": "roadhog-pawn", "rook": "roadhog-rook", "knight": "roadhog-knight", "bishop": "roadhog-bishop", "queen": "roadhog-queen", "king": "roadhog-king" } },
+    { "id": "tracer", "name": "Tracer", "universe": "overwatch", "signature": "Chronal", "image": "Img/Characters/Overwatch/TracerPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "pieceEffects": { "pawn": "tracer-pawn", "rook": "tracer-rook", "knight": "tracer-knight", "bishop": "tracer-bishop", "queen": "tracer-queen", "king": "tracer-king" } },
+    { "id": "bomb-king", "name": "Bomb King", "universe": "paladins", "signature": "Royal", "image": "Img/Characters/Paladins/BombKingPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "pieceEffects": { "pawn": "bomb-king-pawn", "rook": "bomb-king-rook", "knight": "bomb-king-knight", "bishop": "bomb-king-bishop", "queen": "bomb-king-queen", "king": "bomb-king-king" } },
+    { "id": "drogoz", "name": "Drogoz", "universe": "paladins", "signature": "Wyrm", "image": "Img/Characters/Paladins/DrogozPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "pieceEffects": { "pawn": "drogoz-pawn", "rook": "drogoz-rook", "knight": "drogoz-knight", "bishop": "drogoz-bishop", "queen": "drogoz-queen", "king": "drogoz-king" } },
+    { "id": "moji", "name": "Moji", "universe": "paladins", "signature": "Familiar", "image": "Img/Characters/Paladins/MojiPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "pieceEffects": { "pawn": "moji-pawn", "rook": "moji-rook", "knight": "moji-knight", "bishop": "moji-bishop", "queen": "moji-queen", "king": "moji-king" } },
+    { "id": "raum", "name": "Raum", "universe": "paladins", "signature": "Abyssal", "image": "Img/Characters/Paladins/RaumPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "pieceEffects": { "pawn": "raum-pawn", "rook": "raum-rook", "knight": "raum-knight", "bishop": "raum-bishop", "queen": "raum-queen", "king": "raum-king" } },
+    { "id": "seris", "name": "Seris", "universe": "paladins", "signature": "Soul", "image": "Img/Characters/Paladins/SerisPNG.png", "logo": "Img/Icons/PaladinsLogo.png", "pieceEffects": { "pawn": "seris-pawn", "rook": "seris-rook", "knight": "seris-knight", "bishop": "seris-bishop", "queen": "seris-queen", "king": "seris-king" } }
+  ]
+}

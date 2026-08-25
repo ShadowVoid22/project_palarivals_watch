@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crownfall Draft | PalaRivals Watch Arcade</title>
+  <meta name="description" content="Draft heroes into chess roles and command their reality-bending piece abilities against an AI rival.">
+  <link rel="stylesheet" href="css/arcade/HeroChess.css">
+  <link rel="stylesheet" href="css/shared/Audio.css">
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body data-audio-scene="build">
+  <div class="chess-world" aria-hidden="true"><i></i><i></i><i></i><b>CF</b><span>TACTICAL REALITY // GRID 8×8</span></div>
+
+  <header class="chess-command">
+    <a class="chess-brand" href="Main.html" aria-label="Return to the PalaRivals Watch main menu">
+      <span>PRW</span><div><small>Arcade Protocol 03</small><strong>Crownfall Draft</strong></div>
+    </a>
+    <div class="chess-operation"><small>Operation</small><strong id="operationLabel">Contested Draft</strong></div>
+    <section class="chess-hud" aria-label="Crownfall match status">
+      <div><span>◇</span><small>Phase</small><strong id="phaseValue">Draft</strong></div>
+      <div><span>♟</span><small>Role</small><strong id="roleValue">Pawn</strong></div>
+      <div><span>↻</span><small>Turn</small><strong id="turnValue">You</strong></div>
+      <div><span>#</span><small>Moves</small><strong id="moveValue">00</strong></div>
+    </section>
+    <button class="chess-rules-button" id="rulesButton" type="button" aria-expanded="false" aria-controls="rulesPanel">Field Manual</button>
+  </header>
+
+  <div class="chess-signal-strip" aria-hidden="true">
+    <span><i></i> Crownfall simulation online</span><span>Draft six identities // command thirty-two manifestations</span><em id="signalText">Your first pick is live</em>
+  </div>
+
+  <main class="chess-shell">
+    <section class="chess-draft" id="draftView" aria-labelledby="draftTitle">
+      <header class="chess-draft__hero">
+        <div><small>Shared Hero Pool // No Duplicate Claims</small><h1 id="draftTitle">Draft the <em>Army.</em></h1><p>You and the rival alternate claims. The selected hero becomes every piece of the highlighted role—and unlocks a role-specific anomaly.</p></div>
+        <div class="draft-duel"><span><b>YOU</b><i id="playerDraftScore">0/6</i></span><strong>VS</strong><span><b id="aiDraftName">DEEP BLUE</b><i id="aiDraftScore">0/6</i></span></div>
+      </header>
+
+      <nav class="piece-progression" id="pieceProgression" aria-label="Drafted chess roles"></nav>
+
+      <div class="draft-arena">
+        <aside class="draft-roster draft-roster--player" aria-labelledby="playerRosterTitle">
+          <header><span>White Formation</span><h2 id="playerRosterTitle">Your Army</h2></header>
+          <div id="playerRoster"></div>
+        </aside>
+
+        <section class="draft-market" aria-labelledby="currentRoleTitle">
+          <header>
+            <div class="draft-role-icon" id="draftRoleIcon" aria-hidden="true">♟</div>
+            <div><small id="draftRoundLabel">Draft 01 // Pawn Identity</small><h2 id="currentRoleTitle">Choose Your Pawns</h2><p id="draftInstruction">Select one hero from the contested pool.</p></div>
+            <span class="draft-turn-badge" id="draftTurnBadge"><i></i>Your Pick</span>
+          </header>
+          <div class="draft-offers" id="draftOffers" aria-live="polite"></div>
+          <footer><span><i></i> Unclaimed heroes return to the pool</span><b id="availableCount">15 identities available</b></footer>
+        </section>
+
+        <aside class="draft-roster draft-roster--ai" aria-labelledby="aiRosterTitle">
+          <header><span>Black Formation</span><h2 id="aiRosterTitle">Rival Army</h2></header>
+          <div id="aiRoster"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="chess-match" id="matchView" aria-labelledby="matchTitle" hidden>
+      <header class="match-banner">
+        <div><small>White Command // Player</small><strong>You</strong><span id="playerCheckStatus">Crown secure</span></div>
+        <div><span id="matchKicker">Reality Board // Turn 01</span><h1 id="matchTitle">Crownfall</h1><p id="matchStatus" role="status" aria-live="polite">Your move. Select a hero piece.</p></div>
+        <div><small>Black Command // AI</small><strong id="matchAiName">Deep Blue</strong><span id="aiCheckStatus">Crown secure</span></div>
+      </header>
+
+      <div class="match-layout">
+        <aside class="army-panel army-panel--player" aria-labelledby="playerArmyTitle">
+          <header><span>01</span><div><small>White Manifest</small><h2 id="playerArmyTitle">Your Pieces</h2></div></header>
+          <div id="playerArmyList"></div>
+        </aside>
+
+        <section class="board-stage" aria-label="Crownfall chess board">
+          <div class="board-frame" id="boardFrame">
+            <div class="chess-board" id="chessBoard" role="grid" aria-label="Playable eight by eight chess board"></div>
+          </div>
+          <div class="move-console">
+            <span><i></i><b id="consoleTurn">WHITE TO MOVE</b></span>
+            <p id="moveFeed">Select a piece to reveal legal moves.</p>
+            <button id="resignButton" type="button">Resign Match</button>
+          </div>
+          <div class="move-history" id="moveHistory" aria-label="Recent moves"></div>
+        </section>
+
+        <aside class="army-panel army-panel--ai" aria-labelledby="aiArmyTitle">
+          <header><span>02</span><div><small>Black Manifest</small><h2 id="aiArmyTitle">Rival Pieces</h2></div></header>
+          <div class="piece-inspector" id="pieceInspector">
+            <span class="piece-inspector__empty">Hover or select a piece to inspect its hero anomaly.</span>
+          </div>
+          <div id="aiArmyList"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <aside class="chess-rules" id="rulesPanel" aria-labelledby="rulesTitle" hidden>
+    <button class="chess-rules__backdrop" type="button" data-close-rules aria-label="Close field manual"></button>
+    <article>
+      <button class="chess-rules__close" type="button" data-close-rules aria-label="Close field manual">×</button>
+      <small>Crownfall Draft // Field Manual</small><h2 id="rulesTitle">Chess, Rewritten</h2>
+      <ol>
+        <li><b>Contest.</b><span>Draft one unique hero for pawns, rooks, knights, bishops, queen, and king. The AI claims from the same pool.</span></li>
+        <li><b>Manifest.</b><span>Your six chosen identities are projected across a standard chess formation.</span></li>
+        <li><b>Anomalies.</b><span>Every hero has a different power for every possible chess role. Hover pieces to inspect the active effect.</span></li>
+        <li><b>Shields.</b><span>A shield blocks one capture attempt. The attack consumes the shield and the attacker remains in place.</span></li>
+        <li><b>Check.</b><span>You may not make a move that leaves your king threatened. Checkmate wins; stalemate draws.</span></li>
+        <li><b>Protocol Limits.</b><span>Pawn promotion is automatic. Castling and en passant are disabled inside the anomaly grid.</span></li>
+      </ol>
+    </article>
+  </aside>
+
+  <section class="chess-result" id="resultPanel" hidden aria-live="assertive">
+    <article>
+      <span id="resultIcon" aria-hidden="true">♛</span><small id="resultKicker">Simulation Complete</small><h2 id="resultTitle">Victory</h2><p id="resultDetail">The rival crown has fallen.</p>
+      <div><span>Moves Played <b id="resultMoves">00</b></span><span>Pieces Remaining <b id="resultPieces">00</b></span></div>
+      <button id="rematchButton" type="button">Draft New Armies <i>↻</i></button><a href="Main.html">Return to Arcade</a>
+    </article>
+  </section>
+
+  <p class="chess-announcer" id="announcer" role="status" aria-live="polite"></p>
+  <script src="js/shared/AudioManager.js"></script>
+  <script src="js/arcade/HeroChess.js"></script>
+</body>
+
+</html>
