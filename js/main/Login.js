@@ -9,7 +9,7 @@ Login = true;
 
 LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
-SubmitButton.addEventListener("click", () => getUsers());
+SubmitButton.addEventListener("click", () => submitClicked());
 
 aync function submitClicked(){
     if (Login){
