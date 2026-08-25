@@ -27,9 +27,9 @@ async function getHeroes() {
 }
 
 async function getHeroID(Hero) {
-        const pool = await poolPromise;
+    const pool = await poolPromise;
     
-    const result = await pool.request()
+    const result = await pool.request();
     .input("hero", sql.VarChar, Hero)
     .query(`
         select HeroID from Heroes where HeroName = @hero
@@ -45,8 +45,8 @@ async function getUsers(Username) {
     let query = `select * from Users`;
 
     if (Username !== undefined) {
-        query += ` where Username = @username`
-        request.input("username", sql.VarChar, Username)
+        query += ` where Username = @username`;
+        request.input("username", sql.VarChar, Username);
     }
 
     const result = await request.query(query);
@@ -63,7 +63,7 @@ async function addUser(Username, Password) {
         .query(`
             insert into Users (Username, Password) 
             values (@username, @password)
-            `)
+            `);
 }
 
 async function getUserID(Username) {
