@@ -21,7 +21,7 @@ async function submitClicked(){
 
 async function checkUsernameLength(){
     let length = UsernameInput.value.length;
-    if(length >= 3 && length <= 50){
+    if(length >= 3 && length <= 50 && length !== undefined){
         return true;
     } else {
         return false;
