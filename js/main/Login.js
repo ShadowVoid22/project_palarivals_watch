@@ -9,7 +9,7 @@ Login = true;
 
 LoginButton.addEventListener("click", () => Login = true);
 SignupButton.addEventListener("click", () => Login = false);
-SubmitButton.addEventListener("click", () => submitClicked);
+SubmitButton.addEventListener("click", () => submitClicked());
 
 async function submitClicked(){
     if (Login){
@@ -30,7 +30,7 @@ function checkUsernameLength(){
 
 async function tryLogin(){
     if (checkUsernameLength()) {
-        const users = await getUsers(UsernameInput.value);
+        let users = await getUsers(UsernameInput.value);
         console.log(users);
         console.log("PLEASE WORK");
     }
