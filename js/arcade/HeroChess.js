@@ -288,12 +288,13 @@ function inside(row, column) {
   return row >= 0 && row < 8 && column >= 0 && column < 8;
 }
 
-function addStep(moves, board, piece, row, column, extra = {}) {
-  if (!inside(row, column) || board[row][column]?.side === piece.side) return;
+function addStep(moves, board, piece, row, column, extra = {}, attacksOnly = false) {
+  if (!inside(row, column)) return;
+  if (!attacksOnly && board[row][column]?.side === piece.side) return;
   moves.push({ row, column, ...extra });
 }
 
-function addSliderMoves(moves, board, piece, fromRow, fromColumn, directions, canVaultFriendly = false) {
+function addSliderMoves(moves, board, piece, fromRow, fromColumn, directions, canVaultFriendly = false, attacksOnly = false) {
   directions.forEach(([rowStep, columnStep]) => {
     let vaulted = false;
     for (let distance = 1; distance < 8; distance += 1) {
@@ -305,7 +306,9 @@ function addSliderMoves(moves, board, piece, fromRow, fromColumn, directions, ca
         moves.push({ row, column });
         continue;
       }
-      if (target.side !== piece.side) moves.push({ row, column });
+      // Attack maps include the first occupied square even when it belongs to
+      // the attacker. That square is defended and is not safe for the enemy king.
+      if (attacksOnly || target.side !== piece.side) moves.push({ row, column });
       if (target.side === piece.side && canVaultFriendly && !vaulted) {
         vaulted = true;
         continue;
@@ -323,6 +326,10 @@ function pseudoMoves(board, fromRow, fromColumn, { attacksOnly = false } = {}) {
   const moves = [];
   const orthogonal = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   const diagonal = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+  const addPieceStep = (row, column, extra = {}) => addStep(moves, board, piece, row, column, extra, attacksOnly);
+  const addPieceSliderMoves = (directions, canVaultFriendly = false) => {
+    addSliderMoves(moves, board, piece, fromRow, fromColumn, directions, canVaultFriendly, attacksOnly);
+  };
 
   if (piece.type === "pawn") {
     const direction = piece.side === "player" ? -1 : 1;
@@ -360,37 +367,37 @@ function pseudoMoves(board, fromRow, fromColumn, { attacksOnly = false } = {}) {
   }
 
   if (piece.type === "rook") {
-    addSliderMoves(moves, board, piece, fromRow, fromColumn, orthogonal, has("rook-friendly-vault"));
-    if (has("rook-diagonal-step")) diagonal.forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc));
+    addPieceSliderMoves(orthogonal, has("rook-friendly-vault"));
+    if (has("rook-diagonal-step")) diagonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc));
     if (has("rook-diagonal-two")) diagonal.forEach(([dr, dc]) => {
-      if (!board[fromRow + dr]?.[fromColumn + dc]) addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2);
+      if (!board[fromRow + dr]?.[fromColumn + dc]) addPieceStep(fromRow + dr * 2, fromColumn + dc * 2);
     });
     if (has("rook-knight-leap") && !piece.effectUsed) {
-      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc, { usesEffect: true }));
+      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
   }
 
   if (piece.type === "bishop") {
-    addSliderMoves(moves, board, piece, fromRow, fromColumn, diagonal, has("bishop-friendly-vault"));
-    if (has("bishop-orthogonal-step")) orthogonal.forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc));
+    addPieceSliderMoves(diagonal, has("bishop-friendly-vault"));
+    if (has("bishop-orthogonal-step")) orthogonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc));
     if (has("bishop-orthogonal-two")) orthogonal.forEach(([dr, dc]) => {
-      if (!board[fromRow + dr]?.[fromColumn + dc]) addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2);
+      if (!board[fromRow + dr]?.[fromColumn + dc]) addPieceStep(fromRow + dr * 2, fromColumn + dc * 2);
     });
     if (has("bishop-knight-leap") && !piece.effectUsed) {
-      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc, { usesEffect: true }));
+      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
   }
 
   if (piece.type === "queen") {
-    addSliderMoves(moves, board, piece, fromRow, fromColumn, [...orthogonal, ...diagonal], has("queen-friendly-vault"));
+    addPieceSliderMoves([...orthogonal, ...diagonal], has("queen-friendly-vault"));
     if (has("queen-knight-leap") && !piece.effectUsed) {
-      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc, { usesEffect: true }));
+      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
     if (has("queen-long-knight-leap") && !piece.effectUsed) {
-      [[3, 1], [3, -1], [-3, 1], [-3, -1], [1, 3], [1, -3], [-1, 3], [-1, -3]].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc, { usesEffect: true }));
+      [[3, 1], [3, -1], [-3, 1], [-3, -1], [1, 3], [1, -3], [-1, 3], [-1, -3]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
-    if (has("queen-cardinal-jump") && !piece.effectUsed) orthogonal.forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
-    if (has("queen-diagonal-jump") && !piece.effectUsed) diagonal.forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
+    if (has("queen-cardinal-jump") && !piece.effectUsed) orthogonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
+    if (has("queen-diagonal-jump") && !piece.effectUsed) diagonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
   }
 
   if (piece.type === "knight") {
@@ -399,21 +406,21 @@ function pseudoMoves(board, fromRow, fromColumn, { attacksOnly = false } = {}) {
     if (has("knight-cardinal-step")) leaps.push([2, 0], [-2, 0], [0, 2], [0, -2]);
     if (has("knight-diagonal-step")) leaps.push([1, 1], [1, -1], [-1, 1], [-1, -1]);
     if (has("knight-orthogonal-step")) leaps.push([1, 0], [-1, 0], [0, 1], [0, -1]);
-    leaps.forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc));
+    leaps.forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc));
   }
 
   if (piece.type === "king") {
-    [...orthogonal, ...diagonal].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc));
+    [...orthogonal, ...diagonal].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc));
     if (!piece.effectUsed && has("king-cardinal-dash")) orthogonal.forEach(([dr, dc]) => {
       const middle = board[fromRow + dr]?.[fromColumn + dc];
-      if (!middle) addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
+      if (!middle) addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
     });
     if (!piece.effectUsed && has("king-diagonal-dash")) diagonal.forEach(([dr, dc]) => {
       const middle = board[fromRow + dr]?.[fromColumn + dc];
-      if (!middle) addStep(moves, board, piece, fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
+      if (!middle) addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
     });
     if (!piece.effectUsed && has("king-knight-leap")) {
-      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addStep(moves, board, piece, fromRow + dr, fromColumn + dc, { usesEffect: true }));
+      [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
   }
   return moves;
@@ -477,6 +484,8 @@ function legalMovesForPiece(board, row, column) {
   const piece = board[row][column];
   if (!piece) return [];
   return pseudoMoves(board, row, column).filter((destination) => {
+    // Checkmate ends the game; the king is never captured as a normal piece.
+    if (board[destination.row][destination.column]?.type === "king") return false;
     const nextBoard = cloneBoard(board);
     applyMove(nextBoard, { fromRow: row, fromColumn: column, ...destination }, { simulate: true });
     return !isInCheck(nextBoard, piece.side);
@@ -624,6 +633,9 @@ function performMove(move) {
   if (state.gameOver) return;
   const movingPiece = state.board[move.fromRow][move.fromColumn];
   if (!movingPiece || movingPiece.side !== state.turn) return;
+  const moveIsStillLegal = legalMovesForPiece(state.board, move.fromRow, move.fromColumn)
+    .some((candidate) => candidate.row === move.row && candidate.column === move.column);
+  if (!moveIsStillLegal) return;
   const side = movingPiece.side;
   const otherSide = side === "player" ? "ai" : "player";
   const result = applyMove(state.board, move);
