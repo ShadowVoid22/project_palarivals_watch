@@ -6,7 +6,7 @@ const MENU_THEMES = Object.freeze({
     copy: "Build your squad. Outplay the lobby. Be the last team standing.",
     universe: "PalaRivals Watch",
     callout: "Choose Your World",
-    primaryHero: "Img/Characters/MarvelRivals/IronManPNG.jpeg",
+    primaryHero: "Img/Characters/MarvelRivals/IronManPNG.png",
     secondaryHero: "Img/Characters/Overwatch/TracerPNG.png"
   },
   marvel: {
@@ -16,8 +16,8 @@ const MENU_THEMES = Object.freeze({
     copy: "Tear open the timeline. Draft impossible alliances and fight for the last reality standing.",
     universe: "Marvel Rivals",
     callout: "Rivals Assemble",
-    primaryHero: "Img/Characters/MarvelRivals/IronManPNG.jpeg",
-    secondaryHero: "Img/Characters/MarvelRivals/ThorPNG.jpeg"
+    primaryHero: "Img/Characters/MarvelRivals/IronManPNG.png",
+    secondaryHero: "Img/Characters/MarvelRivals/ThorPNG.png"
   },
   paladins: {
     code: "RC-02",
