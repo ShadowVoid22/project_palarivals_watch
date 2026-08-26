@@ -16,6 +16,7 @@ const heroes = heroData.heroes || [];
 const abilities = abilityData.abilities || {};
 const traits = traitData.traits || {};
 const heroTraits = traitData.heroes || {};
+let heroLore = {};
 
 const universePresentation = {
   rivals: {
@@ -41,6 +42,18 @@ function getUniversePresentation(universe) {
     designation: "Cross-Universe Operative",
     code: "PRW-00"
   };
+}
+
+async function loadHeroLore() {
+  try {
+    const response = await fetch("data/hero-lore.json");
+    if (!response.ok) throw new Error(`Lore request failed with status ${response.status}`);
+    const loreData = await response.json();
+    heroLore = loreData.heroes || {};
+  } catch (error) {
+    console.warn("Hero lore could not be loaded.", error);
+    heroLore = {};
+  }
 }
 
 function populateFilters() {
@@ -72,6 +85,18 @@ function renderHeroes() {
   heroGrid.replaceChildren(...visibleHeroes.map(createCard));
   heroCount.textContent = `${visibleHeroes.length} / ${heroes.length} files available`;
   emptyState.hidden = visibleHeroes.length > 0;
+}
+
+let lastFilterSoundAt = 0;
+
+function updateFilters() {
+  renderHeroes();
+  const now = performance.now();
+
+  if (now - lastFilterSoundAt > 90) {
+    window.PRWAudio?.play("filter");
+    lastFilterSoundAt = now;
+  }
 }
 
 function createCard(hero, index) {
@@ -117,6 +142,7 @@ function createTraitFile(id) {
 
 function showHero(hero) {
   const heroAbility = abilities[hero.id];
+  const lore = heroLore[hero.id];
   const traitIds = heroTraits[hero.id] || [];
   const world = getUniversePresentation(hero.universe);
   dialog.dataset.universe = hero.universe || "unknown";
@@ -153,15 +179,46 @@ function showHero(hero) {
           ? `<div class="trait-list">${traitIds.map(createTraitFile).join("")}</div>`
           : `<p class="ability-description">No traits are listed for this hero yet.</p>`}
       </section>
+      <section class="detail-section detail-section--lore">
+        <div class="lore-file">
+          <div class="lore-file__stamp">
+            <small>Background Intel</small>
+            <strong>Declassified</strong>
+            <span>${world.code} // ${hero.id.toUpperCase()}</span>
+          </div>
+          <div class="lore-file__copy">
+            <p class="detail-section__label">Origin Record // Archive Entry</p>
+            <h3>${lore?.title || "Dossier Pending"}</h3>
+            <p class="lore-file__text">${lore?.text || "No background intelligence has been filed for this hero yet."}</p>
+            ${lore?.sourceUrl ? `
+              <a class="lore-file__source" href="${lore.sourceUrl}" target="_blank" rel="noopener noreferrer">
+                <span>Official lore source</span>
+                <strong>${lore.sourceLabel || "View source"}</strong>
+                <b aria-hidden="true">&#8599;</b>
+              </a>` : ""}
+          </div>
+        </div>
+      </section>
     </div>`;
 
   dialog.showModal();
+  window.PRWAudio?.play("fileOpen");
 }
 
-[searchInput, universeFilter, traitFilter].forEach((control) => control.addEventListener("input", renderHeroes));
-closeDialog.addEventListener("click", () => dialog.close());
+function closeHeroDialog() {
+  if (!dialog.open) return;
+  dialog.close();
+  window.PRWAudio?.play("fileClose");
+}
+
+[searchInput, universeFilter, traitFilter].forEach((control) => control.addEventListener("input", updateFilters));
+closeDialog.addEventListener("click", closeHeroDialog);
 dialog.addEventListener("click", (event) => {
-  if (event.target === dialog) dialog.close();
+  if (event.target === dialog) closeHeroDialog();
+});
+dialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeHeroDialog();
 });
 
 if (heroes.length === 0) {
@@ -171,5 +228,5 @@ if (heroes.length === 0) {
   emptyState.querySelector("p").textContent = "No hero data is available.";
 } else {
   populateFilters();
-  renderHeroes();
+  loadHeroLore().finally(renderHeroes);
 }

@@ -25,6 +25,16 @@
       pulse: 0.022,
       pad: 0.026,
     },
+    compendium: {
+      title: "Archive of Three Worlds",
+      bpm: 68,
+      root: 47,
+      scale: [0, 2, 5, 7, 9, 12],
+      melody: [0, null, 2, null, 4, 3, null, 1, 2, null, 5, null, 4, 2, 1, null],
+      bass: [0, null, null, null, 3, null, null, null, 1, null, null, null, 4, null, 2, null],
+      pulse: 0.024,
+      pad: 0.032,
+    },
     build: {
       title: "Neon Assembly",
       bpm: 102,
@@ -494,6 +504,33 @@
           });
         }
       }
+
+      if (this.scene === "compendium") {
+        if (step === 3 || step === 7 || step === 11 || step === 15) {
+          const scanNote = scene.root + 24 + scene.scale[(step + 1) % scene.scale.length];
+          this.makeTone({
+            frequency: midiToFrequency(scanNote),
+            endFrequency: midiToFrequency(scanNote + 5),
+            duration: stepDuration * 0.7,
+            gain: 0.014,
+            type: "sine",
+            startAt,
+            destination: this.musicBus,
+            filterFrequency: 3600,
+          });
+        }
+
+        if (step === 0 || step === 8) {
+          this.makeNoise({
+            duration: 0.14,
+            gain: 0.007,
+            startAt,
+            frequency: 5200,
+            filterType: "highpass",
+            destination: this.musicBus,
+          });
+        }
+      }
     }
 
     setScene(sceneName) {
@@ -651,6 +688,20 @@
           break;
         case "modalClose":
           tone(240, 0.1, 0.035, "sine", 0, 480);
+          break;
+        case "fileOpen":
+          tone(310, 0.16, 0.045, "triangle", 0, 520);
+          tone(620, 0.19, 0.038, "sine", 0.055, 930);
+          tone(1120, 0.22, 0.025, "sine", 0.115, 1480);
+          noise(0.12, 0.018, 4300, 0.035, "highpass");
+          break;
+        case "fileClose":
+          tone(760, 0.12, 0.032, "sine", 0, 470);
+          tone(390, 0.16, 0.03, "triangle", 0.055, 220);
+          noise(0.08, 0.012, 2600, 0, "highpass");
+          break;
+        case "filter":
+          tone(690, 0.045, 0.022, "sine", 0, 920);
           break;
         default:
           break;

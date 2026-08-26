@@ -1,0 +1,96 @@
+{
+  "_instructions": "Each entry is a paraphrased canon summary. Edit title and text to change the Compendium. sourceLabel and sourceUrl control the official source link. Keep every hero ID and the surrounding JSON punctuation intact.",
+  "version": 2,
+  "heroes": {
+    "groot": {
+      "title": "Stranded on Klyntar",
+      "text": "Groot is a flora colossus from Planet X who can control plant life and regenerate his body from a single splinter. A steadfast member of the Guardians of the Galaxy, he joined Rocket and Star-Lord on a mission to Klyntar before their ship was shot down. Now Knull, the planet's dark ruler, intends to corrupt Groot's regenerative gift and use it to cultivate an ultimate symbiote.",
+      "sourceLabel": "Marvel Rivals — Official Groot Lore",
+      "sourceUrl": "https://www.marvelrivals.com/20241123/41360_1195653.html"
+    },
+    "hulk": {
+      "title": "The Monster at Los Diablos",
+      "text": "Dr. Bruce Banner became the Hulk after absorbing gamma radiation from the detonation of a weapon he created. He later developed a Gamma Belt to better control his transformations and coexist with the monster inside him. When the Timestream Entanglement turned Los Diablos Missile Base into a demonic battlefield, Banner chose to release the Hulk and fight the monsters on their own terms.",
+      "sourceLabel": "Marvel Rivals — Official Hulk Lore",
+      "sourceUrl": "https://www.marvelrivals.com/20241123/41360_1195678.html"
+    },
+    "iron-man": {
+      "title": "Stronghold of the Avengers",
+      "text": "After being wounded by a weapon of his own design, Tony Stark built the first Iron Man armor to keep himself alive and later turned that technology toward protecting others. When supernatural forces descended on New York, Tony and the Avengers converted their tower into a defensive stronghold. From there, he studies Chronovium and searches for a way to reverse the Timestream Entanglement.",
+      "sourceLabel": "Marvel Rivals — Official Iron Man Lore",
+      "sourceUrl": "https://www.marvelrivals.com/heroes/index.html?id=ef114434-6c2a-48ff-a4f7-05dc278aedde"
+    },
+    "spider-man": {
+      "title": "Two Worlds to Protect",
+      "text": "A radioactive spider gave Peter Parker extraordinary strength, agility, wall-crawling ability, and a danger-warning spider-sense. He uses those powers as Spider-Man while trying to live by the responsibility they demand. Since the Timestream Entanglement, Peter has fought ancient darkness in New York and protected the Web of Life and Destiny beside other Web-Warriors in Tokyo Webworld.",
+      "sourceLabel": "Marvel Rivals — Official Spider-Man Lore",
+      "sourceUrl": "https://www.marvelrivals.com/m/20241123/41360_1195680.html"
+    },
+    "thor": {
+      "title": "The Exiled God of Thunder",
+      "text": "Thor Odinson is the prince of Asgard and God of Thunder, wielding Mjolnir only while he remains worthy of its power. After the Timestream Entanglement forced Odin into a restorative Odinsleep, Thor and Loki fought over the Asgardian throne. Loki won through deception and cast Thor into a distant, dangerous timeline, leaving the thunder god to battle his way home.",
+      "sourceLabel": "Marvel Rivals — Official Thor Lore",
+      "sourceUrl": "https://www.marvelrivals.com/heroes/?id=fcddbb53-6a99-45f6-9cc8-65c68edd96e0"
+    },
+    "bastion": {
+      "title": "The Last Unit Chooses Peace",
+      "text": "Bastion-E54 units were designed for peacekeeping before being turned against humanity during the Omnic Crisis. One damaged unit remained dormant in the wilderness for more than a decade and awakened with curiosity about nature instead of a clear wartime mission. After Torbjörn recognized its independence and repaired it, Bastion helped defend Gothenburg and ultimately joined Overwatch to protect the world it had once been built to destroy.",
+      "sourceLabel": "Overwatch — Official Bastion Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/bastion/"
+    },
+    "genji": {
+      "title": "The Cyborg Who Found Himself",
+      "text": "Genji Shimada was nearly killed by his brother Hanzo after refusing a greater role in their family's criminal empire. Overwatch saved him through extensive cybernetic reconstruction, and he served Blackwatch before the organization fell. Years of study with Zenyatta helped Genji accept both his human and mechanical selves; after later rejoining Overwatch, he returned to Tokyo and chose to remain with Hanzo, Kiriko, and their allies to defend his family and home.",
+      "sourceLabel": "Overwatch — Official Genji Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-gb/heroes/genji/"
+    },
+    "junkrat": {
+      "title": "The Secret in the Omnium",
+      "text": "Junkrat grew up scavenging the irradiated ruins surrounding Junkertown, where the lingering radiation fed his instability and fascination with explosives. He became a target after discovering an immensely valuable secret inside the ruined Australian omnium. Junkrat promised Roadhog half the reward in exchange for protection, and after their exile from Junkertown the pair launched an international crime spree fueled by bombs, treasure, and mayhem.",
+      "sourceLabel": "Overwatch — Official Junkrat Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/junkrat/"
+    },
+    "roadhog": {
+      "title": "Mako Rutledge's Last Road",
+      "text": "Mako Rutledge joined the Australian Liberation Front after his community was displaced to make peace with the omnics. The group's destruction of the omnium fusion core irradiated the Outback and transformed his home into a wasteland, gradually erasing the man Mako had been and giving rise to Roadhog. He later became Junkrat's bodyguard for half of a promised treasure, sharing his exile and destructive journey beyond Junkertown.",
+      "sourceLabel": "Overwatch — Official Roadhog Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/roadhog/"
+    },
+    "tracer": {
+      "title": "Lost and Recalled Through Time",
+      "text": "Lena Oxton was Overwatch's youngest experimental pilot when the Slipstream teleporting fighter vanished during its first flight. She returned months later with her molecules desynchronized from time, unable to remain anchored in the present. Winston's chronal accelerator stabilized her and allowed her to control her own timeline, turning Tracer into a celebrated agent who eventually answered the recall and helped rebuild Overwatch.",
+      "sourceLabel": "Overwatch — Official Tracer Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/tracer/"
+    },
+    "bomb-king": {
+      "title": "The Weapon That Crowned Itself",
+      "text": "Bomb King is a living construct animated through crystal magic and created as a weapon for the warlord Betty La Bomba. Instead of serving her, he destroyed her forces and declared himself ruler of every land he encountered. His tiny bombs are sentient as well, each possessing its own volatile personality beneath the king's explosive command.",
+      "sourceLabel": "Official Paladins Wiki — Bomb King Lore",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Bomb_King"
+    },
+    "drogoz": {
+      "title": "The Wyrin Who Refused to Crawl",
+      "text": "Drogoz was born a wingless wyrin and forced to serve beneath a powerful dragon. He escaped that life with crystal-powered mechanical wings crafted by the dwarven engineer Barik, gaining the flight his birth had denied him. Free and heavily armed, Drogoz pursues wealth, power, and recognition as an equal to the dragons who once stood above him.",
+      "sourceLabel": "Official Paladins Wiki — Drogoz Lore",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Drogoz"
+    },
+    "moji": {
+      "title": "The Leipori Returns to Battle",
+      "text": "While most Leipori withdrew into the Burrows beneath the Enchanted Forest during the Realm's war, Moji used her nature magic to fight for the world's recovery. Yagorath's attack on her homeland convinced her that healing could not wait while her friends remained in danger. Riding her familiar Po-Li, Moji returned as a battlefield support who brings restorative magic to allies and chaotic sorcery to their enemies.",
+      "sourceLabel": "Official Paladins Wiki — Current Moji Bio",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Moji"
+    },
+    "raum": {
+      "title": "Rage Summoned from the Abyss",
+      "text": "Raum was tempered by the Abyss's endless wars and exists for annihilation, having exhausted nearly every opponent worthy of him there. Seris manipulated Corvus into summoning the Abyssal lord as a weapon against the Resistance, but Raum could not be controlled. He instead rampaged across the Realm, consuming souls and bringing destruction to every faction in his path.",
+      "sourceLabel": "Official Paladins Wiki — Current Raum Bio",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Raum"
+    },
+    "seris": {
+      "title": "The Oracle Wearing Abby's Form",
+      "text": "Seris came from beyond the void and entered the Realm by taking the form of Abby, destroying the town whose name she then adopted. The resulting being serves as an oracle of the Abyss, draining and restoring souls while perceiving the past and possible futures at once. She appears at decisive moments to steer events toward an unknown fate, including the deception that led Corvus to summon Raum.",
+      "sourceLabel": "Official Paladins Wiki — Current Seris Bio",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Seris"
+    }
+  }
+}

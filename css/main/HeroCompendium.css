@@ -925,6 +925,186 @@ dialog[data-universe="paladins"] .detail-hero__world-design b {
 .trait-file small { color: #708098; font-size: 9px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
 .trait-file p { grid-column: 2; margin: 5px 0 0; color: #909db2; font-size: 11px; line-height: 1.4; }
 
+.detail-section--lore {
+  grid-column: 1 / -1;
+  padding: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--detail-accent) 8%, transparent), transparent 38%),
+    rgba(11, 18, 34, .94);
+}
+
+.detail-section--lore::after {
+  position: absolute;
+  right: -22px;
+  bottom: -48px;
+  width: 148px;
+  height: 148px;
+  content: "";
+  opacity: .12;
+  border: 1px solid var(--detail-accent);
+  transform: rotate(45deg);
+  box-shadow: inset 0 0 0 18px rgba(255, 255, 255, .025), 0 0 0 13px color-mix(in srgb, var(--detail-accent) 18%, transparent);
+  pointer-events: none;
+}
+
+.lore-file {
+  min-height: 190px;
+  display: grid;
+  grid-template-columns: minmax(185px, .34fr) minmax(0, 1fr);
+  position: relative;
+  z-index: 1;
+}
+
+.lore-file__stamp {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  padding: 28px;
+  border-right: 1px solid rgba(127, 159, 207, .14);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--detail-accent) 13%, transparent), transparent 68%),
+    rgba(5, 11, 23, .54);
+}
+
+.lore-file__stamp::before,
+.lore-file__stamp::after {
+  position: absolute;
+  content: "";
+}
+
+.lore-file__stamp::before {
+  top: 24px;
+  left: 28px;
+  width: 44px;
+  height: 3px;
+  background: var(--detail-accent);
+  box-shadow: 0 0 12px var(--detail-accent);
+}
+
+.lore-file__stamp::after {
+  right: 0;
+  bottom: 18px;
+  width: 1px;
+  height: 42px;
+  background: var(--detail-accent);
+}
+
+.lore-file__stamp small {
+  margin-top: 18px;
+  color: #74839b;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.lore-file__stamp strong {
+  margin: 4px 0 13px;
+  color: var(--detail-accent);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(25px, 3vw, 34px);
+  font-style: italic;
+  line-height: .9;
+  text-transform: uppercase;
+}
+
+.lore-file__stamp span {
+  padding: 5px 8px;
+  color: #9ba9be;
+  border: 1px solid rgba(137, 165, 207, .18);
+  background: rgba(255, 255, 255, .025);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+
+.lore-file__copy {
+  max-width: 790px;
+  align-self: center;
+  padding: 31px clamp(27px, 5vw, 55px);
+}
+
+.lore-file__copy h3 {
+  margin: 2px 0 13px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-style: italic;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.lore-file__text {
+  margin: 0;
+  color: #a6b2c5;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.lore-file__source {
+  width: min(100%, 520px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 18px;
+  margin-top: 21px;
+  padding: 11px 14px;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--detail-accent) 30%, rgba(127, 159, 207, .2));
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--detail-accent) 10%, transparent), transparent 62%),
+    rgba(255, 255, 255, .025);
+  text-decoration: none;
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.lore-file__source span {
+  color: #77869c;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.lore-file__source strong {
+  overflow: hidden;
+  color: #c5d0e0;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: .035em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lore-file__source b {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  color: var(--detail-accent);
+  font-size: 20px;
+  font-weight: 500;
+  transition: transform .18s ease;
+}
+
+.lore-file__source:hover,
+.lore-file__source:focus-visible {
+  border-color: color-mix(in srgb, var(--detail-accent) 68%, white 8%);
+  background-color: color-mix(in srgb, var(--detail-accent) 8%, transparent);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--detail-accent) 12%, transparent);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+.lore-file__source:hover b,
+.lore-file__source:focus-visible b {
+  transform: translate(2px, -2px);
+}
+
 @keyframes archive-pulse { 50% { opacity: .5; transform: scale(.85); } }
 @keyframes dossier-enter { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
 
@@ -970,6 +1150,20 @@ dialog[data-universe="paladins"] .detail-hero__world-design b {
   .detail-hero__logo { bottom: 75px; }
   .detail-content { padding: 12px; }
   .detail-section { padding: 17px; }
+  .detail-section--lore { padding: 0; }
+  .lore-file { grid-template-columns: 1fr; }
+  .lore-file__stamp {
+    min-height: 126px;
+    padding: 22px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(127, 159, 207, .14);
+  }
+  .lore-file__stamp::before { top: 19px; left: 22px; }
+  .lore-file__stamp::after { display: none; }
+  .lore-file__stamp small { margin-top: 13px; }
+  .lore-file__copy { padding: 24px 22px 28px; }
+  .lore-file__text { font-size: 14px; line-height: 1.58; }
+  .lore-file__source strong { font-size: 11px; }
 }
 
 @media (max-width: 390px) {
