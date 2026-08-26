@@ -12,11 +12,11 @@
     "abilityDraftCost": 2
   },
   "heroes": [
-    { "id": "groot", "name": "Groot", "universe": "marvel", "image": "Img/Characters/MarvelRivals/GrootPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 10, "cost": 3 },
-    { "id": "hulk", "name": "Hulk", "universe": "marvel", "image": "Img/Characters/MarvelRivals/HulkPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 10, "health": 12, "cost": 5 },
-    { "id": "iron-man", "name": "Iron Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/IronManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 8, "health": 6, "cost": 4 },
-    { "id": "spider-man", "name": "Spider-Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/SpiderManPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 5, "cost": 3 },
-    { "id": "thor", "name": "Thor", "universe": "marvel", "image": "Img/Characters/MarvelRivals/ThorPNG.jpeg", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 9, "health": 9, "cost": 4 },
+    { "id": "groot", "name": "Groot", "universe": "marvel", "image": "Img/Characters/MarvelRivals/GrootPNG.png", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 10, "cost": 3 },
+    { "id": "hulk", "name": "Hulk", "universe": "marvel", "image": "Img/Characters/MarvelRivals/HulkPNG.png", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 10, "health": 12, "cost": 5 },
+    { "id": "iron-man", "name": "Iron Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/IronManPNG.png", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 8, "health": 6, "cost": 4 },
+    { "id": "spider-man", "name": "Spider-Man", "universe": "marvel", "image": "Img/Characters/MarvelRivals/SpiderManPNG.png", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 7, "health": 5, "cost": 3 },
+    { "id": "thor", "name": "Thor", "universe": "marvel", "image": "Img/Characters/MarvelRivals/ThorPNG.png", "logo": "Img/Icons/MarvelRivalsLogo.png", "power": 9, "health": 9, "cost": 4 },
     { "id": "bastion", "name": "Bastion", "universe": "overwatch", "image": "Img/Characters/Overwatch/BastionPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 9, "health": 7, "cost": 3 },
     { "id": "genji", "name": "Genji", "universe": "overwatch", "image": "Img/Characters/Overwatch/GenjiPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 6, "health": 5, "cost": 3 },
     { "id": "junkrat", "name": "Junkrat", "universe": "overwatch", "image": "Img/Characters/Overwatch/JunkratPNG.png", "logo": "Img/Icons/OverwatchLogo.png", "power": 7, "health": 4, "cost": 2 },
