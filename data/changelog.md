@@ -47,6 +47,10 @@ Status: Current Build
 ### Hero Compendium
 - Added hero compendium
 
+### Daily Hero
+- Every Day try to guess the correct hero, do you have the knowlage to guess them correctly?
+- In the future this gamemode will give you currency to get skins
+
 ## Version 0.2.0 — Ability Draft & Balance Changes
 Date: August 20, 2026
 Status: Previous Build

@@ -2,6 +2,7 @@
   "version": 1,
   "epoch": "2026-08-26",
   "maxGuesses": 6,
+  "rotationSeed": "PRW-DAILY-HERO-SEASON-01",
   "rotation": [
     "tracer",
     "groot",

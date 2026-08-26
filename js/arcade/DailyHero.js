@@ -62,6 +62,55 @@ function positiveModulo(value, divisor) {
   return ((value % divisor) + divisor) % divisor;
 }
 
+function hashRotationSeed(value) {
+  let hash = 2166136261;
+  for (const character of String(value)) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function createSeededRandom(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value += 0x6D2B79F5;
+    let result = value;
+    result = Math.imul(result ^ (result >>> 15), result | 1);
+    result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+    return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function rawRotationForCycle(baseRotation, cycleIndex) {
+  if (cycleIndex === 0) return [...baseRotation];
+  const shuffled = [...baseRotation];
+  const random = createSeededRandom(hashRotationSeed(`${config.rotationSeed || "PRW-DAILY-HERO"}:${cycleIndex}`));
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function rotationForCycle(baseRotation, cycleIndex) {
+  const rotation = rawRotationForCycle(baseRotation, cycleIndex);
+  if (cycleIndex === 0 || rotation.length < 2) return rotation;
+
+  const previousRotation = rawRotationForCycle(baseRotation, cycleIndex - 1);
+  if (rotation.every((heroId, index) => heroId === previousRotation[index])) {
+    rotation.push(rotation.shift());
+  }
+
+  const previousFinalHero = previousRotation.at(-1);
+  if (rotation[0] === previousFinalHero) {
+    const safeSwapIndex = rotation.findIndex((heroId, index) => index > 0 && heroId !== previousFinalHero);
+    [rotation[0], rotation[safeSwapIndex]] = [rotation[safeSwapIndex], rotation[0]];
+  }
+  return rotation;
+}
+
 function formatDateLabel(key) {
   const date = utcDateFromKey(key);
   return new Intl.DateTimeFormat("en-US", {
@@ -175,8 +224,11 @@ function chooseDailyAnswer() {
   const current = utcDateFromKey(currentDateKey);
   const daysSinceEpoch = Math.floor((current - epoch) / DAY_MS);
   dailyNumber = daysSinceEpoch + 1;
-  const rotation = (config.rotation || []).filter((id) => heroById(id));
-  const answerId = rotation[positiveModulo(daysSinceEpoch, rotation.length)] || heroes[0]?.id;
+  const baseRotation = (config.rotation || []).filter((id) => heroById(id));
+  const cycleIndex = Math.floor(daysSinceEpoch / baseRotation.length);
+  const dayWithinCycle = positiveModulo(daysSinceEpoch, baseRotation.length);
+  const activeRotation = rotationForCycle(baseRotation, cycleIndex);
+  const answerId = activeRotation[dayWithinCycle] || heroes[0]?.id;
   return heroById(answerId);
 }
 
