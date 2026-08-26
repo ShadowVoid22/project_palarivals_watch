@@ -44,6 +44,9 @@ Status: Current Build
 - Fixed a bug where the AI does not ready up
 - The Ai now builds teams based on the traits and how good a character is.
 
+### Hero Compendium
+- Added hero compendium
+
 ## Version 0.2.0 — Ability Draft & Balance Changes
 Date: August 20, 2026
 Status: Previous Build
