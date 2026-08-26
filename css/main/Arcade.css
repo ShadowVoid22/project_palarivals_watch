@@ -70,6 +70,14 @@ body.arcade-menu-open { overflow:hidden; }
 .arcade-mode-card--chess .arcade-mode-card__content { top:43px; left:44%; padding:22px 22px 16px 6%; align-content:center; background:linear-gradient(90deg,transparent,#050a14 16%,#050a14); }
 .arcade-mode-card--chess .arcade-mode-card__content > strong { font-size:clamp(2.9rem,5vw,5rem); }
 .arcade-mode-card--chess .arcade-mode-card__content > span:not([class]) { max-width:620px; }
+.arcade-mode-card--daily { --mode-accent:var(--arcade-green); grid-column:1/-1; min-height:310px; }
+.arcade-mode-card--daily .arcade-mode-card__art { left:51%; }
+.arcade-mode-card--daily .arcade-mode-card__art::before { background:linear-gradient(270deg,rgba(5,10,20,.08),#050a14 94%),linear-gradient(0deg,#050a14 1%,transparent 47%); }
+.arcade-mode-card--daily .arcade-mode-card__art img { width:39%; height:100%; margin-left:-5%; filter:saturate(.2) contrast(1.18) brightness(.48); }
+.arcade-mode-card--daily .arcade-mode-card__art > b { top:4%; right:7%; color:color-mix(in srgb,var(--mode-accent) 24%,transparent); font-size:10rem; }
+.arcade-mode-card--daily .arcade-mode-card__content { right:43%; padding:22px 6% 16px 22px; align-content:center; background:linear-gradient(270deg,transparent,#050a14 16%,#050a14); }
+.arcade-mode-card--daily .arcade-mode-card__content > strong { font-size:clamp(2.9rem,5vw,5rem); }
+.arcade-mode-card--daily .arcade-mode-card__content > span:not([class]) { max-width:620px; }
 .arcade-mode-card:hover,.arcade-mode-card:focus-visible { z-index:4; border-color:var(--mode-accent); outline:none; box-shadow:0 30px 70px rgba(0,0,0,.4),0 0 30px color-mix(in srgb,var(--mode-accent) 15%,transparent),inset 0 -4px var(--mode-accent); transform:translateY(-7px); }
 
 .arcade-mode-card__topline { position:absolute; z-index:7; top:0; right:0; left:0; display:flex; min-height:43px; padding:0 13px; border-bottom:1px solid rgba(255,255,255,.08); align-items:center; gap:10px; color:var(--mode-accent); background:linear-gradient(90deg,rgba(3,8,17,.88),rgba(3,8,17,.64)); font-size:.42rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; backdrop-filter:blur(6px); }
@@ -130,6 +138,7 @@ body[data-mode="light"] .arcade-menu__panel { box-shadow:0 42px 105px rgba(26,47
   .arcade-mode-card { min-height:440px; }.arcade-mode-card__content { padding-inline:15px; }.arcade-mode-card__meta { display:none; }
   .arcade-mode-card--locked { min-height:130px; }.arcade-mode-card__cipher { display:none; }
   .arcade-mode-card--chess { min-height:310px; }
+  .arcade-mode-card--daily { min-height:310px; }
 }
 
 @media (max-width:760px) {
@@ -138,6 +147,11 @@ body[data-mode="light"] .arcade-menu__panel { box-shadow:0 42px 105px rgba(26,47
   .arcade-mode-card--chess .arcade-mode-card__art::before { background:linear-gradient(0deg,#050a14 3%,rgba(5,10,20,.88) 37%,rgba(5,10,20,.16) 78%),linear-gradient(90deg,rgba(169,120,255,.1),transparent 48%,rgba(255,70,126,.09)); }
   .arcade-mode-card--chess .arcade-mode-card__content { top:auto; left:0; padding:120px 15px 18px; background:linear-gradient(transparent,#050a14 45%); }
   .arcade-mode-card--chess .arcade-mode-card__content > strong { font-size:3.25rem; }
+  .arcade-mode-card--daily { grid-column:auto; min-height:430px; }
+  .arcade-mode-card--daily .arcade-mode-card__art { left:0; }
+  .arcade-mode-card--daily .arcade-mode-card__art::before { background:linear-gradient(0deg,#050a14 3%,rgba(5,10,20,.88) 37%,rgba(5,10,20,.16) 78%),linear-gradient(90deg,rgba(85,230,160,.1),transparent 48%,rgba(255,70,126,.09)); }
+  .arcade-mode-card--daily .arcade-mode-card__content { right:0; padding:120px 15px 18px; background:linear-gradient(transparent,#050a14 45%); }
+  .arcade-mode-card--daily .arcade-mode-card__content > strong { font-size:3.25rem; }
   .arcade-menu { align-items:end; padding:7px; }.arcade-menu__panel { max-height:calc(100svh - 8px); padding:20px 15px; clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px); }
   .arcade-menu__header { min-height:102px; padding-right:48px; grid-template-columns:1fr; }.arcade-menu__brand,.arcade-menu__network { display:none; }.arcade-menu__heading h2 { font-size:clamp(3.2rem,15vw,5.2rem); }.arcade-menu__heading p { font-size:.7rem; }.arcade-menu__close { width:40px;height:40px; }
   .arcade-menu__selector { min-height:38px; }.arcade-menu__selector em { display:none; }

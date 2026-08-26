@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050914">
+  <title>Daily Hero | PalaRivals Watch Arcade</title>
+  <meta name="description" content="Identify the daily PalaRivals Watch hero using their universe, traits, role, power, health, and cost.">
+  <link rel="stylesheet" href="css/arcade/DailyHero.css">
+  <link rel="stylesheet" href="css/shared/Audio.css">
+  <script>
+    window.va = window.va || function () {
+      (window.vaq = window.vaq || []).push(arguments);
+    };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+
+<body data-audio-scene="compendium">
+  <div class="daily-world" aria-hidden="true">
+    <i></i><i></i><i></i><span>?</span><b>UTC // DAILY SIGNAL</b>
+  </div>
+
+  <header class="daily-command">
+    <a class="daily-brand" href="Main.html" aria-label="Return to the PalaRivals Watch Arcade menu">
+      <span>PRW</span>
+      <div><small>Arcade Protocol 04</small><strong>Daily Hero</strong></div>
+    </a>
+    <div class="daily-command__signal">
+      <i></i><span><small>Global Puzzle Feed</small><strong>Signal Synchronized</strong></span>
+    </div>
+    <div class="daily-command__clock">
+      <span><small>UTC Time</small><strong id="utcClock">--:--:--</strong></span>
+      <span><small>Next Hero</small><strong id="resetClock">--:--:--</strong></span>
+    </div>
+    <a class="daily-command__exit" href="Main.html"><span>Exit to Arcade</span><b aria-hidden="true">&#8594;</b></a>
+  </header>
+
+  <div class="daily-signal-strip" aria-hidden="true">
+    <span><i></i> One hero // One global answer // Six attempts</span>
+    <b id="stripDate">UTC Archive Loading</b>
+    <em>New transmission at 00:00 UTC</em>
+  </div>
+
+  <main class="daily-shell">
+    <aside class="daily-briefing" aria-labelledby="briefingTitle">
+      <div class="daily-briefing__number">
+        <small>Encrypted Case</small>
+        <strong id="puzzleNumber">#---</strong>
+        <span id="puzzleDate">----.--.--</span>
+      </div>
+
+      <section class="daily-profile" aria-hidden="true">
+        <div class="daily-profile__silhouette"><span>?</span><i></i></div>
+        <p>Identity Classified</p>
+      </section>
+
+      <section class="daily-briefing__rules">
+        <p class="daily-kicker">Field Briefing</p>
+        <h2 id="briefingTitle">Decode the Operative</h2>
+        <p>Guess a hero and compare their combat record with today's classified target.</p>
+        <div class="feedback-key">
+          <span><i class="is-exact"></i><b>Match</b> Correct information</span>
+          <span><i class="is-wrong"></i><b>No Match</b> Different information</span>
+          <span><i class="is-direction">&#8593;</i><b>Higher</b> Target value is higher</span>
+          <span><i class="is-direction">&#8595;</i><b>Lower</b> Target value is lower</span>
+        </div>
+      </section>
+
+      <section class="daily-record" aria-label="Daily Hero statistics">
+        <div><small>Played</small><strong id="playedStat">0</strong></div>
+        <div><small>Wins</small><strong id="winsStat">0</strong></div>
+        <div><small>Streak</small><strong id="streakStat">0</strong></div>
+      </section>
+    </aside>
+
+    <section class="daily-terminal" aria-labelledby="dailyTitle">
+      <header class="daily-terminal__header">
+        <div>
+          <p class="daily-kicker"><span></span> Crossworld Identification Matrix</p>
+          <h1 id="dailyTitle">Who Is Today's <em>Hero?</em></h1>
+          <p>Origin and role require exact matches. Power, HP, and Cost point toward the target with higher or lower arrows.</p>
+        </div>
+        <div class="attempt-readout" aria-label="Attempts remaining">
+          <span>Attempts</span><strong><b id="attemptsUsed">0</b> / <i id="attemptLimit">6</i></strong><small id="attemptsRemaining">6 guesses remain</small>
+        </div>
+      </header>
+
+      <section class="intel-table" aria-label="Hero guesses and comparison results">
+        <div class="intel-table__scroll">
+          <div class="intel-table__head" aria-hidden="true">
+            <span>Hero</span><span>Origin Game</span><span>Trait</span><span>Role</span><span>Power</span><span>HP</span><span>Cost</span>
+          </div>
+          <div class="guess-grid" id="guessGrid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <form class="guess-console" id="guessForm" autocomplete="off">
+        <label for="guessInput"><span>Select Your Suspect</span><small>Search all 15 active heroes</small></label>
+        <div class="guess-console__field">
+          <span class="guess-console__scan" aria-hidden="true"></span>
+          <input id="guessInput" type="text" placeholder="Enter a hero name..." role="combobox" aria-autocomplete="list" aria-controls="heroSuggestions" aria-expanded="false">
+          <button id="guessButton" type="submit" disabled><span>Submit Guess</span><b aria-hidden="true">&#8594;</b></button>
+        </div>
+        <div class="hero-suggestions" id="heroSuggestions" role="listbox" aria-label="Matching heroes" hidden></div>
+        <p class="guess-message" id="guessMessage" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="completed-console" id="completedConsole" hidden>
+        <div><small>Daily Transmission Complete</small><strong id="completedSummary">Target identified.</strong></div>
+        <button id="showResultsButton" type="button">View Results</button>
+        <button id="shareInlineButton" type="button">Share Grid</button>
+      </section>
+    </section>
+  </main>
+
+  <section class="daily-result" id="resultPanel" aria-labelledby="resultTitle" aria-hidden="true" hidden>
+    <button class="daily-result__backdrop" type="button" data-result-close aria-label="Close daily result"></button>
+    <article role="dialog" aria-modal="true">
+      <button class="daily-result__close" type="button" data-result-close aria-label="Close daily result">&times;</button>
+      <div class="result-signal" id="resultSignal" aria-hidden="true"><i></i><span>&#10003;</span></div>
+      <p class="daily-kicker" id="resultKicker">Identity Confirmed</p>
+      <h2 id="resultTitle">Target Acquired</h2>
+      <p id="resultCopy">You decoded today's operative.</p>
+      <div class="result-hero">
+        <img id="resultHeroImage" src="" alt="">
+        <div><small>Today's Hero</small><strong id="resultHeroName">Classified</strong><span id="resultHeroDetails">Origin // Trait // Role</span></div>
+      </div>
+      <div class="result-actions">
+        <button id="shareButton" type="button"><span>Copy Result</span><b aria-hidden="true">&#9638;</b></button>
+        <a href="Main.html">Return to Arcade</a>
+      </div>
+      <footer><span>Next encrypted identity</span><strong id="resultResetClock">--:--:--</strong></footer>
+    </article>
+  </section>
+
+  <script src="js/shared/AudioManager.js"></script>
+  <script src="js/arcade/DailyHero.js"></script>
+</body>
+</html>

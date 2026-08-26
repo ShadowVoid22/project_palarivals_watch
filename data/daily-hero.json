@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "epoch": "2026-08-26",
+  "maxGuesses": 6,
+  "rotation": [
+    "tracer",
+    "groot",
+    "seris",
+    "iron-man",
+    "moji",
+    "roadhog",
+    "spider-man",
+    "bomb-king",
+    "bastion",
+    "thor",
+    "genji",
+    "raum",
+    "junkrat",
+    "hulk",
+    "drogoz"
+  ],
+  "universeLabels": {
+    "rivals": "Marvel Rivals",
+    "overwatch": "Overwatch",
+    "paladins": "Paladins"
+  }
+}
