@@ -3,41 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b17">
   <title>Hero Compendium | PalaRivals Watch</title>
   <link rel="stylesheet" href="css/main/HeroCompendium.css">
 </head>
 <body>
+  <div class="compendium-atmosphere" aria-hidden="true">
+    <span class="compendium-atmosphere__grid"></span>
+    <span class="compendium-atmosphere__beam compendium-atmosphere__beam--one"></span>
+    <span class="compendium-atmosphere__beam compendium-atmosphere__beam--two"></span>
+  </div>
+
   <header class="compendium-header">
-    <div>
-      <p>PALARIVALS WATCH</p>
-      <h1>Hero Compendium</h1>
-      <span id="heroCount">Loading heroes...</span>
+    <nav class="compendium-nav" aria-label="Compendium navigation">
+      <a class="brand-lockup" href="Main.html" aria-label="PalaRivals Watch main menu">
+        <span class="brand-lockup__mark">PRW</span>
+        <span>
+          <small>Autobattler Command</small>
+          <strong>PalaRivals <em>Watch</em></strong>
+        </span>
+      </a>
+      <a class="back-link" href="Main.html"><span aria-hidden="true">&#8592;</span><span class="back-link__label">Main Menu</span></a>
+    </nav>
+
+    <div class="compendium-intro">
+      <div class="compendium-intro__copy">
+        <p class="eyebrow"><span></span> Cross-Universe Intelligence Archive</p>
+        <h1>Hero <span>Compendium</span></h1>
+        <p class="intro-copy">Study every recruit, decode their combat ability, and find the traits that turn a squad into a winning strike team.</p>
+      </div>
+      <div class="archive-status" aria-label="Archive status">
+        <span class="archive-status__pulse"></span>
+        <div>
+          <small>Archive Status</small>
+          <strong>Database Online</strong>
+        </div>
+        <span id="heroCount">Loading heroes...</span>
+      </div>
     </div>
-    <a href="Main.html">Back to Main Menu</a>
   </header>
 
-  <main>
-    <section class="controls" aria-label="Hero filters">
-      <label>Search <input id="heroSearch" type="search" placeholder="Search heroes..."></label>
-      <label>Universe
-        <select id="universeFilter">
-          <option value="all">All Universes</option>
-        </select>
-      </label>
-      <label>Trait
-        <select id="traitFilter">
-          <option value="all">All Traits</option>
-        </select>
-      </label>
+  <main class="compendium-main">
+    <section class="filter-console" aria-labelledby="filterHeading">
+      <div class="filter-console__heading">
+        <span class="filter-console__icon" aria-hidden="true">&#9678;</span>
+        <div>
+          <p>Recruitment Database</p>
+          <h2 id="filterHeading">Find Your Hero</h2>
+        </div>
+      </div>
+
+      <div class="controls" aria-label="Hero filters">
+        <label class="control control--search">
+          <span>Search Archive</span>
+          <span class="control__field">
+            <span class="search-icon" aria-hidden="true"></span>
+            <input id="heroSearch" type="search" placeholder="Hero name or signature..." autocomplete="off">
+          </span>
+        </label>
+        <label class="control">
+          <span>Universe</span>
+          <span class="control__field">
+            <select id="universeFilter">
+              <option value="all">All Universes</option>
+            </select>
+          </span>
+        </label>
+        <label class="control">
+          <span>Trait Protocol</span>
+          <span class="control__field">
+            <select id="traitFilter">
+              <option value="all">All Traits</option>
+            </select>
+          </span>
+        </label>
+      </div>
     </section>
 
-    <section id="heroGrid" class="hero-grid" aria-live="polite"></section>
-    <p id="emptyState" hidden>No heroes match your filters.</p>
+    <section class="archive-results" aria-labelledby="resultsHeading">
+      <div class="section-heading">
+        <div>
+          <p>Active Roster // Clearance Granted</p>
+          <h2 id="resultsHeading">Hero Files</h2>
+        </div>
+        <span>SELECT A FILE TO INSPECT</span>
+      </div>
+      <section id="heroGrid" class="hero-grid" aria-live="polite"></section>
+      <div id="emptyState" class="empty-state" hidden>
+        <span aria-hidden="true">!</span>
+        <h2>No signals found</h2>
+        <p>No heroes match your current filters. Try a different search protocol.</p>
+      </div>
+    </section>
   </main>
 
-  <dialog id="heroDialog">
+  <dialog id="heroDialog" aria-labelledby="dialogHeroName">
+    <button id="closeDialog" class="dialog-close" type="button"><span>Close File</span><b aria-hidden="true">&times;</b></button>
     <article id="heroDetails"></article>
-    <button id="closeDialog" type="button">Close</button>
   </dialog>
 
   <script src="data/hero-chess.js"></script>
