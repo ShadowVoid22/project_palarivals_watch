@@ -309,7 +309,10 @@ function addSliderMoves(moves, board, piece, fromRow, fromColumn, directions, ca
       // Attack maps include the first occupied square even when it belongs to
       // the attacker. That square is defended and is not safe for the enemy king.
       if (attacksOnly || target.side !== piece.side) moves.push({ row, column });
-      if (target.side === piece.side && canVaultFriendly && !vaulted) {
+      // Vault abilities still work for movement and normal captures, but a king
+      // cannot be checked through an occupied square. Royal threat lines must
+      // stop at the first blocker so checkmate never arrives through cover.
+      if (!attacksOnly && target.side === piece.side && canVaultFriendly && !vaulted) {
         vaulted = true;
         continue;
       }
@@ -396,8 +399,16 @@ function pseudoMoves(board, fromRow, fromColumn, { attacksOnly = false } = {}) {
     if (has("queen-long-knight-leap") && !piece.effectUsed) {
       [[3, 1], [3, -1], [-3, 1], [-3, -1], [1, 3], [1, -3], [-1, 3], [-1, -3]].forEach(([dr, dc]) => addPieceStep(fromRow + dr, fromColumn + dc, { usesEffect: true }));
     }
-    if (has("queen-cardinal-jump") && !piece.effectUsed) orthogonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
-    if (has("queen-diagonal-jump") && !piece.effectUsed) diagonal.forEach(([dr, dc]) => addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true }));
+    if (has("queen-cardinal-jump") && !piece.effectUsed) orthogonal.forEach(([dr, dc]) => {
+      if (!attacksOnly || !board[fromRow + dr]?.[fromColumn + dc]) {
+        addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
+      }
+    });
+    if (has("queen-diagonal-jump") && !piece.effectUsed) diagonal.forEach(([dr, dc]) => {
+      if (!attacksOnly || !board[fromRow + dr]?.[fromColumn + dc]) {
+        addPieceStep(fromRow + dr * 2, fromColumn + dc * 2, { usesEffect: true });
+      }
+    });
   }
 
   if (piece.type === "knight") {
@@ -616,12 +627,13 @@ function handleSquareClick(row, column) {
   }
 }
 
-function moveNotation(piece, move, result) {
+function moveNotation(piece, move, result, { check = false, checkmate = false } = {}) {
   const hero = heroById(piece.heroId);
   if (result.shieldHit) return `${hero.name} shattered a shield on ${boardCoordinate(move.row, move.column)}.`;
   const action = result.captured ? "captured on" : "moved to";
-  const suffix = result.promoted ? " and promoted." : result.extraTurn ? " — TEMPO TURN." : ".";
-  return `${hero.name} ${action} ${boardCoordinate(move.row, move.column)}${suffix}`;
+  const moveEffect = result.promoted ? " and promoted" : result.extraTurn ? " — TEMPO TURN" : "";
+  const threat = checkmate ? " — CHECKMATE" : check ? " — CHECK" : "";
+  return `${hero.name} ${action} ${boardCoordinate(move.row, move.column)}${moveEffect}${threat}.`;
 }
 
 function gameStateFor(side) {
@@ -639,7 +651,9 @@ function performMove(move) {
   const side = movingPiece.side;
   const otherSide = side === "player" ? "ai" : "player";
   const result = applyMove(state.board, move);
-  const notation = moveNotation(movingPiece, move, result);
+  const opponentState = gameStateFor(otherSide);
+  const checkmate = opponentState.check && !opponentState.moves.length;
+  const notation = moveNotation(movingPiece, move, result, { check: opponentState.check, checkmate });
   state.lastMove = move;
   state.moveCount += 1;
   state.history.unshift(notation);
@@ -647,9 +661,8 @@ function performMove(move) {
   state.legalMoves = [];
   moveFeed.textContent = notation;
   announce(notation);
-  window.PRWAudio?.play(result.captured ? "hit" : result.shieldHit ? "shield" : "move");
+  window.PRWAudio?.play(opponentState.check ? "critical" : result.captured ? "attack" : result.shieldHit ? "shield" : "move");
 
-  const opponentState = gameStateFor(otherSide);
   if (!opponentState.moves.length) {
     endGame(opponentState.check ? side : "draw", opponentState.check ? "checkmate" : "stalemate");
     return;
