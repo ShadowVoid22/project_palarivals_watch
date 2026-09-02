@@ -15,6 +15,15 @@
     "drogoz": { "name": "Dragon Punch", "type": "Attack", "description": "His opening attack deals 6 bonus damage.", "effects": { "firstStrikeBonus": 6 } },
     "moji": { "name": "Familiar Feast", "type": "Attack", "description": "Deals 8 bonus damage to enemies at or below 50% health.", "effects": { "executeThreshold": 0.5, "executeBonus": 8 } },
     "raum": { "name": "Soul Armor", "type": "Passive", "description": "Gains 5 maximum health and heals for 25% of damage dealt.", "effects": { "bonusHealth": 5, "lifesteal": 0.25 } },
-    "seris": { "name": "Soul Collector", "type": "Passive", "description": "Heals for 45% of damage dealt and restores 3 more health after a knockout.", "effects": { "lifesteal": 0.45, "onKillHeal": 3 } }
+    "seris": { "name": "Soul Collector", "type": "Passive", "description": "Heals for 45% of damage dealt and restores 3 more health after a knockout.", "effects": { "lifesteal": 0.45, "onKillHeal": 3 } },
+    "mantis": { "name": "Soul Resurgence", "type": "Support", "description": "After every second attack, restores 3 health. This healing triggers even when the attack is dodged.", "effects": { "periodicHealEvery": 2, "periodicHeal": 3 } },
+    "rocket": { "name": "B.R.B. Beacon", "type": "Support", "description": "The first time Rocket is knocked out each combat, the beacon reconstructs him with 5 health.", "effects": { "reviveHealth": 5 } },
+    "ultron": { "name": "Dynamic Evolution", "type": "Passive", "description": "After every successful attack, Ultron permanently gains 1 power for the rest of combat.", "effects": { "onHitPower": 1 } },
+    "mercy": { "name": "Caduceus Link", "type": "Support", "description": "Every other ally starts combat with 1 additional power and 3 additional maximum health.", "effects": { "allyBonusPower": 1, "allyBonusHealth": 3 } },
+    "zenyatta": { "name": "Orb of Discord", "type": "Attack", "description": "Attacks ignore 3 points of enemy defense and deal 3 bonus damage to enemies at or below 40% health.", "effects": { "armorPierce": 3, "executeThreshold": 0.4, "executeBonus": 3 } },
+    "winston": { "name": "Primal Rage", "type": "Transformation", "description": "The first time Winston falls to 50% health or lower, he heals 3 and gains 5 power for the rest of combat.", "effects": { "enrageThreshold": 0.5, "enragePower": 5, "enrageHeal": 3 } },
+    "vora": { "name": "Dark Siphon", "type": "Attack", "description": "Heals for 15% of damage dealt and gains up to 6 bonus damage as her own health is lost.", "effects": { "lifesteal": 0.15, "missingHealthDamage": 6 } },
+    "barik": { "name": "Turret Network", "type": "Deployable", "description": "Gains 2 maximum health. On every second attack, his turret fires for 4 additional damage.", "effects": { "bonusHealth": 2, "bonusAttackEvery": 2, "bonusAttackDamage": 4 } },
+    "kasumi": { "name": "Curse", "type": "Attack", "description": "Each successful attack adds a Curse stack, causing every later attack to deal 2 more damage than the last.", "effects": { "attackRamp": 2, "dodgeChance": 0.1 } }
   }
 }

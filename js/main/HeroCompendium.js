@@ -161,6 +161,23 @@ function getHeroById(collection, heroId) {
 }
 
 function formatEffectName(value) {
+  const effectNames = {
+    periodicHealEvery: "Healing Pulse Frequency",
+    periodicHeal: "Healing per Pulse",
+    reviveHealth: "One-Time Revival Health",
+    onHitPower: "Power Gained per Hit",
+    allyBonusPower: "Power Granted to Other Allies",
+    allyBonusHealth: "Health Granted to Other Allies",
+    armorPierce: "Enemy Defense Ignored",
+    enrageThreshold: "Rage Health Threshold",
+    enragePower: "Power Gained on Rage",
+    enrageHeal: "Health Restored on Rage",
+    missingHealthDamage: "Maximum Missing-Health Damage",
+    bonusAttackEvery: "Turret Volley Frequency",
+    bonusAttackDamage: "Turret Volley Damage",
+    attackRamp: "Stacking Curse Damage",
+  };
+  if (effectNames[value]) return effectNames[value];
   return String(value || "")
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -168,6 +185,7 @@ function formatEffectName(value) {
 
 function formatEffectValue(key, value) {
   if (typeof value !== "number") return value;
+  if (/Every$/i.test(key)) return `Every ${value}`;
   if (/chance|lifesteal|threshold/i.test(key)) return `${Math.round(value * 100)}%`;
   if (/multiplier/i.test(key)) return `${value}x`;
   return value > 0 ? `+${value}` : String(value);

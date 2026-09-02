@@ -185,8 +185,10 @@ function combineAbilityEffects(components) {
 
   components.forEach((component) => {
     Object.entries(component.effects || {}).forEach(([effect, value]) => {
-      if (effect === "executeThreshold") {
+      if (["executeThreshold", "enrageThreshold"].includes(effect)) {
         effects[effect] = Math.max(effects[effect] || 0, value);
+      } else if (["bonusAttackEvery", "periodicHealEvery"].includes(effect)) {
+        effects[effect] = effects[effect] ? Math.min(effects[effect], value) : value;
       } else {
         effects[effect] = (effects[effect] || 0) + value;
       }
@@ -242,10 +244,24 @@ const EFFECT_LABELS = {
   lifesteal: "Damage Converted to Health",
   executeThreshold: "Execute Health Threshold",
   executeBonus: "Execute Damage",
+  periodicHealEvery: "Attacks per Healing Pulse",
+  periodicHeal: "Healing per Pulse",
+  reviveHealth: "One-Time Revival Health",
+  onHitPower: "Power Gained per Hit",
+  allyBonusPower: "Power Granted to Other Allies",
+  allyBonusHealth: "Health Granted to Other Allies",
+  armorPierce: "Enemy Defense Ignored",
+  enrageThreshold: "Rage Health Threshold",
+  enragePower: "Power Gained on Rage",
+  enrageHeal: "Health Restored on Rage",
+  missingHealthDamage: "Maximum Missing-Health Damage",
+  bonusAttackEvery: "Attacks per Bonus Volley",
+  bonusAttackDamage: "Bonus Volley Damage",
+  attackRamp: "Stacking Damage per Hit",
 };
 
 function formatEffectValue(effect, value) {
-  if (["critChance", "dodgeChance", "lifesteal", "executeThreshold"].includes(effect)) {
+  if (["critChance", "dodgeChance", "lifesteal", "executeThreshold", "enrageThreshold"].includes(effect)) {
     return `${Math.round(value * 100)}%`;
   }
   if (["damageReduction", "thorns"].includes(effect)) return `${value}`;
@@ -713,30 +729,55 @@ function createEnemyTeam() {
   state.enemyName = AI_NAMES[(state.round - 1) % AI_NAMES.length];
 }
 
-function createFighter(hero, index, side) {
+function createFighter(hero, index, side, team) {
+  const auraEffects = team.filter((ally) => ally !== hero).reduce((combined, ally) => ({
+    allyBonusPower: combined.allyBonusPower + (ally.ability?.effects?.allyBonusPower || 0),
+    allyBonusHealth: combined.allyBonusHealth + (ally.ability?.effects?.allyBonusHealth || 0),
+  }), { allyBonusPower: 0, allyBonusHealth: 0 });
   const effects = hero.ability?.effects || {};
-  const maxHealth = hero.health + (effects.bonusHealth || 0);
+  const receivedPower = auraEffects.allyBonusPower;
+  const receivedHealth = auraEffects.allyBonusHealth;
+  const maxHealth = hero.health + (effects.bonusHealth || 0) + receivedHealth;
   return {
     ...clone(hero),
     side,
     index,
-    power: hero.power + (effects.bonusPower || 0),
+    power: hero.power + (effects.bonusPower || 0) + receivedPower,
     maxHealth,
     currentHealth: maxHealth,
     attacks: 0,
+    hasRevived: false,
+    hasEnraged: false,
     effects,
   };
 }
 
 function simulateCombat() {
-  const player = state.team.filter(Boolean).map((hero, index) => createFighter(hero, index, "player"));
-  const enemy = state.enemyTeam.filter(Boolean).map((hero, index) => createFighter(hero, index, "enemy"));
+  const playerHeroes = state.team.filter(Boolean);
+  const enemyHeroes = state.enemyTeam.filter(Boolean);
+  const player = playerHeroes.map((hero, index) => createFighter(hero, index, "player", playerHeroes));
+  const enemy = enemyHeroes.map((hero, index) => createFighter(hero, index, "enemy", enemyHeroes));
   const initialPlayer = clone(player);
   const initialEnemy = clone(enemy);
   const events = [];
   let playerFront = 0;
   let enemyFront = 0;
   let playerAttacks = Math.random() >= .5;
+
+  const triggerEnrage = (fighter) => {
+    if (
+      fighter.currentHealth <= 0
+      || fighter.hasEnraged
+      || !fighter.effects.enrageThreshold
+      || fighter.currentHealth / fighter.maxHealth > fighter.effects.enrageThreshold
+    ) return { power: 0, healing: 0 };
+    fighter.hasEnraged = true;
+    const power = fighter.effects.enragePower || 0;
+    const healing = Math.min(fighter.maxHealth - fighter.currentHealth, fighter.effects.enrageHeal || 0);
+    fighter.power += power;
+    fighter.currentHealth += healing;
+    return { power, healing };
+  };
 
   while (playerFront < player.length && enemyFront < enemy.length && events.length < 60) {
     const attacker = playerAttacks ? player[playerFront] : enemy[enemyFront];
@@ -749,14 +790,26 @@ function simulateCombat() {
     const execute = defender.currentHealth / defender.maxHealth <= (effects.executeThreshold || 0)
       ? (effects.executeBonus || 0)
       : 0;
+    const attackRamp = attacker.attacks * (effects.attackRamp || 0);
+    const missingHealthDamage = Math.round((1 - attacker.currentHealth / attacker.maxHealth) * (effects.missingHealthDamage || 0));
+    const bonusAttack = effects.bonusAttackEvery && (attacker.attacks + 1) % effects.bonusAttackEvery === 0
+      ? (effects.bonusAttackDamage || 0)
+      : 0;
     let damage = 0;
     let healing = 0;
     let retaliation = 0;
     let powerGain = 0;
+    let defenderHealing = 0;
+    let revived = false;
 
     if (!dodged) {
-      damage = Math.max(1, attacker.power + firstStrike + execute + (critical ? 3 + (effects.critBonus || 0) : 0) + Math.floor(Math.random() * 3) - (defenderEffects.damageReduction || 0));
+      damage = Math.max(1, attacker.power + firstStrike + execute + attackRamp + missingHealthDamage + bonusAttack + (critical ? 3 + (effects.critBonus || 0) : 0) + Math.floor(Math.random() * 3) - Math.max(0, (defenderEffects.damageReduction || 0) - (effects.armorPierce || 0)));
       defender.currentHealth -= damage;
+
+      if (effects.onHitPower && attacker.currentHealth > 0) {
+        powerGain += effects.onHitPower;
+        attacker.power += effects.onHitPower;
+      }
 
       if (effects.lifesteal && attacker.currentHealth > 0) {
         healing = Math.min(attacker.maxHealth - attacker.currentHealth, Math.max(1, Math.ceil(damage * effects.lifesteal)));
@@ -769,7 +822,16 @@ function simulateCombat() {
       }
     }
 
-    const defenderDefeated = defender.currentHealth <= 0;
+    let defenderDefeated = defender.currentHealth <= 0;
+    const defenderRage = triggerEnrage(defender);
+    defenderHealing += defenderRage.healing;
+    if (defenderDefeated && defenderEffects.reviveHealth && !defender.hasRevived) {
+      defender.hasRevived = true;
+      defender.currentHealth = Math.min(defender.maxHealth, defenderEffects.reviveHealth);
+      defenderHealing += defender.currentHealth;
+      defenderDefeated = false;
+      revived = true;
+    }
     if (defenderDefeated && attacker.currentHealth > 0) {
       if (effects.onKillPower) {
         powerGain = effects.onKillPower;
@@ -783,9 +845,25 @@ function simulateCombat() {
     }
 
     attacker.attacks += 1;
-    const attackerDefeated = attacker.currentHealth <= 0;
+    if (effects.periodicHealEvery && attacker.attacks % effects.periodicHealEvery === 0 && attacker.currentHealth > 0) {
+      const pulseHealing = Math.min(attacker.maxHealth - attacker.currentHealth, effects.periodicHeal || 0);
+      attacker.currentHealth += pulseHealing;
+      healing += pulseHealing;
+    }
+    const attackerRage = triggerEnrage(attacker);
+    powerGain += attackerRage.power;
+    healing += attackerRage.healing;
+    let attackerDefeated = attacker.currentHealth <= 0;
+    let attackerRevived = false;
+    if (attackerDefeated && effects.reviveHealth && !attacker.hasRevived) {
+      attacker.hasRevived = true;
+      attacker.currentHealth = Math.min(attacker.maxHealth, effects.reviveHealth);
+      healing += attacker.currentHealth;
+      attackerDefeated = false;
+      attackerRevived = true;
+    }
     const abilityTriggered = Boolean(
-      dodged || firstStrike || execute || critical && effects.critChance || healing || retaliation || powerGain,
+      dodged || firstStrike || execute || attackRamp || missingHealthDamage || bonusAttack || effects.armorPierce || critical && effects.critChance || healing || defenderHealing || retaliation || powerGain || revived || attackerRevived,
     );
 
     events.push({
@@ -807,8 +885,11 @@ function simulateCombat() {
       healing,
       retaliation,
       powerGain,
+      defenderHealing,
+      revived,
+      attackerRevived,
       attackerPower: attacker.power,
-      abilityName: abilityTriggered ? (dodged ? defender.ability?.name : attacker.ability?.name) : null,
+      abilityName: abilityTriggered ? (dodged || revived ? defender.ability?.name : attacker.ability?.name) : null,
     });
 
     if (defenderDefeated) {
@@ -943,13 +1024,17 @@ function playCombatEvent(result, eventIndex = 0) {
     floatText(attacker, `+${event.healing} HP`, "heal");
     window.PRWAudio?.play("heal");
   }
+  if (event.defenderHealing) {
+    floatText(defender, event.revived ? `REVIVE +${event.defenderHealing}` : `+${event.defenderHealing} HP`, "heal");
+    window.PRWAudio?.play("heal");
+  }
   if (event.retaliation) floatText(attacker, `-${event.retaliation} REFLECT`, "ability");
   if (event.powerGain) {
     floatText(attacker, `+${event.powerGain} POWER`, "ability");
     const stats = attacker?.querySelector("figcaption span");
     if (stats) stats.textContent = `✦ ${event.attackerPower} · ♥ ${event.attackerMaxHealth}`;
   }
-  if (event.abilityName) floatText(attacker, event.abilityName, "ability");
+  if (event.abilityName) floatText(event.revived ? defender : attacker, event.abilityName, "ability");
 
   if (event.defenderDefeated) defender?.classList.add("combat-draft-unit--defeated");
   if (event.attackerDefeated) attacker?.classList.add("combat-draft-unit--defeated");
@@ -959,7 +1044,7 @@ function playCombatEvent(result, eventIndex = 0) {
   const abilityText = event.abilityName ? `<strong>${event.abilityName}!</strong> ` : "";
   elements.combatFeed.innerHTML = event.dodged
     ? `${abilityText}${event.defenderName} evaded ${event.attackerName}.`
-    : `${abilityText}${event.attackerName} dealt ${event.damage} damage to ${event.defenderName}.${event.healing ? ` Restored ${event.healing} health.` : ""}`;
+    : `${abilityText}${event.attackerName} dealt ${event.damage} damage to ${event.defenderName}.${event.healing ? ` Restored ${event.healing} health.` : ""}${event.revived ? ` ${event.defenderName} reconstructed with ${event.defenderHealing} health.` : ""}`;
 
   combatTimeout = window.setTimeout(() => playCombatEvent(result, eventIndex + 1), COMBAT_STEP_MS);
 }

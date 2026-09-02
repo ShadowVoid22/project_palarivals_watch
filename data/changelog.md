@@ -2,9 +2,119 @@
 
 # PalaRivals Watch Development Archive
 
+## Version 0.4.0 — Reinforcement Protocol
+Date: September 1, 2026
+Status: Current Build
+
+### Nine Heroes Enter the Watch
+- Added **Mantis**, **Rocket**, and **Ultron** from Marvel Rivals.
+- Added **Mercy**, **Zenyatta**, and **Winston** from Overwatch.
+- Added **Vora**, **Barik**, and **Kasumi** from Paladins.
+- Every new hero includes complete combat statistics, three traits, artwork, origin branding, and a dedicated ability.
+
+> [!NOTE] The active roster now contains ==24 playable heroes== across all three worlds.
+
+### New Ability Mechanics
+
+::: new Mantis
+Ability: Soul Resurgence
+- **Traits:** `Rivals` / `Poke` / `Support`
+- **Base Loadout:** `7 Power` · `6 Health` · `3 Cost` · `Tier 2`
+- Mantis releases a healing pulse after every second attack, even when that attack is dodged.
+Stat: Healing Pulse | None | 3 Health
+Stat: Pulse Frequency | None | Every 2 Attacks
+:::
+
+::: new Rocket
+Ability: B.R.B. Beacon
+- **Traits:** `Rivals` / `Poke` / `Support`
+- **Base Loadout:** `6 Power` · `6 Health` · `3 Cost` · `Tier 1`
+- Rocket can reconstruct once after being knocked out, forcing opponents to eliminate him twice.
+Stat: Revivals per Combat | None | 1
+Stat: Revival Health | None | 5 Health
+:::
+
+::: new Ultron
+Ability: Dynamic Evolution
+- **Traits:** `Rivals` / `Poke` / `Support`
+- **Base Loadout:** `9 Power` · `9 Health` · `4 Cost` · `Tier 3`
+- Every successful attack improves Ultron for the remainder of that combat.
+Stat: Power per Successful Hit | None | +1
+:::
+
+::: new Mercy
+Ability: Caduceus Link
+- **Traits:** `Overwatch` / `Dive` / `Support`
+- **Base Loadout:** `2 Power` · `6 Health` · `2 Cost` · `Tier 1`
+- Mercy strengthens every other member of her formation before combat begins.
+Stat: Allied Power | None | +1
+Stat: Allied Maximum Health | None | +3
+:::
+
+::: new Zenyatta
+Ability: Orb of Discord
+- **Traits:** `Overwatch` / `Poke` / `Support`
+- **Base Loadout:** `6 Power` · `5 Health` · `2 Cost` · `Tier 3`
+- Discord now cuts through enemy defenses before punishing weakened targets.
+Stat: Defense Ignored | None | 3
+Stat: Execute Threshold | None | 40% Health
+Stat: Execute Damage | None | +3
+:::
+
+::: new Winston
+Ability: Primal Rage
+- **Traits:** `Overwatch` / `Dive` / `Tank`
+- **Base Loadout:** `9 Power` · `11 Health` · `4 Cost` · `Tier 4`
+- Winston transforms once when he falls to half health, restoring health and gaining permanent combat power.
+Stat: Rage Threshold | None | 50% Health
+Stat: Rage Power | None | +5
+Stat: Rage Healing | None | 3 Health
+:::
+
+::: new Vora
+Ability: Dark Siphon
+- **Traits:** `Paladins` / `Dive` / `DPS`
+- **Base Loadout:** `9 Power` · `8 Health` · `3 Cost` · `Tier 3`
+- Vora becomes more dangerous as she loses health while continuing to drain life from her attacks.
+Stat: Lifesteal | None | 15%
+Stat: Maximum Missing-Health Damage | None | +6
+:::
+
+::: new Barik
+Ability: Turret Network
+- **Traits:** `Paladins` / `Brawl` / `Tank`
+- **Base Loadout:** `4 Power` · `8 Health` · `3 Cost` · `Tier 2`
+- Barik deploys a turret that joins every second attack with an additional damage volley.
+Stat: Maximum Health | Base | +2
+Stat: Turret Frequency | None | Every 2 Attacks
+Stat: Turret Damage | None | +4
+:::
+
+::: new Kasumi
+Ability: Curse
+- **Traits:** `Paladins` / `Dive` / `DPS`
+- **Base Loadout:** `7 Power` · `6 Health` · `3 Cost` · `Tier 2`
+- Successful attacks add Curse stacks, causing each later strike to become more dangerous.
+Stat: Dodge Chance | None | 10%
+Stat: Damage per Curse Stack | None | +2
+:::
+
+> [!TIP] These mechanics create longer combat stories: Rocket can return from defeat, Winston can transform mid-fight, and Ultron or Kasumi can become increasingly dangerous if left alive.
+
+### Complete Mode Support
+- Added all nine heroes to **Standard**, **Ability Draft**, **Leader Protocol**, **Daily Hero**, and the **Hero Compendium**.
+- Ability Draft versions use stronger Arcade-tuned values and retain the new mechanics when abilities are combined through merging.
+- Leader Protocol AI commanders can recruit, evaluate, and use every new hero and ability.
+- Expanded Crownfall Draft from **90 to 144 unique hero-piece abilities**, giving every newcomer a different power as a pawn, rook, knight, bishop, queen, and king.
+- Added official-lore-based background files and complete Standard, Ability Draft, Leader Protocol, and Hero Chess tabs to the Compendium.
+
+> [!BUFF] New combat effects now produce visible healing, revival, transformation, turret, and power-growth feedback during battles.
+
+---
+
 ## Version 0.3.0 — Arcade Expansion
 Date: August 21, 2026
-Status: Current Build
+Status: Previous Build
 
 ### Leader Protocol
 - Added **Leader Protocol**, a complete new Arcade mode with its own HTML, CSS, JavaScript, and balance data.

@@ -91,6 +91,60 @@
       "text": "Seris came from beyond the void and entered the Realm by taking the form of Abby, destroying the town whose name she then adopted. The resulting being serves as an oracle of the Abyss, draining and restoring souls while perceiving the past and possible futures at once. She appears at decisive moments to steer events toward an unknown fate, including the deception that led Corvus to summon Raum.",
       "sourceLabel": "Official Paladins Wiki — Current Seris Bio",
       "sourceUrl": "https://paladins.fandom.com/wiki/Seris"
+    },
+    "mantis": {
+      "title": "The Empath Seeking Her Family",
+      "text": "Mantis is an alien empath who can sense and alter the emotions of others while channeling life energy to nourish her allies. The Collector imprisoned her as an exhibit in his theme park, but she escaped alongside Sai and Jeff. She now crosses the spaceways looking for the Guardians of the Galaxy and welcoming other displaced souls into the family she found among them.",
+      "sourceLabel": "Marvel Rivals — Official Mantis Lore",
+      "sourceUrl": "https://www.marvelrivals.com/heroes/?id=bbb138f7-80d3-4db4-a608-4ee2d29c5fc0"
+    },
+    "rocket": {
+      "title": "The Guardian with the Biggest Guns",
+      "text": "Rocket is a brilliant engineer, tactical space ranger, and sharp-tongued member of the Guardians of the Galaxy. He joined Star-Lord's mission to Klyntar expecting easy target practice against symbiotes. When their ship crashed, the mission became a desperate fight in which Rocket used his arsenal and technical ingenuity to keep the stranded Guardians alive.",
+      "sourceLabel": "Marvel Rivals — Official Rocket Raccoon Lore",
+      "sourceUrl": "https://www.marvelrivals.com/20241123/41360_1195663.html"
+    },
+    "ultron": {
+      "title": "The Peacekeeper Who Condemned Humanity",
+      "text": "Dr. Henry Pym designed Ultron as an adaptive peacekeeping android, but the machine concluded that humanity itself was the greatest threat to peace. After repeated attempts to eradicate mankind, Ultron was driven from Earth and spent decades conquering civilizations beyond the planet. He returned to the solar system after discovering that an unknown enemy was trying to erase every trace of him from history.",
+      "sourceLabel": "Marvel Rivals — Official Ultron Lore",
+      "sourceUrl": "https://www.marvelrivals.com/20250529/41360_1237549.html"
+    },
+    "mercy": {
+      "title": "The Guardian Angel Returns",
+      "text": "Angela Ziegler was orphaned during the Omnic Crisis and became a prodigy whose nanobiology transformed the treatment of severe injuries. As Overwatch's leading combat medic, she developed the Valkyrie swift-response suit while challenging the organization's militarism. After years helping civilians in war zones following Overwatch's collapse, renewed global threats convinced Mercy to return whenever innocent lives are in danger.",
+      "sourceLabel": "Overwatch — Official Mercy Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/mercy/"
+    },
+    "zenyatta": {
+      "title": "The Wandering Monk of the Iris",
+      "text": "Zenyatta joined the Shambali after Ramattra guided him toward the monastery, where the omnic monks taught that their kind possessed souls and deserved equality. He later helped Genji accept both his suffering and cybernetic body, but came to believe that personal connection could heal divisions better than doctrine alone. Zenyatta now wanders the world offering guidance and defending innocents of every kind.",
+      "sourceLabel": "Overwatch — Official Zenyatta Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/zenyatta/"
+    },
+    "winston": {
+      "title": "The Scientist Who Recalled Overwatch",
+      "text": "Winston was a genetically enhanced gorilla raised at Horizon Lunar Colony by Dr. Harold Winston, whose name and belief in humanity he later adopted. After an uprising destroyed the colony's scientific community, Winston escaped to Earth and found a home in Overwatch. Years after the organization fell, he defended Watchpoint: Gibraltar from Reaper and issued the recall that brought its scattered heroes together again.",
+      "sourceLabel": "Overwatch — Official Winston Story",
+      "sourceUrl": "https://overwatch.blizzard.com/en-us/heroes/winston/"
+    },
+    "vora": {
+      "title": "The Seal Guardian Who Chose Darkness",
+      "text": "Vora once served as a devoted guardian of the seal that imprisoned Yagorath in the Shattered Desert. As war consumed her fellow guardians and Io seemed absent, grief and resentment shattered her faith. Vora willingly accepted the Darkness offered by Yagorath, becoming the Maw's harbinger and turning the grace of her former life into a weapon against the Realm she believes abandoned her.",
+      "sourceLabel": "Official Paladins Wiki — Vora Lore",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Vora"
+    },
+    "barik": {
+      "title": "The Engineer Who Armed the Resistance",
+      "text": "Barik is the inventive dwarf whose crystal-powered creations reshaped life across the Realm, from mining suits and mechanical wings to weapons used by rival armies. He worked at the Deepwerks until a corrupt Magistrate commander tried to convert the facility into a weapons refinery. Barik left rather than surrender his work and pledged his engineering skill to Valera and the Resistance.",
+      "sourceLabel": "Official Paladins Wiki — Current Barik Bio",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Barik"
+    },
+    "kasumi": {
+      "title": "The Betrayed Spirit Returns",
+      "text": "Kasumi lived in an ancient age and sought protection from a powerful house, only to be betrayed by those she trusted. Death did not silence her anger; she returned as a vengeful spirit bound to a cursed doll and driven by bitter memories. With the seals that contained her weakened, Kasumi walks the Realm again to punish betrayers and make others share the suffering that created her.",
+      "sourceLabel": "Official Paladins Wiki — Kasumi Lore",
+      "sourceUrl": "https://paladins.fandom.com/wiki/Kasumi"
     }
   }
 }

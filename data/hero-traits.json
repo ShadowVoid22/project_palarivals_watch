@@ -115,6 +115,15 @@
     "drogoz": ["paladins", "poke", "dps"],
     "moji": ["paladins", "brawl", "support"],
     "raum": ["paladins", "brawl", "tank"],
-    "seris": ["paladins", "poke", "support"]
+    "seris": ["paladins", "poke", "support"],
+    "mantis": ["rivals", "poke", "support"],
+    "rocket": ["rivals", "poke", "support"],
+    "ultron": ["rivals", "poke", "support"],
+    "mercy": ["overwatch", "dive", "support"],
+    "zenyatta": ["overwatch", "poke", "support"],
+    "winston": ["overwatch", "dive", "tank"],
+    "vora": ["paladins", "dive", "dps"],
+    "barik": ["paladins", "brawl", "tank"],
+    "kasumi": ["paladins", "dive", "dps"]
   }
 }
