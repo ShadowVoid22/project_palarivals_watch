@@ -77,7 +77,7 @@ function publicUser(user) {
 }
 
 function isAuthSchemaError(error) {
-    return [207, 208, 8152, 2628].includes(Number(error?.number));
+    return [207, 208, 229, 8152, 2628, 51001, 51002].includes(Number(error?.number));
 }
 
 module.exports = async (request, response) => {
@@ -108,6 +108,7 @@ module.exports = async (request, response) => {
                 return sendJson(response, 409, { error: "That username is already registered." });
             }
 
+            await database.ensureAuthSchema();
             const passwordHash = await hashPassword(password);
             const createdUser = await database.addUser(username, passwordHash);
             return sendJson(response, 201, {
@@ -128,6 +129,7 @@ module.exports = async (request, response) => {
         let passwordUpgradePending = false;
         if (passwordResult.legacy) {
             try {
+                await database.ensureAuthSchema();
                 await database.updateUserPassword(existingUser.Username, await hashPassword(password));
             } catch (error) {
                 if (!isAuthSchemaError(error)) throw error;

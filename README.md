@@ -16,6 +16,8 @@ The sign-up and login form uses the server endpoint at `/api/auth`, so open the 
 2. Run `database/migrations/001_secure_user_passwords.sql` once against the SQL Server database. It expands the password column for secure hashes and prevents duplicate usernames.
 3. Run `npm install`, then `npm start` for local development.
 
+The authentication API also performs this small migration automatically when needed. Running the SQL file manually is still recommended; automatic migration requires the configured database user to have `ALTER TABLE` and `CREATE INDEX` permission.
+
 For Vercel, add those same `DB_*` values under **Project Settings → Environment Variables**, enable them for the environments you use, and redeploy. Local `.env.local` values are intentionally not committed to GitHub.
 
 Passwords are stored as salted scrypt hashes. Existing plaintext account passwords are upgraded automatically after a successful login.

@@ -26,6 +26,7 @@ const config = {
 };
 
 let poolPromise;
+let authSchemaPromise;
 
 function getPool() {
     const missingVariables = getMissingDatabaseVariables();
@@ -44,6 +45,45 @@ function getPool() {
     }
 
     return poolPromise;
+}
+
+function ensureAuthSchema() {
+    if (!authSchemaPromise) {
+        authSchemaPromise = (async () => {
+            const pool = await getPool();
+
+            await pool.request().query(`
+                if object_id(N'Users', N'U') is null
+                    throw 51001, 'The Users table does not exist.', 1;
+
+                if col_length('Users', 'Password') < 255
+                    alter table Users alter column Password nvarchar(255) not null;
+
+                if not exists (
+                    select 1
+                    from sys.indexes
+                    where name = 'UX_Users_Username'
+                      and object_id = object_id('Users')
+                )
+                begin
+                    if exists (
+                        select Username
+                        from Users
+                        group by Username
+                        having count(*) > 1
+                    )
+                        throw 51002, 'Duplicate usernames must be resolved before creating the unique index.', 1;
+
+                    create unique index UX_Users_Username on Users (Username);
+                end;
+            `);
+        })().catch((error) => {
+            authSchemaPromise = null;
+            throw error;
+        });
+    }
+
+    return authSchemaPromise;
 }
 
 async function getHeroes() {
@@ -156,6 +196,7 @@ module.exports = {
     getHeroID,
     getUsers,
     addUser,
+    ensureAuthSchema,
     getUserForAuth,
     updateUserPassword,
     getUserID,
