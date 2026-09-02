@@ -1,5 +1,17 @@
 const sql = require("mssql");
-require("dotenv").config();
+const path = require("path");
+const dotenv = require("dotenv");
+
+// Vercel's CLI writes pulled development variables to .env.local. Load that
+// file first for `npm start`, while retaining .env as a local fallback.
+dotenv.config({ path: path.join(__dirname, ".env.local"), quiet: true });
+dotenv.config({ path: path.join(__dirname, ".env"), quiet: true });
+
+const requiredDatabaseVariables = ["DB_USER", "DB_PASSWORD", "DB_SERVER", "DB_DATABASE"];
+
+function getMissingDatabaseVariables() {
+    return requiredDatabaseVariables.filter((name) => !String(process.env[name] || "").trim());
+}
 
 const config = {
     user: process.env.DB_USER,
@@ -16,6 +28,14 @@ const config = {
 let poolPromise;
 
 function getPool() {
+    const missingVariables = getMissingDatabaseVariables();
+    if (missingVariables.length) {
+        const error = new Error(`Missing database environment variables: ${missingVariables.join(", ")}`);
+        error.code = "DATABASE_CONFIG_MISSING";
+        error.missingVariables = missingVariables;
+        throw error;
+    }
+
     if (!poolPromise) {
         poolPromise = sql.connect(config).catch((error) => {
             poolPromise = null;

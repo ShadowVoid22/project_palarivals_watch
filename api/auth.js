@@ -134,6 +134,14 @@ module.exports = async (request, response) => {
             return sendJson(response, 409, { error: "That username is already registered." });
         }
 
+        if (error?.code === "DATABASE_CONFIG_MISSING") {
+            console.error("Authentication database is not configured.", error.missingVariables);
+            return sendJson(response, 503, {
+                error: `The account database is not configured. Add ${error.missingVariables.join(", ")} to the Vercel project or local .env.local file.`,
+                code: error.code,
+            });
+        }
+
         console.error("Authentication API failed.", error);
         return sendJson(response, 503, {
             error: "The account service is unavailable. Check the database environment settings and try again.",
