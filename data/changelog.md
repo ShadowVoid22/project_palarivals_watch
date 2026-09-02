@@ -6,8 +6,9 @@
 Date: September 1, 2026
 Status: Current Build
 
-### Sign in
+### Sign in/Signup
 - You can now sign in
+- You can now create an account
 
 ### Nine Heroes Enter the Watch
 - Added **Mantis**, **Rocket**, and **Ultron** from Marvel Rivals.

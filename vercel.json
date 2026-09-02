@@ -10,6 +10,10 @@
       "destination": "/GameLobby.html"
     },
     {
+      "source": "/online",
+      "destination": "/OnlineLobby.html"
+    },
+    {
       "source": "/profile",
       "destination": "/Profile.html"
     },

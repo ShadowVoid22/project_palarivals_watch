@@ -195,6 +195,7 @@ async function getUsersHeroes() {
 
 
 module.exports = {
+    getPool,
     getHeroes,
     getHeroID,
     getUsers,

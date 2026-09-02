@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Online Operations | PalaRivals Watch</title>
+  <meta name="description" content="Live online PalaRivals Watch matches against real commanders with AI backfill.">
+  <link rel="stylesheet" href="css/online/OnlineLobby.css">
+  <link rel="stylesheet" href="css/shared/Audio.css">
+</head>
+<body data-audio-scene="build">
+  <div class="network-atmosphere" aria-hidden="true"><i></i><i></i><span></span></div>
+
+  <main class="online-shell">
+    <header class="online-command">
+      <a class="online-brand" href="Main.html" aria-label="Return to main menu">
+        <b>PRW</b><span><small>Global Combat Network</small><strong>Online Operations</strong></span>
+      </a>
+      <div class="connection-state" id="connectionState"><i></i><span><small>Live Sync</small><strong>Connecting</strong></span></div>
+      <div class="online-hud">
+        <span><small>Integrity</small><strong id="onlineHealth">100</strong></span>
+        <span><small>Round</small><strong id="onlineRound">--</strong></span>
+        <span class="online-hud__timer"><small id="onlinePhaseLabel">Matchmaking</small><strong id="onlineTimer">00:12</strong></span>
+        <span><small>Credits</small><strong id="onlineCredits">--</strong></span>
+      </div>
+    </header>
+
+    <section class="matchmaking-screen" id="matchmakingScreen" aria-labelledby="queueTitle">
+      <div class="matchmaking-screen__signal" aria-hidden="true"><i></i><i></i><i></i><b>8</b></div>
+      <p>PRW Network // Ranked Simulation</p>
+      <h1 id="queueTitle">Enter the <em>Live Grid</em></h1>
+      <span>Join up to seven real commanders in a synchronized autobattle. Any open seats are filled by adaptive AI so every operation launches with eight combatants.</span>
+      <button id="joinOnlineButton" type="button"><i></i><b>Find Online Match</b><small>Global queue</small></button>
+      <div class="queue-progress" id="queueProgress" hidden>
+        <div><i></i><span>Searching for commanders</span><b id="queueCount">1 / 8</b></div>
+        <ol id="queueSeats" aria-label="Matchmaking seats"></ol>
+        <button id="fillWithAiButton" type="button">Launch now with AI backfill</button>
+      </div>
+      <p class="queue-error" id="queueError" role="alert" hidden></p>
+    </section>
+
+    <section class="online-game" id="onlineGame" hidden>
+      <section class="formation-panel">
+        <header class="formation-panel__header">
+          <div><p>Live Formation // <span id="commanderName">Commander</span></p><h1>Deploy Your Strike Team</h1></div>
+          <div class="formation-actions">
+            <span><small>Units Online</small><b><i id="onlineUnitCount">0</i> / 6</b></span>
+            <button id="onlineReadyButton" type="button" aria-pressed="false"><i>✓</i><span>Ready</span></button>
+          </div>
+        </header>
+
+        <section class="trait-radar" aria-label="Active team traits">
+          <header><span>Synergy Radar</span><small>Unique heroes only</small></header>
+          <div id="onlineTraits"><p>Deploy heroes to activate team traits.</p></div>
+        </section>
+
+        <div class="formation-field" id="formationField">
+          <span class="formation-field__label">Primary Combat Formation</span>
+          <div class="online-roster online-roster--team" id="onlineTeam" data-zone="team" aria-label="Six online combat slots"></div>
+          <span class="formation-field__divider"><i></i>Reserve Rail // Non-combat<i></i></span>
+          <div class="online-roster online-roster--bench" id="onlineBench" data-zone="bench" aria-label="Six online reserve slots"></div>
+        </div>
+
+        <section class="online-combat" id="onlineCombat" hidden>
+          <header><span><i></i>Live engagement</span><h2 id="combatMatchTitle">Combat Link Established</h2><b id="combatResultBadge">FIGHT</b></header>
+          <div class="online-combat__teams">
+            <article><h3 id="combatFirstName">Commander Alpha</h3><div id="combatFirstTeam"></div></article>
+            <b>VS</b>
+            <article><h3 id="combatSecondName">Commander Bravo</h3><div id="combatSecondTeam"></div></article>
+          </div>
+          <div class="online-combat__feed" id="onlineCombatFeed">Targeting systems synchronized…</div>
+          <ol class="online-combat__timeline" id="onlineCombatTimeline"></ol>
+        </section>
+      </section>
+
+      <section class="online-shop">
+        <header>
+          <div><p>Network Armory // Personal Stock</p><h2>Available Heroes</h2></div>
+          <span><small>Shop Tier</small><b id="onlineShopTier">01</b></span>
+        </header>
+        <div class="online-shop__cards" id="onlineShopCards" aria-label="Three online shop offers"></div>
+        <div class="online-shop__controls">
+          <button id="onlineUpgradeButton" type="button"><i>↑</i><span>Upgrade Tier<small id="onlineUpgradeHint">Unlock stronger heroes</small></span><b id="onlineUpgradeCost">◆ 4</b></button>
+          <button id="onlineRerollButton" type="button"><i>↻</i><span>Reroll<small>New live offers</small></span><b>◆ 1</b></button>
+          <button id="onlineFreezeButton" type="button" aria-pressed="false"><i>❄</i><span>Freeze<small>Keep offers next round</small></span></button>
+        </div>
+      </section>
+
+      <aside class="online-leaderboard">
+        <header><p><i></i>Live Match // <span id="humanCount">1</span> Human</p><h2>Commanders</h2><span class="signal-bars"><i></i><i></i><i></i></span></header>
+        <ol id="onlinePlayerList"></ol>
+        <footer><span><i></i>Server authoritative</span><b id="matchCode">MATCH ----</b></footer>
+      </aside>
+    </section>
+  </main>
+
+  <div class="online-toast" id="onlineToast" role="status" aria-live="polite" hidden></div>
+  <aside class="online-hero-info" id="onlineHeroInfo" role="tooltip" hidden></aside>
+
+  <script src="js/shared/AudioManager.js"></script>
+  <script src="js/online/OnlineLobby.js"></script>
+</body>
+</html>

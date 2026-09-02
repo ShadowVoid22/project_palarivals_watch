@@ -21,3 +21,13 @@ The authentication API also performs this small migration automatically when nee
 For Vercel, add those same `DB_*` values under **Project Settings → Environment Variables**, enable them for the environments you use, and redeploy. Local `.env.local` values are intentionally not committed to GitHub.
 
 Passwords are stored as salted scrypt hashes. Existing plaintext account passwords are upgraded automatically after a successful login.
+
+## Online Operations mode
+
+Online Operations is the main menu's real-player mode and is separate from Arcade. Matches support eight commanders. Players joining the same queue are placed together, and any open seats are filled by AI after the queue countdown or when a player chooses **Launch now with AI**.
+
+The mode uses an authoritative SQL Server match record and short polling so it can run on the existing Vercel deployment without a permanent WebSocket server. Purchases, movement, ready state, combat, health, and eliminations are all validated by the server. A disconnected player can reconnect with the locally stored match token; after the disconnect grace period, AI takes control of that seat.
+
+Before deploying the mode, run `database/migrations/002_online_matches.sql` against the same SQL Server database used for accounts. The production database user needs `SELECT`, `INSERT`, and `UPDATE` permission on `OnlineMatches`. The API will try to create this table automatically when it is missing, but the migration is recommended because automatic setup also requires schema-creation permissions.
+
+For local multiplayer testing, make sure the `DB_*` variables in `.env.local` point to a development database, start the app with `npm start`, then open `/OnlineLobby.html` in two browser sessions. Without those variables, the page intentionally shows a database-setup message rather than starting a fake online match.

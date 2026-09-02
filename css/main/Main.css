@@ -210,9 +210,64 @@ button {
 
 #MainButtonSection {
   display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
   gap: 12px;
   margin-top: clamp(26px, 4vh, 40px);
+}
+
+.MainButtons--online {
+  position: relative;
+  display: grid;
+  min-width: 148px;
+  padding-inline: 18px;
+  grid-template-columns: 12px 1fr;
+  column-gap: 8px;
+  border-color: rgba(79, 240, 173, .34);
+  color: #baffdf;
+  background: linear-gradient(110deg, rgba(32, 193, 147, .13), rgba(42, 119, 218, .12));
+}
+
+.MainButtons--online > span:nth-child(2) {
+  align-self: end;
+  line-height: 1;
+}
+
+.MainButtons--online > small {
+  grid-column: 2;
+  align-self: start;
+  color: rgba(154, 216, 199, .58);
+  font-size: .42rem;
+  letter-spacing: .12em;
+}
+
+.online-button-signal {
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+.online-button-signal i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ff0ad;
+  box-shadow: 0 0 10px #4ff0ad;
+  animation: online-menu-signal 1.35s ease-in-out infinite;
+}
+
+.MainButtons--online:hover {
+  border-color: #4ff0ad;
+  color: #071710;
+  background: linear-gradient(120deg, #4ff0ad, #52cfff);
+}
+
+.MainButtons--online:hover > small {
+  color: rgba(4, 28, 20, .65);
+}
+
+@keyframes online-menu-signal {
+  50% { opacity: .38; transform: scale(.72); }
 }
 
 .MainButtons {
