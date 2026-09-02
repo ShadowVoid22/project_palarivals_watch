@@ -11,6 +11,21 @@ let state = null;
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, "..")));
 
+app.post("/__smoke/complete", (_request, response) => {
+    if (!state?.players?.length) return response.status(404).json({ error: "No smoke match exists." });
+    const champion = state.players.find((player) => player.isAI) || state.players[0];
+    state.status = "complete";
+    state.phase = "complete";
+    state.phaseEndsAt = null;
+    state.championId = champion.id;
+    state.message = `${champion.name} is the last commander standing`;
+    state.players.forEach((player) => {
+        player.eliminated = player.id !== champion.id;
+        player.hp = player.id === champion.id ? Math.max(1, player.hp) : 0;
+    });
+    return response.json({ matchId: state.id, championId: champion.id });
+});
+
 app.post("/api/online", (request, response) => {
     const { action, displayName, matchId, playerId, playerToken, payload } = request.body || {};
     try {

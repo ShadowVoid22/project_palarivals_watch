@@ -54,6 +54,10 @@ const combatSecondRemaining = document.querySelector("#combatSecondRemaining");
 const combatRoundLabel = document.querySelector("#combatRoundLabel");
 const combatFeed = document.querySelector("#onlineCombatFeed");
 const combatTimeline = document.querySelector("#onlineCombatTimeline");
+const matchCompleteElement = document.querySelector("#onlineMatchComplete");
+const completeTitle = document.querySelector("#onlineCompleteTitle");
+const completeMessage = document.querySelector("#onlineCompleteMessage");
+const playAgainButton = document.querySelector("#onlinePlayAgainButton");
 const toastElement = document.querySelector("#onlineToast");
 const heroInfo = document.querySelector("#onlineHeroInfo");
 
@@ -462,6 +466,7 @@ function playCombat(state) {
     || state.combatResults[0];
   if (!result) return;
   combatElement.hidden = false;
+  matchCompleteElement.hidden = true;
   formationField.hidden = true;
   combatFirstName.textContent = result.firstName;
   combatSecondName.textContent = result.secondName;
@@ -496,10 +501,43 @@ function playCombat(state) {
 function renderComplete(state) {
   combatElement.hidden = false;
   formationField.hidden = true;
+  clearCombatTimers();
   const champion = state.players.find((player) => player.id === state.championId);
   combatTitle.textContent = champion ? `${champion.name} Wins Online Operations` : "Operation Complete";
   combatResultBadge.textContent = state.championId === state.me.id ? "CHAMPION" : "GG";
   combatFeed.textContent = state.message;
+  completeTitle.textContent = state.championId === state.me.id ? "You Are the Last Commander Standing" : `${champion?.name || "No Commander"} Won the Operation`;
+  completeMessage.textContent = state.championId === state.me.id
+    ? `Victory secured in round ${state.round}. Re-enter the network to defend your title.`
+    : `Your run ended in round ${state.round}. Your completed match has been released and a new lobby is ready.`;
+  matchCompleteElement.hidden = false;
+  playAgainButton.disabled = false;
+}
+
+function resetToMatchmaking() {
+  window.clearTimeout(pollTimer);
+  clearCombatTimers();
+  clearSession();
+  currentState = null;
+  selectedSlot = null;
+  combatElement.hidden = true;
+  matchCompleteElement.hidden = true;
+  formationField.hidden = false;
+  onlineGame.hidden = true;
+  matchmakingScreen.hidden = false;
+  queueProgress.hidden = true;
+  queueError.hidden = true;
+  joinButton.hidden = false;
+  joinButton.disabled = false;
+  joinButton.querySelector("b").textContent = "Find Online Match";
+  setConnection("Ready for matchmaking", false);
+  updateClock();
+}
+
+function findNewMatch() {
+  playAgainButton.disabled = true;
+  resetToMatchmaking();
+  joinMatch();
 }
 
 function renderGame(state) {
@@ -645,6 +683,7 @@ function showHeroInfo(event, heroId) {
 }
 
 joinButton.addEventListener("click", joinMatch);
+playAgainButton.addEventListener("click", findNewMatch);
 fillWithAiButton.addEventListener("click", () => sendAction("start-now"));
 readyButton.addEventListener("click", () => sendAction("ready"));
 rerollButton.addEventListener("click", () => sendAction("reroll"));
