@@ -133,9 +133,12 @@ async function addUser(Username, Password) {
         .input("password", sql.NVarChar(255), Password)
         .query(`
             insert into Users (Username, Password)
-            output inserted.UserID, inserted.Username
-            values (@username, @password)
-            `);
+            values (@username, @password);
+
+            select top 1 UserID, Username
+            from Users
+            where Username = @username;
+        `);
 
     return result.recordset[0];
 }

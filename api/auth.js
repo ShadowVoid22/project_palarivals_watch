@@ -116,6 +116,13 @@ function describeDatabaseFailure(error, action) {
         };
     }
 
+    if (number === 334) {
+        return {
+            code: "DATABASE_TRIGGER_OUTPUT_CONFLICT",
+            error: "The Users table trigger conflicted with the account insert. Deploy the trigger-safe account API update.",
+        };
+    }
+
     if ([245, 8114].includes(number)) {
         return {
             code: "DATABASE_COLUMN_TYPE_MISMATCH",
