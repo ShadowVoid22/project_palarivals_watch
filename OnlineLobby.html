@@ -62,13 +62,26 @@
         </div>
 
         <section class="online-combat" id="onlineCombat" hidden>
-          <header><span><i></i>Live engagement</span><h2 id="combatMatchTitle">Combat Link Established</h2><b id="combatResultBadge">FIGHT</b></header>
-          <div class="online-combat__teams">
-            <article><h3 id="combatFirstName">Commander Alpha</h3><div id="combatFirstTeam"></div></article>
-            <b>VS</b>
-            <article><h3 id="combatSecondName">Commander Bravo</h3><div id="combatSecondTeam"></div></article>
+          <header class="online-combat__header">
+            <div><span><i></i>Live engagement // Server verified</span><h2 id="combatMatchTitle">Combat Link Established</h2></div>
+            <div class="online-combat__event-meter"><small>Combat sequence</small><strong id="combatEventCounter">00 / 00</strong><i><b id="combatEventProgress"></b></i></div>
+            <b id="combatResultBadge">FIGHT</b>
+          </header>
+          <div class="online-combat__arena" id="onlineCombatArena">
+            <div class="online-combat__teams">
+              <article class="online-combat__side online-combat__side--first">
+                <header><div><small>Alpha formation</small><h3 id="combatFirstName">Commander Alpha</h3></div><span><b id="combatFirstRemaining">0</b> Online</span></header>
+                <div class="online-combat__squad" id="combatFirstTeam"></div>
+              </article>
+              <div class="online-combat__versus"><i></i><b>VS</b><small>Round <span id="combatRoundLabel">01</span></small></div>
+              <article class="online-combat__side online-combat__side--second">
+                <header><div><small>Bravo formation</small><h3 id="combatSecondName">Commander Bravo</h3></div><span><b id="combatSecondRemaining">0</b> Online</span></header>
+                <div class="online-combat__squad" id="combatSecondTeam"></div>
+              </article>
+            </div>
+            <div class="online-combat__fx" id="onlineCombatFx" aria-hidden="true"></div>
           </div>
-          <div class="online-combat__feed" id="onlineCombatFeed">Targeting systems synchronized…</div>
+          <div class="online-combat__feed"><span>Tactical feed</span><strong id="onlineCombatFeed">Targeting systems synchronized…</strong></div>
           <ol class="online-combat__timeline" id="onlineCombatTimeline"></ol>
         </section>
       </section>

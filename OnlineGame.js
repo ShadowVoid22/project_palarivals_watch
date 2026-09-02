@@ -259,6 +259,7 @@ function combatFighter(instance, team, side, index) {
     return {
         id: instance.id,
         name: catalog.name,
+        abilityName: abilities[instance.id]?.name || "Standard Attack",
         level: instance.level || 1,
         side,
         index,
@@ -301,6 +302,8 @@ function simulateCombat(state, firstPlayer, secondPlayer, label) {
         const defenders = actingSide === "first" ? living(second) : living(first);
         const attacker = attackers[turns % attackers.length];
         const defender = defenders[0];
+        const attackerHealthBefore = attacker.health;
+        const defenderHealthBefore = defender.health;
         attacker.attacks += 1;
 
         if (!defender.enraged && defender.effects.enrageThreshold
@@ -308,12 +311,23 @@ function simulateCombat(state, firstPlayer, secondPlayer, label) {
             defender.enraged = true;
             defender.power += defender.effects.enragePower || 0;
             defender.health = Math.min(defender.maxHealth, defender.health + (defender.effects.enrageHeal || 0));
-            events.push({ type: "ability", actor: defender.name, text: "transformed under pressure" });
+            events.push({
+                type: "ability",
+                actor: defender.name,
+                actorSide: defender.side,
+                actorIndex: defender.index,
+                actorHealth: defender.health,
+                actorMaxHealth: defender.maxHealth,
+                abilityName: abilities[defender.id]?.name || "Combat Protocol",
+                text: `${defender.name} transformed under pressure`,
+            });
         }
 
         const dodged = nextRandom(state, `${label}-dodge-${turns}`) < (defender.effects.dodgeChance || 0);
         let damage = 0;
         let critical = false;
+        let healing = 0;
+        let retaliationDamage = 0;
         if (!dodged) {
             critical = nextRandom(state, `${label}-crit-${turns}`) < (attacker.effects.critChance || 0);
             damage = attacker.power;
@@ -332,32 +346,66 @@ function simulateCombat(state, firstPlayer, secondPlayer, label) {
             damage = Math.max(1, Math.round(damage - (defender.effects.damageReduction || 0)));
             defender.health = Math.max(0, defender.health - damage);
             if (attacker.effects.lifesteal) {
+                const beforeHeal = attacker.health;
                 attacker.health = Math.min(attacker.maxHealth, attacker.health + Math.max(1, Math.round(damage * attacker.effects.lifesteal)));
+                healing += attacker.health - beforeHeal;
             }
-            if (defender.effects.thorns) attacker.health = Math.max(0, attacker.health - defender.effects.thorns);
+            if (defender.effects.thorns) {
+                retaliationDamage = Math.min(attacker.health, defender.effects.thorns);
+                attacker.health = Math.max(0, attacker.health - retaliationDamage);
+            }
         }
 
+        let revived = false;
         if (defender.health <= 0 && defender.effects.reviveHealth && !defender.revived) {
             defender.revived = true;
             defender.health = Math.min(defender.maxHealth, defender.effects.reviveHealth);
-            events.push({ type: "ability", actor: defender.name, text: "returned to combat" });
+            revived = true;
+            events.push({
+                type: "ability",
+                actor: defender.name,
+                actorSide: defender.side,
+                actorIndex: defender.index,
+                actorHealth: defender.health,
+                actorMaxHealth: defender.maxHealth,
+                abilityName: abilities[defender.id]?.name || "Combat Protocol",
+                text: `${defender.name} returned to combat`,
+            });
         }
 
         if (defender.health <= 0 && attacker.effects.onKillHeal) {
+            const beforeHeal = attacker.health;
             attacker.health = Math.min(attacker.maxHealth, attacker.health + attacker.effects.onKillHeal);
+            healing += attacker.health - beforeHeal;
         }
 
         if (attacker.effects.periodicHealEvery && attacker.attacks % attacker.effects.periodicHealEvery === 0) {
+            const beforeHeal = attacker.health;
             attacker.health = Math.min(attacker.maxHealth, attacker.health + (attacker.effects.periodicHeal || 0));
+            healing += attacker.health - beforeHeal;
         }
 
         events.push({
             type: dodged ? "dodge" : (defender.health <= 0 ? "knockout" : "attack"),
             actor: attacker.name,
             target: defender.name,
+            actorSide: attacker.side,
+            actorIndex: attacker.index,
+            targetSide: defender.side,
+            targetIndex: defender.index,
             damage,
             critical,
+            dodged,
+            revived,
+            targetHealthBefore: defenderHealthBefore,
             targetHealth: defender.health,
+            targetMaxHealth: defender.maxHealth,
+            actorHealthBefore: attackerHealthBefore,
+            actorHealth: attacker.health,
+            actorMaxHealth: attacker.maxHealth,
+            healing,
+            retaliationDamage,
+            abilityName: abilities[attacker.id]?.name || "Standard Attack",
             text: dodged ? `${defender.name} evaded` : `${attacker.name} hit ${defender.name} for ${damage}`,
         });
         actingSide = actingSide === "first" ? "second" : "first";

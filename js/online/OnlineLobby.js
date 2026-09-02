@@ -45,6 +45,13 @@ const combatFirstName = document.querySelector("#combatFirstName");
 const combatSecondName = document.querySelector("#combatSecondName");
 const combatFirstTeam = document.querySelector("#combatFirstTeam");
 const combatSecondTeam = document.querySelector("#combatSecondTeam");
+const combatArena = document.querySelector("#onlineCombatArena");
+const combatFx = document.querySelector("#onlineCombatFx");
+const combatEventCounter = document.querySelector("#combatEventCounter");
+const combatEventProgress = document.querySelector("#combatEventProgress");
+const combatFirstRemaining = document.querySelector("#combatFirstRemaining");
+const combatSecondRemaining = document.querySelector("#combatSecondRemaining");
+const combatRoundLabel = document.querySelector("#combatRoundLabel");
 const combatFeed = document.querySelector("#onlineCombatFeed");
 const combatTimeline = document.querySelector("#onlineCombatTimeline");
 const toastElement = document.querySelector("#onlineToast");
@@ -104,6 +111,7 @@ function restoreSession() {
 
 function clearSession() {
   session = null;
+  playedCombatId = null;
   sessionStorage.removeItem(SESSION_KEY);
 }
 
@@ -293,12 +301,160 @@ function renderLeaderboard(state) {
 
 function combatFighterMarkup(fighter) {
   const hero = heroCatalog.get(fighter.id) || fighter;
-  return `<figure class="combat-fighter" data-combat-name="${escapeHtml(fighter.name)}"><img src="${escapeHtml(hero.image || "")}" alt="${escapeHtml(fighter.name)}"><b>LV ${fighter.level}</b><span><i style="--health:100%"></i></span></figure>`;
+  const ability = fighter.abilityName || hero.ability?.name || "Standard Attack";
+  return `
+    <figure class="combat-fighter" data-combat-index="${fighter.index}" data-hero-info="${escapeHtml(fighter.id)}" style="--unit-delay:${fighter.index * 70}ms">
+      <span class="combat-fighter__portrait"><img src="${escapeHtml(hero.image || "")}" alt="${escapeHtml(fighter.name)}"><i></i></span>
+      <span class="combat-fighter__level">LV ${fighter.level}</span>
+      <span class="combat-fighter__reticle"><i></i></span>
+      <span class="combat-fighter__health" aria-label="${fighter.maxHealth} health"><i style="width:100%"></i><b>${fighter.maxHealth} / ${fighter.maxHealth}</b></span>
+      <span class="combat-fighter__charge"><i></i></span>
+      <figcaption><strong>${escapeHtml(fighter.name)}</strong><em>${escapeHtml(ability)}</em><small>✦ ${fighter.power} · ♥ ${fighter.maxHealth}</small></figcaption>
+    </figure>`;
 }
 
 function clearCombatTimers() {
   combatTimers.forEach(window.clearTimeout);
   combatTimers = [];
+}
+
+function combatUnit(side, index) {
+  const team = side === "first" ? combatFirstTeam : combatSecondTeam;
+  return team.querySelector(`[data-combat-index="${index}"]`);
+}
+
+function combatPoint(unit) {
+  const arenaRect = combatArena.getBoundingClientRect();
+  const unitRect = unit?.getBoundingClientRect();
+  return unitRect ? {
+    x: unitRect.left - arenaRect.left + unitRect.width / 2,
+    y: unitRect.top - arenaRect.top + unitRect.height * 0.42,
+  } : { x: arenaRect.width / 2, y: arenaRect.height / 2 };
+}
+
+function removeCombatFx(element, delay = 900) {
+  combatTimers.push(window.setTimeout(() => element.remove(), delay));
+}
+
+function floatingCombatText(unit, text, variant = "damage") {
+  if (!unit) return;
+  const point = combatPoint(unit);
+  const element = document.createElement("span");
+  element.className = `online-combat-float online-combat-float--${variant}`;
+  element.textContent = text;
+  element.style.left = `${point.x}px`;
+  element.style.top = `${point.y}px`;
+  combatFx.append(element);
+  removeCombatFx(element);
+}
+
+function launchCombatProjectile(attacker, defender, event) {
+  if (!attacker || !defender) return;
+  const origin = combatPoint(attacker);
+  const target = combatPoint(defender);
+  const travelX = target.x - origin.x;
+  const travelY = target.y - origin.y;
+  const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
+  const variant = event.critical ? "critical" : (event.abilityName && event.abilityName !== "Standard Attack" ? "ability" : "standard");
+  const projectile = document.createElement("i");
+  projectile.className = `online-combat-projectile online-combat-projectile--${variant}`;
+  projectile.style.left = `${origin.x}px`;
+  projectile.style.top = `${origin.y}px`;
+  projectile.style.setProperty("--travel-x", `${travelX}px`);
+  projectile.style.setProperty("--travel-y", `${travelY}px`);
+  projectile.style.setProperty("--projectile-angle", `${angle}deg`);
+  const impact = document.createElement("i");
+  impact.className = `online-combat-impact online-combat-impact--${event.dodged ? "miss" : variant}`;
+  impact.style.left = `${target.x}px`;
+  impact.style.top = `${target.y}px`;
+  combatFx.append(projectile, impact);
+  removeCombatFx(projectile, 700);
+  removeCombatFx(impact, 900);
+}
+
+function setCombatHealth(unit, health, maxHealth) {
+  if (!unit || !Number.isFinite(Number(health))) return;
+  const maximum = Math.max(1, Number(maxHealth) || 1);
+  const current = Math.max(0, Number(health));
+  const percent = Math.max(0, Math.min(100, current / maximum * 100));
+  const bar = unit.querySelector(".combat-fighter__health i");
+  const value = unit.querySelector(".combat-fighter__health b");
+  if (bar) bar.style.width = `${percent}%`;
+  if (value) value.textContent = `${Math.ceil(current)} / ${maximum}`;
+  unit.classList.toggle("is-danger", percent > 0 && percent <= 30);
+  unit.classList.toggle("is-defeated", current <= 0);
+}
+
+function updateCombatRemaining() {
+  combatFirstRemaining.textContent = combatFirstTeam.querySelectorAll(".combat-fighter:not(.is-defeated)").length;
+  combatSecondRemaining.textContent = combatSecondTeam.querySelectorAll(".combat-fighter:not(.is-defeated)").length;
+}
+
+function pushCombatTimeline(event, index) {
+  const item = document.createElement("li");
+  item.className = `is-${event.type}${event.critical ? " is-critical" : ""}`;
+  const result = event.type === "ability" ? event.abilityName : (event.type === "dodge" ? "Evaded" : (event.type === "knockout" ? "Knockout" : `${event.damage} damage`));
+  item.innerHTML = `<b>${String(index + 1).padStart(2, "0")}</b><span><strong>${escapeHtml(event.actor)}</strong><small>${escapeHtml(result)}</small></span><em>${event.target ? escapeHtml(event.target) : "PROC"}</em>`;
+  combatTimeline.prepend(item);
+  while (combatTimeline.children.length > 5) combatTimeline.lastElementChild.remove();
+}
+
+function revealCombatResult(result, state) {
+  const won = result.winnerId === state.me.id;
+  const lost = result.loserId === state.me.id;
+  combatResultBadge.textContent = result.draw ? "DRAW" : (won ? "VICTORY" : (lost ? "DEFEAT" : "COMPLETE"));
+  combatResultBadge.classList.toggle("is-win", won);
+  combatResultBadge.classList.toggle("is-loss", lost);
+  combatElement.classList.add("is-final");
+  window.PRWAudio?.play(won ? "victory" : (lost ? "defeat" : "round"));
+}
+
+function playCombatEvent(event, index, total, result, state) {
+  combatArena.querySelectorAll(".is-attacking,.is-hit,.is-dodging,.is-targeted,.is-ability,.is-healing").forEach((unit) => {
+    unit.classList.remove("is-attacking", "is-hit", "is-dodging", "is-targeted", "is-ability", "is-healing");
+  });
+  const progress = Math.round((index + 1) / Math.max(1, total) * 100);
+  combatEventCounter.textContent = `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+  combatEventProgress.style.width = `${progress}%`;
+
+  if (event.type === "ability") {
+    const actor = combatUnit(event.actorSide, event.actorIndex);
+    actor?.classList.add("is-ability", "is-healing");
+    setCombatHealth(actor, event.actorHealth, event.actorMaxHealth);
+    floatingCombatText(actor, event.abilityName || "ABILITY", "ability");
+    combatFeed.textContent = event.text;
+    pushCombatTimeline(event, index);
+    window.PRWAudio?.play("upgrade");
+  } else {
+    const attacker = combatUnit(event.actorSide, event.actorIndex);
+    const defender = combatUnit(event.targetSide, event.targetIndex);
+    attacker?.classList.add("is-attacking");
+    if (event.abilityName && event.abilityName !== "Standard Attack") attacker?.classList.add("is-ability");
+    defender?.classList.add("is-targeted", event.dodged ? "is-dodging" : "is-hit");
+    launchCombatProjectile(attacker, defender, event);
+    combatArena.classList.remove("is-impact", "is-heavy-impact");
+    void combatArena.offsetWidth;
+    combatArena.classList.add(event.critical || event.type === "knockout" ? "is-heavy-impact" : "is-impact");
+    combatTimers.push(window.setTimeout(() => {
+      setCombatHealth(defender, event.targetHealth, event.targetMaxHealth);
+      setCombatHealth(attacker, event.actorHealth, event.actorMaxHealth);
+      if (event.dodged) floatingCombatText(defender, "EVADE", "dodge");
+      else floatingCombatText(defender, event.type === "knockout" ? "K.O." : `-${event.damage}`, event.critical ? "critical" : (event.type === "knockout" ? "knockout" : "damage"));
+      if (event.healing > 0) {
+        attacker?.classList.add("is-healing");
+        floatingCombatText(attacker, `+${event.healing}`, "healing");
+      }
+      if (event.retaliationDamage > 0) floatingCombatText(attacker, `-${event.retaliationDamage} REFLECT`, "retaliation");
+      updateCombatRemaining();
+    }, 210));
+    combatFeed.textContent = event.dodged
+      ? `${event.target} evaded ${event.actor}'s attack.`
+      : `${event.actor} dealt ${event.damage} damage to ${event.target}${event.critical ? " — critical hit!" : "."}`;
+    pushCombatTimeline(event, index);
+    window.PRWAudio?.play(event.type === "knockout" ? "eliminate" : (event.critical ? "critical" : "attack"), { critical: event.critical });
+  }
+
+  if (index === total - 1) combatTimers.push(window.setTimeout(() => revealCombatResult(result, state), 650));
 }
 
 function playCombat(state) {
@@ -310,27 +466,30 @@ function playCombat(state) {
   combatFirstName.textContent = result.firstName;
   combatSecondName.textContent = result.secondName;
   combatTitle.textContent = `${result.firstName} vs ${result.secondName}`;
-  combatFirstTeam.innerHTML = result.teams.first.map(combatFighterMarkup).join("") || "No deployed heroes";
-  combatSecondTeam.innerHTML = result.teams.second.map(combatFighterMarkup).join("") || "No deployed heroes";
-  const won = result.winnerId === state.me.id;
-  const lost = result.loserId === state.me.id;
-  combatResultBadge.textContent = result.draw ? "DRAW" : (won ? "WIN" : (lost ? "LOSS" : "LIVE"));
-
   if (playedCombatId === result.id) return;
   playedCombatId = result.id;
   clearCombatTimers();
+  combatElement.scrollTop = 0;
+  combatElement.classList.remove("is-final");
+  combatResultBadge.classList.remove("is-win", "is-loss");
+  combatResultBadge.textContent = "LIVE";
+  combatRoundLabel.textContent = String(state.round).padStart(2, "0");
+  combatFirstTeam.innerHTML = result.teams.first.map(combatFighterMarkup).join("") || '<p class="online-combat__empty">No deployed heroes</p>';
+  combatSecondTeam.innerHTML = result.teams.second.map(combatFighterMarkup).join("") || '<p class="online-combat__empty">No deployed heroes</p>';
+  combatFx.innerHTML = "";
   combatTimeline.innerHTML = "";
   combatFeed.textContent = "Targeting systems synchronized…";
-  result.events.slice(0, 28).forEach((event, index) => {
-    combatTimers.push(window.setTimeout(() => {
-      combatFeed.textContent = event.text;
-      const item = document.createElement("li");
-      item.className = event.type === "knockout" ? "is-knockout" : "";
-      item.textContent = event.type === "knockout" ? `${event.target} KO` : event.text;
-      combatTimeline.prepend(item);
-      while (combatTimeline.children.length > 6) combatTimeline.lastElementChild.remove();
-      window.PRWAudio?.play(event.type === "knockout" ? "eliminate" : "attack");
-    }, 250 + index * 410));
+  combatEventCounter.textContent = `00 / ${String(result.events.length).padStart(2, "0")}`;
+  combatEventProgress.style.width = "0%";
+  updateCombatRemaining();
+  const interval = Math.min(520, Math.max(145, Math.floor(11_600 / Math.max(1, result.events.length))));
+  if (!result.events.length) {
+    combatFeed.textContent = "No opposition detected. Combat resolved by deployment strength.";
+    combatTimers.push(window.setTimeout(() => revealCombatResult(result, state), 700));
+    return;
+  }
+  result.events.forEach((event, index) => {
+    combatTimers.push(window.setTimeout(() => playCombatEvent(event, index, result.events.length, result, state), 450 + index * interval));
   });
 }
 
