@@ -55,6 +55,7 @@ let inspectorHideTimeout = null;
 let inspectorPinned = false;
 
 const state = {
+  profileMatchId: null,
   phase: "loading",
   round: 1,
   credits: 0,
@@ -1090,6 +1091,14 @@ function finishCombat(result) {
   elements.phaseLabel.textContent = playerWon ? "Round Victory" : "Round Defeat";
   updateHud();
   window.PRWAudio?.play(playerWon ? "victory" : "defeat");
+  if (state.gameOver) {
+    window.PRWProfileStats?.recordMatch({
+      matchKey: state.profileMatchId,
+      mode: "ability-draft",
+      outcome: state.playerHealth > 0 ? "win" : "loss",
+      heroes: state.team.filter(Boolean).map((hero) => hero.id),
+    });
+  }
 }
 
 function beginBuildRound() {
@@ -1119,6 +1128,7 @@ function resetGame() {
   window.clearInterval(timerInterval);
   window.clearTimeout(combatTimeout);
   state.phase = "build";
+  state.profileMatchId = window.PRWProfileStats?.createMatchId("ability-draft") || `ability-draft:${Date.now()}`;
   state.round = 1;
   state.credits = catalog.rules.startingCredits;
   state.playerHealth = catalog.rules.startingHealth;

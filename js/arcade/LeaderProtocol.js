@@ -40,7 +40,8 @@
   const state = {
     phase: "loading", round: 1, credits: 0, seconds: 0, selectedLeader: null,
     team: [], shop: [], players: [], draftChoices: [], selectedSlot: null,
-    currentCombat: null, gameOver: false
+    currentCombat: null, gameOver: false,
+    profileMatchId: window.PRWProfileStats?.createMatchId("leader-protocol") || `leader-protocol:${Date.now()}`
   };
 
   function heroDefinition(id) {
@@ -747,6 +748,14 @@
     dom.returnButton.hidden = !state.gameOver;
     dom.result.hidden = false;
     renderPlayers();
+    if (state.gameOver) {
+      window.PRWProfileStats?.recordMatch({
+        matchKey: state.profileMatchId,
+        mode: "leader-protocol",
+        outcome: human.eliminated ? "loss" : "win",
+        heroes: state.team.filter(Boolean).map((unit) => unit.heroId),
+      });
+    }
   }
 
   function continueCampaign() {

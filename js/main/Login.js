@@ -23,6 +23,7 @@ function writeAuthSession(user) {
   const session = {
     id: user.id,
     username: user.username,
+    token: user.token,
     authenticatedAt: new Date().toISOString(),
   };
   window.localStorage.setItem(PRW_AUTH_SESSION_KEY, JSON.stringify(session));

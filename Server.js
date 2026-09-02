@@ -3,6 +3,7 @@ const path = require("path");
 const database = require("./Database");
 const authHandler = require("./api/auth");
 const onlineHandler = require("./api/online");
+const profileStatsHandler = require("./api/profile-stats");
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.static(__dirname));
 
 app.all("/api/auth", authHandler);
 app.all("/api/online", onlineHandler);
+app.all("/api/profile-stats", profileStatsHandler);
 
 app.get("/api/getusers", async (req, res) => {
     try {

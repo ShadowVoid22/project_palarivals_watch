@@ -65,6 +65,7 @@ const heroInfo = document.querySelector("#onlineHeroInfo");
 
 let session = null;
 let currentState = null;
+const profileRecordedMatches = new Set();
 let serverClockOffset = 0;
 let pollTimer = null;
 let clockTimer = null;
@@ -514,6 +515,15 @@ function renderComplete(state) {
     : `Your run ended in round ${state.round}. Your completed match has been released and a new lobby is ready.`;
   matchCompleteElement.hidden = false;
   playAgainButton.disabled = false;
+  if (!profileRecordedMatches.has(state.id)) {
+    profileRecordedMatches.add(state.id);
+    window.PRWProfileStats?.recordMatch({
+      matchKey: `online:${state.id}`,
+      mode: "online",
+      outcome: state.championId === state.me.id ? "win" : "loss",
+      heroes: state.me.team.filter(Boolean).map((hero) => hero.id),
+    });
+  }
 }
 
 function mergeCandidate(me) {

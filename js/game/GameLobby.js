@@ -92,6 +92,7 @@ const scoutFormation = document.querySelector("#scoutFormation");
 const closeScoutButtons = [...document.querySelectorAll("[data-close-scout]")];
 
 const gameState = {
+  profileMatchId: window.PRWProfileStats?.createMatchId("standard") || `standard:${Date.now()}`,
   credits: Number(creditsElement.textContent),
   shopTier: 1,
   round: 1,
@@ -113,6 +114,15 @@ const gameState = {
   bench: Array(6).fill(null),
   drag: null,
 };
+
+function recordStandardMatch(isVictory) {
+  window.PRWProfileStats?.recordMatch({
+    matchKey: gameState.profileMatchId,
+    mode: "standard",
+    outcome: isVictory ? "win" : "loss",
+    heroes: gameState.team.filter(Boolean).map((hero) => hero.id),
+  });
+}
 
 const MAX_SHOP_TIER = 4;
 const MAX_HERO_LEVEL = 4;
@@ -2767,6 +2777,7 @@ function showMatchResultScreen(isVictory, winnerName = "") {
       ? "You are the last commander standing."
       : `${winnerName || "Another commander"} remains in the fight. Your integrity reached zero.`);
   announce(spectatorFinish ? `${winnerName || "A commander"} won the match.` : (isVictory ? "Match victory." : "You have been eliminated from the match."));
+  recordStandardMatch(isVictory);
 }
 
 function showEliminationPrompt(winnerName = "") {
@@ -2785,6 +2796,7 @@ function showEliminationPrompt(winnerName = "") {
   matchResultDescription.textContent = `${winnerName || "Another commander"} remains in the fight. Continue watching every surviving AI battle or return to the menu.`;
   spectateMatchButton.focus();
   announce("Your squad was eliminated. Spectator mode is available.");
+  recordStandardMatch(false);
 }
 
 function beginSpectatorMode() {

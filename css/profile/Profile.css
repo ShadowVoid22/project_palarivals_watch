@@ -471,6 +471,43 @@ a {
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
+#HeroList li > span {
+  display: block;
+  padding-right: 90px;
+  color: #edf7ff;
+  font-size: 0.86rem;
+}
+
+#HeroList li > small {
+  position: absolute;
+  right: 27px;
+  color: #7f93ae;
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#HeroList .profile-hero-empty {
+  grid-column: 1 / -1;
+  min-height: 96px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+#HeroList .profile-hero-empty > small {
+  position: static;
+  margin-top: 5px;
+}
+
+#HeroList .profile-hero-empty.is-loading::before {
+  animation: profile-telemetry-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes profile-telemetry-pulse {
+  to { opacity: 0.35; transform: scale(0.88); }
+}
+
 #HeroList li::before {
   position: absolute;
   top: 10px;
@@ -542,6 +579,30 @@ a {
   box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35), 0 0 30px rgba(255, 79, 113, 0.08);
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
   filter: saturate(1.08) contrast(1.05);
+}
+
+#HeroPicture.is-empty {
+  opacity: 0.2;
+  filter: grayscale(1) saturate(0.2);
+}
+
+#TopHeroName {
+  position: absolute;
+  right: 38px;
+  bottom: 77px;
+  left: 38px;
+  z-index: 4;
+  overflow: hidden;
+  color: white;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 12px #000;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 #TopHeroPicks {

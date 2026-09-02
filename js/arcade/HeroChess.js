@@ -61,6 +61,7 @@ let state;
 
 function createState() {
   return {
+    profileMatchId: window.PRWProfileStats?.createMatchId("hero-chess") || `hero-chess:${Date.now()}`,
     phase: "draft",
     aiName: AI_NAMES[Math.floor(Math.random() * AI_NAMES.length)],
     roleIndex: 0,
@@ -745,6 +746,12 @@ function endGame(winner, reason) {
   resultPanel.hidden = false;
   renderMatch();
   window.PRWAudio?.play(playerWon ? "win" : draw ? "modalOpen" : "lose");
+  window.PRWProfileStats?.recordMatch({
+    matchKey: state.profileMatchId,
+    mode: "hero-chess",
+    outcome: draw ? "draw" : (playerWon ? "win" : "loss"),
+    heroes: Object.values(state.assignments.player).filter(Boolean),
+  });
 }
 
 function resetGame() {

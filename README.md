@@ -12,15 +12,21 @@ This is a fan-made project. Characters and related properties belong to NetEase 
 
 The sign-up and login form uses the server endpoint at `/api/auth`, so open the project through `npm start`, `vercel dev`, or a Vercel deployment instead of opening `Main.html` directly.
 
-1. Copy `.env.example` to `.env.local` and fill in `DB_USER`, `DB_PASSWORD`, `DB_SERVER`, `DB_DATABASE`, and `DB_PORT`.
+1. Copy `.env.example` to `.env.local` and fill in `AUTH_SESSION_SECRET`, `DB_USER`, `DB_PASSWORD`, `DB_SERVER`, `DB_DATABASE`, and `DB_PORT`.
 2. Run `database/migrations/001_secure_user_passwords.sql` once against the SQL Server database. It expands the password column for secure hashes and prevents duplicate usernames.
 3. Run `npm install`, then `npm start` for local development.
 
 The authentication API also performs this small migration automatically when needed. Running the SQL file manually is still recommended; automatic migration requires the configured database user to have `ALTER TABLE` and `CREATE INDEX` permission.
 
-For Vercel, add those same `DB_*` values under **Project Settings → Environment Variables**, enable them for the environments you use, and redeploy. Local `.env.local` values are intentionally not committed to GitHub.
+For Vercel, add those same `DB_*` values and `AUTH_SESSION_SECRET` under **Project Settings → Environment Variables**, enable them for the environments you use, and redeploy. Local `.env.local` values are intentionally not committed to GitHub. If `AUTH_SESSION_SECRET` is omitted, the app temporarily falls back to `DB_PASSWORD`, but a separate long random secret is recommended.
 
 Passwords are stored as salted scrypt hashes. Existing plaintext account passwords are upgraded automatically after a successful login.
+
+## Career profile tracking
+
+Completed Standard, Online Operations, Ability Draft, Leader Protocol, and Hero Chess matches update the signed-in player's wins, losses, matches played, win rate, and most-used heroes. Run `database/migrations/003_profile_stats.sql` against the account database before deployment. The production database user needs `SELECT`, `INSERT`, and `UPDATE` permission on `ProfileMatches` and `ProfileHeroUsage`. The API can create the tables automatically when its database user has schema-creation permission.
+
+Players who signed in before profile tracking was added must log out and sign back in once to receive a signed account session.
 
 ## Online Operations mode
 

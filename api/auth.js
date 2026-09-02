@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const database = require("../Database");
+const { createSessionToken } = require("../AuthSession");
 
 const scrypt = (password, salt) => new Promise((resolve, reject) => {
     crypto.scrypt(password, salt, 32, (error, key) => {
@@ -73,6 +74,7 @@ function publicUser(user) {
     return {
         id: user.UserID,
         username: user.Username,
+        token: createSessionToken(user),
     };
 }
 
