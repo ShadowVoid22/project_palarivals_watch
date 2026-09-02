@@ -76,8 +76,66 @@ function publicUser(user) {
     };
 }
 
+function getSqlErrorNumber(error) {
+    const candidates = [
+        error?.number,
+        error?.originalError?.number,
+        error?.originalError?.info?.number,
+        error?.precedingErrors?.[0]?.number,
+    ];
+    const number = candidates.map(Number).find(Number.isFinite);
+    return number ?? null;
+}
+
 function isAuthSchemaError(error) {
-    return [207, 208, 229, 8152, 2628, 51001, 51002].includes(Number(error?.number));
+    return [207, 208, 8152, 2628, 51001, 51002].includes(getSqlErrorNumber(error));
+}
+
+function describeDatabaseFailure(error, action) {
+    const number = getSqlErrorNumber(error);
+    const operation = action === "signup" ? "Account creation" : "Login";
+
+    if (number === 229) {
+        return {
+            code: "DATABASE_PERMISSION_DENIED",
+            error: `${operation} was blocked by SQL Server permissions. Grant the configured DB_USER SELECT, INSERT, and UPDATE permission on the Users table.`,
+        };
+    }
+
+    if (number === 515) {
+        return {
+            code: "DATABASE_REQUIRED_COLUMN",
+            error: "The Users table has a required column without a default value. Check the Vercel Function Log for the column name.",
+        };
+    }
+
+    if (number === 547) {
+        return {
+            code: "DATABASE_CONSTRAINT_REJECTED",
+            error: "The Users table rejected the new account because of a database constraint.",
+        };
+    }
+
+    if ([245, 8114].includes(number)) {
+        return {
+            code: "DATABASE_COLUMN_TYPE_MISMATCH",
+            error: "The Users table column types do not match the account API.",
+        };
+    }
+
+    if (["ELOGIN", "ETIMEOUT", "ESOCKET", "ECONNCLOSED", "ENOTOPEN"].includes(error?.code)) {
+        return {
+            code: `DATABASE_${error.code}`,
+            error: `${operation} could not connect to SQL Server (${error.code}). Check the Vercel database credentials, firewall, and server availability.`,
+        };
+    }
+
+    return {
+        code: number ? `DATABASE_SQL_${number}` : "DATABASE_REQUEST_FAILED",
+        error: number
+            ? `${operation} was rejected by SQL Server (error ${number}). Check the matching Vercel Function Log for details.`
+            : `${operation} failed in the account database. Check the matching Vercel Function Log for details.`,
+    };
 }
 
 module.exports = async (request, response) => {
@@ -145,7 +203,9 @@ module.exports = async (request, response) => {
             user: publicUser(existingUser),
         });
     } catch (error) {
-        if (error?.number === 2601 || error?.number === 2627) {
+        const sqlErrorNumber = getSqlErrorNumber(error);
+
+        if (sqlErrorNumber === 2601 || sqlErrorNumber === 2627) {
             return sendJson(response, 409, { error: "That username is already registered." });
         }
 
@@ -158,7 +218,7 @@ module.exports = async (request, response) => {
         }
 
         if (isAuthSchemaError(error)) {
-            console.error("Authentication database schema is outdated.", error.number);
+            console.error("Authentication database schema is outdated.", sqlErrorNumber, error);
             return sendJson(response, 503, {
                 error: "The account database needs its one-time security migration before new accounts can be created.",
                 code: "AUTH_SCHEMA_MIGRATION_REQUIRED",
@@ -166,10 +226,15 @@ module.exports = async (request, response) => {
         }
 
         console.error("Authentication API failed.", error);
-        return sendJson(response, 503, {
-            error: "The account service is unavailable. Check the database environment settings and try again.",
-        });
+        return sendJson(response, 503, describeDatabaseFailure(error, action));
     }
 };
 
-module.exports._internals = { validateCredentials, hashPassword, verifyPassword, isAuthSchemaError };
+module.exports._internals = {
+    validateCredentials,
+    hashPassword,
+    verifyPassword,
+    getSqlErrorNumber,
+    isAuthSchemaError,
+    describeDatabaseFailure,
+};
