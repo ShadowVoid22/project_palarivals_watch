@@ -6,6 +6,9 @@
 Date: September 1, 2026
 Status: Current Build
 
+### Sign in
+- You can now sign in
+
 ### Nine Heroes Enter the Watch
 - Added **Mantis**, **Rocket**, and **Ultron** from Marvel Rivals.
 - Added **Mercy**, **Zenyatta**, and **Winston** from Overwatch.
