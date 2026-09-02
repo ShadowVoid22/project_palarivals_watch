@@ -76,6 +76,10 @@ function publicUser(user) {
     };
 }
 
+function isAuthSchemaError(error) {
+    return [207, 208, 8152, 2628].includes(Number(error?.number));
+}
+
 module.exports = async (request, response) => {
     if (request.method !== "POST") {
         response.setHeader("Allow", "POST");
@@ -121,12 +125,21 @@ module.exports = async (request, response) => {
             return sendJson(response, 401, { error: "Incorrect username or password." });
         }
 
+        let passwordUpgradePending = false;
         if (passwordResult.legacy) {
-            await database.updateUserPassword(existingUser.Username, await hashPassword(password));
+            try {
+                await database.updateUserPassword(existingUser.Username, await hashPassword(password));
+            } catch (error) {
+                if (!isAuthSchemaError(error)) throw error;
+                passwordUpgradePending = true;
+                console.error("Legacy password upgrade requires the account schema migration.", error.number);
+            }
         }
 
         return sendJson(response, 200, {
-            message: "Login successful. Welcome back.",
+            message: passwordUpgradePending
+                ? "Login successful. Account security upgrade is pending administrator maintenance."
+                : "Login successful. Welcome back.",
             user: publicUser(existingUser),
         });
     } catch (error) {
@@ -142,6 +155,14 @@ module.exports = async (request, response) => {
             });
         }
 
+        if (isAuthSchemaError(error)) {
+            console.error("Authentication database schema is outdated.", error.number);
+            return sendJson(response, 503, {
+                error: "The account database needs its one-time security migration before new accounts can be created.",
+                code: "AUTH_SCHEMA_MIGRATION_REQUIRED",
+            });
+        }
+
         console.error("Authentication API failed.", error);
         return sendJson(response, 503, {
             error: "The account service is unavailable. Check the database environment settings and try again.",
@@ -149,4 +170,4 @@ module.exports = async (request, response) => {
     }
 };
 
-module.exports._internals = { validateCredentials, hashPassword, verifyPassword };
+module.exports._internals = { validateCredentials, hashPassword, verifyPassword, isAuthSchemaError };
