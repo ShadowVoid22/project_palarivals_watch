@@ -26,6 +26,14 @@ app.post("/__smoke/complete", (_request, response) => {
     return response.json({ matchId: state.id, championId: champion.id });
 });
 
+app.post("/__smoke/duplicates", (_request, response) => {
+    const player = state?.players?.find((entry) => !entry.isAI);
+    if (!player || state.phase !== "build") return response.status(409).json({ error: "A human build phase is required." });
+    player.credits = 20;
+    player.shop = ["tracer", "tracer", "mercy"];
+    return response.json({ matchId: state.id, playerId: player.id });
+});
+
 app.post("/api/online", (request, response) => {
     const { action, displayName, matchId, playerId, playerToken, payload } = request.body || {};
     try {

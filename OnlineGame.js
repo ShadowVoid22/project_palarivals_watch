@@ -185,33 +185,30 @@ function heroInstance(id, level = 1) {
     return { id, level: Math.max(1, Math.min(MAX_LEVEL, Number(level) || 1)) };
 }
 
-function allRosterSlots(player) {
-    return [
+function mergeableRosterPair(player) {
+    const slots = [
         ...player.team.map((hero, index) => ({ zone: "team", index, hero })),
         ...player.bench.map((hero, index) => ({ zone: "bench", index, hero })),
-    ];
+    ].filter((slot) => slot.hero && slot.hero.level < MAX_LEVEL);
+
+    for (let firstIndex = 0; firstIndex < slots.length; firstIndex += 1) {
+        const first = slots[firstIndex];
+        const second = slots.slice(firstIndex + 1).find((slot) => (
+            slot.hero.id === first.hero.id && slot.hero.level === first.hero.level
+        ));
+        if (second) return [first, second];
+    }
+    return null;
 }
 
-function mergeRoster(player) {
-    const merges = [];
-    let didMerge = true;
-    while (didMerge) {
-        didMerge = false;
-        const slots = allRosterSlots(player).filter((slot) => slot.hero && slot.hero.level < MAX_LEVEL);
-        for (const first of slots) {
-            const second = slots.find((slot) => slot !== first
-                && slot.hero.id === first.hero.id
-                && slot.hero.level === first.hero.level);
-            if (!second) continue;
-            const nextLevel = first.hero.level + 1;
-            player[first.zone][first.index] = heroInstance(first.hero.id, nextLevel);
-            player[second.zone][second.index] = null;
-            merges.push({ id: first.hero.id, level: nextLevel });
-            didMerge = true;
-            break;
-        }
-    }
-    return merges;
+function mergeOnePair(player) {
+    const pair = mergeableRosterPair(player);
+    if (!pair) return null;
+    const [first, second] = pair;
+    const merged = heroInstance(first.hero.id, first.hero.level + 1);
+    player[first.zone][first.index] = merged;
+    player[second.zone][second.index] = null;
+    return merged;
 }
 
 function traitCounts(team) {
@@ -431,8 +428,7 @@ function aiCandidateScore(hero, player) {
     const owned = player.team.filter(Boolean);
     const counts = traitCounts(owned);
     const overlap = (heroTraits[hero.id] || []).reduce((score, trait) => score + (counts.get(trait) || 0) * 5, 0);
-    const duplicate = owned.some((entry) => entry.id === hero.id && entry.level < MAX_LEVEL) ? 7 : 0;
-    return hero.power + hero.health * 0.65 + overlap + duplicate + hero.tier;
+    return hero.power + hero.health * 0.65 + overlap + hero.tier;
 }
 
 function buildAiTeam(state, player) {
@@ -446,7 +442,6 @@ function buildAiTeam(state, player) {
         const selection = candidates[Math.min(candidates.length - 1, Math.floor(nextRandom(state, `ai-pick-${safety}`) * 3))].hero;
         const openIndex = player.team.findIndex((hero) => !hero);
         player.team[openIndex] = heroInstance(selection.id);
-        mergeRoster(player);
         safety += 1;
     }
     player.ready = true;
@@ -629,6 +624,14 @@ function applyPlayerAction(state, player, action, payload = {}) {
     player.ready = false;
     player.status = "Building live";
 
+    if (action === "merge") {
+        const merged = mergeOnePair(player);
+        if (!merged) throw Object.assign(new Error("You need two matching heroes of the same level to merge."), { code: "ONLINE_NO_MERGE" });
+        const hero = heroById.get(merged.id);
+        player.status = `${hero?.name || "Hero"} manually merged to level ${merged.level}`;
+        return;
+    }
+
     if (action === "buy") {
         const index = Number(payload.index);
         const heroId = player.shop[index];
@@ -645,8 +648,7 @@ function applyPlayerAction(state, player, action, payload = {}) {
         player.credits -= hero.cost;
         zone[openIndex] = heroInstance(heroId);
         player.shop[index] = null;
-        const merges = mergeRoster(player);
-        player.status = merges.length ? `${hero.name} merged to level ${merges.at(-1).level}` : `${hero.name} recruited`;
+        player.status = `${hero.name} recruited`;
         return;
     }
 
@@ -684,7 +686,6 @@ function applyPlayerAction(state, player, action, payload = {}) {
             throw Object.assign(new Error("Invalid roster position."), { code: "ONLINE_BAD_ACTION" });
         }
         [to[toIndex], from[fromIndex]] = [from[fromIndex], to[toIndex]];
-        mergeRoster(player);
         player.status = "Formation updated";
         return;
     }
@@ -781,5 +782,5 @@ module.exports = {
     touchPlayer,
     publicState,
     hashToken,
-    _internals: { mergeRoster, simulateCombat, buildAiTeam, traitCounts, get heroes() { return heroes; } },
+    _internals: { mergeableRosterPair, mergeOnePair, simulateCombat, buildAiTeam, traitCounts, get heroes() { return heroes; } },
 };

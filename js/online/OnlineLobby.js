@@ -24,6 +24,8 @@ const creditsElement = document.querySelector("#onlineCredits");
 const commanderName = document.querySelector("#commanderName");
 const unitCount = document.querySelector("#onlineUnitCount");
 const readyButton = document.querySelector("#onlineReadyButton");
+const mergeButton = document.querySelector("#onlineMergeButton");
+const mergeHint = document.querySelector("#onlineMergeHint");
 const traitsElement = document.querySelector("#onlineTraits");
 const teamElement = document.querySelector("#onlineTeam");
 const benchElement = document.querySelector("#onlineBench");
@@ -514,6 +516,15 @@ function renderComplete(state) {
   playAgainButton.disabled = false;
 }
 
+function mergeCandidate(me) {
+  const heroes = [...me.team, ...me.bench].filter((hero) => hero && hero.level < 4);
+  for (let index = 0; index < heroes.length; index += 1) {
+    const hero = heroes[index];
+    if (heroes.slice(index + 1).some((candidate) => candidate.id === hero.id && candidate.level === hero.level)) return hero;
+  }
+  return null;
+}
+
 function resetToMatchmaking() {
   window.clearTimeout(pollTimer);
   clearCombatTimers();
@@ -556,6 +567,11 @@ function renderGame(state) {
   readyButton.classList.toggle("is-ready", me.ready);
   readyButton.setAttribute("aria-pressed", String(me.ready));
   readyButton.querySelector("span").textContent = me.ready ? "Ready!" : "Ready";
+  const candidate = mergeCandidate(me);
+  const candidateName = candidate ? (heroCatalog.get(candidate.id)?.name || candidate.name || "Hero") : null;
+  mergeButton.disabled = locked || !candidate;
+  mergeButton.classList.toggle("can-merge", Boolean(candidate) && !locked);
+  mergeHint.textContent = candidate ? `${candidateName} → LV ${candidate.level + 1}` : "Matching pair required";
   renderRoster(teamElement, me.team, "team");
   renderRoster(benchElement, me.bench, "bench");
   renderTraits(me.team);
@@ -686,6 +702,7 @@ joinButton.addEventListener("click", joinMatch);
 playAgainButton.addEventListener("click", findNewMatch);
 fillWithAiButton.addEventListener("click", () => sendAction("start-now"));
 readyButton.addEventListener("click", () => sendAction("ready"));
+mergeButton.addEventListener("click", () => sendAction("merge"));
 rerollButton.addEventListener("click", () => sendAction("reroll"));
 upgradeButton.addEventListener("click", () => sendAction("upgrade"));
 freezeButton.addEventListener("click", () => sendAction("freeze"));
