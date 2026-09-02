@@ -178,20 +178,24 @@
 
       <p class="prw-auth-card__description" id="prwAuthDescription">Enter your credentials to reconnect with your PalaRivals Watch profile.</p>
 
-      <div class="prw-auth-card__fields">
-        <div class="prw-login-panel__row">
-          <label for="prwUsernameInput"><span>Username</span><input id="prwUsernameInput" type="text" minlength="3" maxlength="50" placeholder="Username (3-50 Characters)" size="25" aria-label="Username input"></label>
-          <small class="prw-login-panel__clarifications">Username must be 3-50 characters long</small>
+      <form id="prwAuthForm" novalidate>
+        <div class="prw-auth-card__fields">
+          <div class="prw-login-panel__row">
+            <label for="prwUsernameInput"><span>Username</span><input id="prwUsernameInput" name="username" type="text" minlength="3" maxlength="50" placeholder="Username (3-50 Characters)" size="25" autocomplete="username" aria-label="Username input" required></label>
+            <small class="prw-login-panel__clarifications">Username must be 3-50 characters long</small>
+          </div>
+          <div class="prw-login-panel__row">
+            <label for="prwPasswordInput"><span>Password</span><input id="prwPasswordInput" name="password" type="password" minlength="6" maxlength="30" placeholder="Password (6-30 Characters)" size="25" autocomplete="current-password" aria-label="Password input" required></label>
+            <small class="prw-login-panel__clarifications">Password must be 6-30 characters long with at least <b>1 uppercase character, 1 lowercase character, and 1 number</b></small>
+          </div>
         </div>
-        <div class="prw-login-panel__row">
-          <label for="prwPasswordInput"><span>Password</span><input id="prwPasswordInput" type="password" minlength="6" maxlength="30" placeholder="Password (6-30 Characters)" size="25" aria-label="Password input"></label>
-          <small class="prw-login-panel__clarifications">Password must be 6-30 characters long with atleast <b>1 Uppercase character, 1 Lowercase character, and 1 Number</b></small>
-        </div>
-      </div>
 
-      <div class="prw-login-panel__row prw-login-panel__actions">
-        <button id="prwLoginButton" type="button"><span>PlaceHolder (Login or Signup)</span><i aria-hidden="true">➜</i></button>
-      </div>
+        <p class="prw-auth-message" id="prwAuthMessage" role="alert" aria-live="polite" hidden></p>
+
+        <div class="prw-login-panel__row prw-login-panel__actions">
+          <button id="prwLoginButton" type="submit"><span>PlaceHolder (Login or Signup)</span><i aria-hidden="true">➜</i></button>
+        </div>
+      </form>
 
       <footer class="prw-auth-card__footer">
         <span>Encrypted profile channel</span>

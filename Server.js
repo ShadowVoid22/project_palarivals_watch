@@ -1,10 +1,14 @@
 const express = require("express");
+const path = require("path");
 const database = require("./Database");
+const authHandler = require("./api/auth");
 
 const app = express();
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(__dirname));
+
+app.all("/api/auth", authHandler);
 
 app.get("/api/getusers", async (req, res) => {
     try {
@@ -20,6 +24,11 @@ app.get("/api/getusers", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Running on port 3000");
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "Main.html"));
+});
+
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, () => {
+    console.log(`Running on port ${port}`);
 });

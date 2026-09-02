@@ -2,6 +2,9 @@
   "name": "palarivals-watch",
   "version": "0.3.0",
   "private": true,
+  "scripts": {
+    "start": "node Server.js"
+  },
   "dependencies": {
     "@vercel/blob": "^2.3.0",
     "dotenv": "^17.0.0",

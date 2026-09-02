@@ -10,9 +10,9 @@ module.exports = async (req, res) => {
 
     try {
         const username = req.query.username;
-        const users = await database.getUserID();
+        const users = await database.getUserID(username);
 
-        res.json(users);
+        res.json(users[0] || null);
     } catch (error) {
         console.error(error);
 

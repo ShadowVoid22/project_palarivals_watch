@@ -272,6 +272,12 @@ body.auth-menu-open {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--auth-primary) 11%, transparent), inset 0 0 20px color-mix(in srgb, var(--auth-primary) 5%, transparent);
 }
 
+.prw-login-panel input[aria-invalid="true"] {
+  border-color: #ff5577;
+  background: rgba(255, 85, 119, .08);
+  box-shadow: 0 0 0 3px rgba(255, 85, 119, .1);
+}
+
 .prw-login-panel__clarifications {
   display: block;
   margin: 7px 0 0;
@@ -287,6 +293,25 @@ body.auth-menu-open {
 
 .prw-login-panel__actions {
   margin-top: 26px;
+}
+
+.prw-auth-message {
+  margin: 18px 0 -8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 85, 119, .3);
+  border-left: 3px solid #ff5577;
+  color: #ffd9e1;
+  background: rgba(255, 85, 119, .08);
+  font-size: .76rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.prw-auth-message[data-state="success"] {
+  border-color: rgba(67, 235, 166, .36);
+  border-left-color: #43eba6;
+  color: #c9ffe9;
+  background: rgba(67, 235, 166, .08);
 }
 
 #prwLoginButton {
@@ -328,6 +353,17 @@ body.auth-menu-open {
 
 #prwLoginButton:hover i {
   transform: translateX(4px);
+}
+
+#prwLoginButton:disabled {
+  filter: grayscale(.3);
+  cursor: wait;
+  opacity: .72;
+  transform: none;
+}
+
+#prwLoginButton.is-loading i {
+  animation: prw-auth-submit 700ms linear infinite;
 }
 
 .prw-auth-card__footer {
@@ -416,6 +452,10 @@ body[data-mode="light"] .prw-auth-card__description {
 
 @keyframes prw-auth-status {
   to { opacity: .55; transform: scale(.82); }
+}
+
+@keyframes prw-auth-submit {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 600px) {

@@ -6,17 +6,28 @@ const config = {
     password: process.env.DB_PASSWORD,
     server: process.env.DB_SERVER,
     database: process.env.DB_DATABASE,
-    port: Number(process.env.DB_PORT),
+    port: Number(process.env.DB_PORT) || 1433,
 
     options: {
         encrypt: true
     }
 };
 
-const poolPromise = sql.connect(config);
+let poolPromise;
+
+function getPool() {
+    if (!poolPromise) {
+        poolPromise = sql.connect(config).catch((error) => {
+            poolPromise = null;
+            throw error;
+        });
+    }
+
+    return poolPromise;
+}
 
 async function getHeroes() {
-    const pool = await poolPromise;
+    const pool = await getPool();
 
     const result = await pool.request().query(`
         select *
@@ -27,7 +38,7 @@ async function getHeroes() {
 }
 
 async function getHeroID(Hero) {
-    const pool = await poolPromise;
+    const pool = await getPool();
     
     const result = await pool.request()
     .input("hero", sql.VarChar, Hero)
@@ -39,10 +50,10 @@ async function getHeroID(Hero) {
 }
 
 async function getUsers(Username) {
-    const pool = await poolPromise;
+    const pool = await getPool();
 
     let request = pool.request();
-    let query = `select * from Users`;
+    let query = `select UserID, Username from Users`;
 
     if (Username !== undefined) {
         query += ` where Username = @username`;
@@ -55,19 +66,49 @@ async function getUsers(Username) {
 }
 
 async function addUser(Username, Password) {
-    const pool = await poolPromise;
+    const pool = await getPool();
 
     const result = await pool.request()
-        .input("username", sql.VarChar, Username)
-        .input("password", sql.VarChar, Password)
+        .input("username", sql.NVarChar(50), Username)
+        .input("password", sql.NVarChar(255), Password)
         .query(`
-            insert into Users (Username, Password) 
+            insert into Users (Username, Password)
+            output inserted.UserID, inserted.Username
             values (@username, @password)
             `);
+
+    return result.recordset[0];
+}
+
+async function getUserForAuth(Username) {
+    const pool = await getPool();
+
+    const result = await pool.request()
+        .input("username", sql.NVarChar(50), Username)
+        .query(`
+            select top 1 UserID, Username, Password
+            from Users
+            where Username = @username
+        `);
+
+    return result.recordset[0] || null;
+}
+
+async function updateUserPassword(Username, Password) {
+    const pool = await getPool();
+
+    await pool.request()
+        .input("username", sql.NVarChar(50), Username)
+        .input("password", sql.NVarChar(255), Password)
+        .query(`
+            update Users
+            set Password = @password
+            where Username = @username
+        `);
 }
 
 async function getUserID(Username) {
-    const pool = await poolPromise;
+    const pool = await getPool();
     
     const result = await pool.request()
     .input("username", sql.VarChar, Username)
@@ -79,7 +120,7 @@ async function getUserID(Username) {
 }
 
 async function getUsersHeroes() {
-    const pool = await poolPromise;
+    const pool = await getPool();
 
     const result = await pool.request().query(`
             select *
@@ -95,6 +136,8 @@ module.exports = {
     getHeroID,
     getUsers,
     addUser,
+    getUserForAuth,
+    updateUserPassword,
     getUserID,
     getUsersHeroes
 };

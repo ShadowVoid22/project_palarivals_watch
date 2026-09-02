@@ -66,6 +66,7 @@ const authModeCode = document.querySelector("#prwAuthModeCode");
 const authActionLabel = document.querySelector("#prwLoginButton span");
 const authCloseButtons = [...document.querySelectorAll("[data-auth-close]")];
 const usernameInput = document.querySelector("#prwUsernameInput");
+const passwordInput = document.querySelector("#prwPasswordInput");
 const arcadeButton = document.querySelector("#ArcadeButton");
 const arcadeMenu = document.querySelector("#ArcadeMenu");
 const arcadeCloseButtons = [...document.querySelectorAll("[data-arcade-close]")];
@@ -197,6 +198,7 @@ function openAuthMenu(mode, trigger) {
     : "Enter your credentials to reconnect with your PalaRivals Watch profile.";
   authModeCode.textContent = isSignup ? "SIGNUP // 02" : "LOGIN // 01";
   authActionLabel.textContent = isSignup ? "Create Account" : "Log In";
+  passwordInput?.setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
   loginPanel.hidden = false;
   loginPanel.setAttribute("aria-hidden", "false");
   body.classList.add("auth-menu-open");
@@ -598,6 +600,7 @@ function closeSuggestionMenu({ restoreFocus = true } = {}) {
 signupButton?.addEventListener("click", () => openAuthMenu("signup", signupButton));
 loginButton?.addEventListener("click", () => openAuthMenu("login", loginButton));
 authCloseButtons.forEach((closeButton) => closeButton.addEventListener("click", closeAuthMenu));
+document.addEventListener("prw:auth-success", () => window.setTimeout(closeAuthMenu, 650));
 arcadeButton?.addEventListener("click", () => openArcadeMenu(arcadeButton));
 arcadeCloseButtons.forEach((closeButton) => closeButton.addEventListener("click", closeArcadeMenu));
 changeLogButton?.addEventListener("click", () => openChangeLog(changeLogButton));
